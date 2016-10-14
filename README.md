@@ -19,14 +19,19 @@ using Docker for Mac, and built 100% with Alpine Linux.
     * Supervisor
 * [Documentation](#additional-documentation)
     * [Alpine Linux](#alpine-linux)
+* [Inspiration](#inspiration)
+* [TODO](#todo)
 
 ## Some Assembly Required
 
-To build the Docker images for entire stack at once:
+To build and run this project:
 
-1. Change directories to the project root;
-2. Reference all the relevant build files, and;
-3. Run the `build` command:
+1. Download the git repo
+    
+        git clone git@github.com:rallen-temp/localenv.git localenv
+        cd localenv
+
+2. Run the `build` command, referencing all the relevant build files:
 
         docker-compose \
         -f build/openresty/docker-compose.yml \
@@ -36,6 +41,18 @@ To build the Docker images for entire stack at once:
         -f build/drush/docker-compose.yml \
         -f build/xhprof/docker-compose.yml \
         build
+
+3. Start the all services described in `docker-compose.yml`:
+
+        docker-compose run -d
+
+4. Watch the output from all the containers as they run:
+        
+        docker-compose logs -f
+
+5. When you're done with it, clean it up:
+
+        docker-compose down
 
 ## Stack Components
 
@@ -388,7 +405,7 @@ Make sure xdebug.remote_connect_back is set equals zero.
 * [PHP-FPM entrypoint example](https://github.com/MetalGuardian/docker-php-fpm/blob/master/Dockerfile)
 * [General PHP-FPM + Nginx Dockerization Guide with GIFs](http://geekyplatypus.com/dockerise-your-php-application-with-nginx-and-php7-fpm)
 
-## Inspiration
+### Inspiration
 
 The Docker images in Docker Hub were a great inspiration when writing this stack, and a lot of the patterns utilized
 here where freely taken from there, with particular attention to the PHP, Composer, and OpenResty project images.
@@ -397,3 +414,7 @@ here where freely taken from there, with particular attention to the PHP, Compos
 - PHP-FPM (Alpine): https://github.com/docker-library/php/blob/1c56325a69718a3e3cf76179e75d070b7e23da62/5.6/alpine/Dockerfile
 - PHP-FPM: https://hub.docker.com/_/php/
 - Composer: https://hub.docker.com/r/composer/composer/
+
+### TO DO:
+
+- Provide an ez install script that builds and runs the images.
