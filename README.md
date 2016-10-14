@@ -1,40 +1,24 @@
 LOCALENV
 ========
 
-Local development environment using Docker and Alpine Linux.
+This a reference Docker Compose project for Drupal, running locally
+using Docker for Mac, and built 100% with Alpine Linux.
 
 ## Table of Contents
 
 * [Some Assembly Required](#some-assembly-required)
-* [Documentation](#documentation)
-
-## Documentation
-
-Docker Compose File
-https://docs.docker.com/compose/compose-file
-
-Docker Compose Command Line
-https://docs.docker.com/compose/reference/
-
-A good idea on how to use a entrypoint shell script:
-https://github.com/MetalGuardian/docker-php-fpm/blob/master/Dockerfile
-
-General PHP-FPM + Nginx Dockerization Guide with GIFs
-http://geekyplatypus.com/dockerise-your-php-application-with-nginx-and-php7-fpm/
-
-## Alpine Linux
-
-Alpine Linux is a Linux distribution built around musl libc and BusyBox. 
-The image is only 5 MB in size and has access to a package repository that is much more complete than other BusyBox 
-based images. This makes Alpine Linux a great image base for utilities and even production applications.
-
-The various versions of docker images are available here:
-
-https://hub.docker.com/_/alpine/
-
-Read more about Alpine here: https://www.alpinelinux.org/about/
-
-About the Alpine Docker image: http://gliderlabs.viewdocs.io/docker-alpine/
+* Stack Components
+    * [Composer](#composer)
+    * [Drush](#drush)
+    * [Memcached](#memcached)
+    * [MariaDB](#mariadb)
+    * [Nginx](#nginx)
+* [Advanced Usage](#advanced-usage)
+    * Docker Compose
+    * Docker CLI
+    * Supervisor
+* [Documentation](#additional-documentation)
+    * [Alpine Linux](#alpine-linux)
 
 ## Some Assembly Required
 
@@ -49,39 +33,136 @@ To build the Docker images for entire stack at once:
         -f build/mariadb/docker-compose.yml \
         -f build/php-fpm/docker-compose.yml \
         -f build/php-cli/docker-compose.yml \
-        -f build/php-cli/docker-compose.yml \
         -f build/drush/docker-compose.yml \
         -f build/xhprof/docker-compose.yml \
         build
 
-## Memcached
+## Stack Components
 
-Docs for running Memcached daemon: https://github.com/memcached/memcached/wiki/ConfiguringServer
+### Composer
 
-Help with the daemon: `memcached -h`, `man memcached`.
+The PHP-CLI image provides a container running the latest version of Composer,
+along with the Z Shell, Drupal Coder Sniffer, and other typical development
+dependencies for Drupal. By default this container is configured to be run
+interactively, as opposed as a binary. You can use this container to install
+additional Composer dependencies as well. The default login shell is ZSH.
 
-## XDebug Networking with Docker for Mac
+To run, use:
+    
+    docker-compose \
+    -f build/php-cli/docker-compose.yml \
+    run --rm php-cli
 
-In order for XDebug to work properly:
+### Drush
 
-1. You must create a host alias `sudo ifconfig lo0 alias 10.254.254.254`.
-2. You must tell XDebug to connect to this alias instead of the default Docker gateway address.
-3. **DO NOT ENABLE `xdebug.remote_connect_back`**. If this is enabled, XDebug ignores the remote host directive
-   (set to the host alias), and instead sees and attempts to use the Docker gateway address of `172.18.0.1` on Docker
-   Mac, resulting in **epic fail** as shown below:
-   
-        /tmp # cat xdebug.log
-        Log opened at 2016-10-09 22:25:56
-        I: Checking remote connect back address.
-        I: Checking header 'HTTP_X_FORWARDED_FOR'.
-        I: Checking header 'REMOTE_ADDR'.
-        I: Remote address found, connecting to 172.18.0.1:9000.
-        E: Could not connect to client. :-(
-        Log closed at 2016-10-09 22:25:56
+The two most currently used versions of Drush are supported in two different images.
 
-Make sure xdebug.remote_connect_back is set equals zero.
+The drush containers are meant to be run interactively as well.
 
-## Docker Compose
+To run the Drush 7 container, use:
+
+    docker-compose \
+    -f build/drush/docker-compose.yml \
+    run --rm drush-7
+    
+To run the Drush 8 container, use:
+
+    docker-compose \
+    -f build/drush/docker-compose.yml \
+    run --rm drush-8
+    
+The default interactive shell for the Drush containers is the Z shell.    
+
+### Memcached
+
+This stack is using the latest official Alpine Linux Memcached image available from Docker Hub.
+
+__Additional information:__ 
+
+- Running Memcached as a daemon: https://github.com/memcached/memcached/wiki/ConfiguringServer
+- Help with the daemon: `memcached -h`, `man memcached`.
+
+### MariaDB
+
+Using a custom version of the official MariaDB DockerHub image for MySQL.
+
+Documentation:
+
+- https://hub.docker.com/_/mariadb/
+- https://hub.docker.com/_/mysql/
+- https://mariadb.com/kb/en/mariadb/installing-and-using-mariadb-via-docker/
+
+Get you a fancy GUI client (on OS X, requires license):
+
+    brew cask install navicat-for-mysql
+    
+Open a CLI console to MySQL
+    
+    docker run -it --link mysql:mysql --rm mysql sh -c 'exec mysql -hmariadb-10.1 -P3306 -uroot -proot'
+    
+Get a list of all startup options
+
+    docker run -it --rm mariadb:10.1 --verbose --help
+    
+Check what are the available charsets
+    
+    root@mariadb-10:ls /usr/share/mysql/charsets/
+    Index.xml  armscii8.xml  cp1250.xml  cp1256.xml  cp850.xml  cp866.xml  geostd8.xml  hebrew.xml	keybcs2.xml  koi8u.xml	 latin2.xml  latin7.xml  macroman.xml
+    README	   ascii.xml	 cp1251.xml  cp1257.xml  cp852.xml  dec8.xml   greek.xml    hp8.xml	koi8r.xml    latin1.xml  latin5.xml  macce.xml	 swe7.xml    
+
+### Nginx
+
+For the reference web server, this stack uses a custom image with the OpenResty Nginx distribution.
+
+The custom image builds OpenResty from scratch to have full control of OpenResty's install location and configuration.
+
+The reason for OpenResty is that:
+
+- It provides easy support for environment variables out of the box; 
+- Baking in support for environment variables on the non-OpenResty Nginx is more involved;
+- The stock, official Nginx image available in Docker Hub does not come with environment variable support out of the box;
+- Environment variables are a must killer feature when using Docker, allowing certain parameters (such as the web root, or listening port)
+  to be configured at run time, as opposed to build time.
+
+The installation can be further customized by modifying the `Dockerfile` in the `build/openresty` directory.
+ 
+The default Nginx install location is set to the more familiar /etc/nginx (instad of OpenResty's default).
+
+The default web root in the nginx containers is `/var/www`, to which you are suggested to mount your own web root.
+
+This stack expects the user to instantiate a separate nginx container for each virtual host / code project the user is
+intends to run, as opposed to putting all virtual hosts inside a single container.
+
+As with the other services in this project, you must build the images yourself before referencing them in Docker Compose.
+
+This is an example Docker Compose implementation for this stack's nginx image:
+
+    version: '2'
+    services:
+      hello-there:
+        image: alexanderallen/openresty:latest
+        environment:
+          NGINX_VHOST_NAME: hello-world
+          NGINX_WEB_ROOT: /var/www/hello-world
+          NGINX_HTTP_LISTEN: 80
+          NGINX_PHPFPM_FASTCGI_PASS: phpservice:9010
+          # Can be debug | info | notice | warn | error | crit | alert | emerg.
+          NGINX_LOGLEVEL: crit
+        links:
+          - php-fpm:phpservice
+        ports:
+          - 80:80
+        volumes_from:
+          - php-fpm
+         
+At the moment this stack does not provide a default Nginx service implementation in the main `docker-compose.yml` file.
+Customize the example above to suit your needs, then add to `docker-compose.yml`.
+
+## Advanced Usage
+
+Intended for Docker Power Users
+
+### Docker Compose
 
 Bring it up
 
@@ -155,31 +236,16 @@ Stop a specific service
     -------------------------------------------------------------------
     localenv_base     ansible-playbook --connect ...   Exit 0
     localenv_phpfpm   /opt/localenv/shell/entryp ...   Exit 137
-    
-## Docker Compose Debugging
-    
-Provisioning manually (for troubleshooting Ansible playbook)
 
-    docker-compose run --entrypoint bash php-fpm
-    Starting localenv_base
-    root@341798fd2c4c:/# . /opt/localenv/shell/entrypoint.sh
 
-Provision manually a service
-
-* To see in real-time the output of the service.
-* To guess from the real-time output what is failing during service creation.
-
-    
-    docker-compose run nginx
-
-## Docker commands
+### Docker CLI Usage
 
 Save an image
 
     docker commit localenv_nginx_1
     sha256:272eb74b60edb7ecb87f0ccde57736b8f0397177096a8389c1211cfffe73eb32
 
-Login to a registry
+Login to a Docker image registry
 
     docker login --username foobar --password baz
     Login Succeeded
@@ -192,8 +258,7 @@ NUKE ABSOLUTELY EVERYTHING
 
     docker rmi -f $(docker images -q)
     
-
-## Docker Networking
+__Docker Networking__
 
 Check container route
 
@@ -206,40 +271,9 @@ Check container route
 
 Check open ports within container
 
-netstat -lnp | grep 1234
+    netstat -lnp | grep 1234
 
-# Supervisor Log redirection
-
-http://veithen.github.io/2015/01/08/supervisord-redirecting-stdout.html
-
-# Working with supervisor
-
-At any time you can run the `supervisorctl` command to bring up supervisor's console.
-To see what commands you have available, type `help` in the console.
-The example below restarts Nginx using the supervisor prompt:
-
-    root@6530be0aa3d7: supervisorctl
-    nginx                            RUNNING   pid 9, uptime 0:27:54
-    supervisor> help
-    
-    default commands (type help <topic>):
-    =====================================
-    add    exit      open  reload  restart   start   tail
-    avail  fg        pid   remove  shutdown  status  update
-    clear  maintail  quit  reread  signal    stop    version
-    
-    supervisor> reload nginx
-    Really restart the remote supervisord process y/N? y
-    Restarted supervisord
-    supervisor> status
-    nginx                            RUNNING   pid 42, uptime 0:00:03
-
-
-## Manually restart a process
-
-    root@b5feaeb8eabb:/# supervisorctl start dbgp-proxy
-
-## Tagging, Pulling, Repositories
+__Tagging, Pulling, Repositories__
 
 Tag an image
 
@@ -268,37 +302,89 @@ Tag an image
     c6f2b330b60c: Mounted from library/ubuntu
     c8a75145fcc4: Mounted from library/ubuntu
     
+### Supervisor
 
-## MariaDB
+__More information__:
 
-Documentation:
+* Supervisor Log redirection: http://veithen.github.io/2015/01/08/supervisord-redirecting-stdout.html
 
-- https://hub.docker.com/_/mariadb/
-- https://hub.docker.com/_/mysql/
-- https://mariadb.com/kb/en/mariadb/installing-and-using-mariadb-via-docker/
+__Working with supervisor__
 
-Fancy GUI client
+At any time you can run the `supervisorctl` command to bring up supervisor's console.
+To see what commands you have available, type `help` in the console.
+The example below restarts Nginx using the supervisor prompt:
 
-    brew cask install navicat-for-mysql
+    root@6530be0aa3d7: supervisorctl
+    nginx                            RUNNING   pid 9, uptime 0:27:54
+    supervisor> help
     
-Connect to MySQL using Docker
+    default commands (type help <topic>):
+    =====================================
+    add    exit      open  reload  restart   start   tail
+    avail  fg        pid   remove  shutdown  status  update
+    clear  maintail  quit  reread  signal    stop    version
     
-    docker run -it --link mysql:mysql --rm mysql sh -c 'exec mysql -hmariadb-10.1 -P3306 -uroot -proot
-    
-Get a list of all startup options
+    supervisor> reload nginx
+    Really restart the remote supervisord process y/N? y
+    Restarted supervisord
+    supervisor> status
+    nginx                            RUNNING   pid 42, uptime 0:00:03
 
-    docker run -it --rm mariadb:10.1 --verbose --help
-    
-Check what are the available charsets
-    
-    root@mariadb-10:ls /usr/share/mysql/charsets/
-    Index.xml  armscii8.xml  cp1250.xml  cp1256.xml  cp850.xml  cp866.xml  geostd8.xml  hebrew.xml	keybcs2.xml  koi8u.xml	 latin2.xml  latin7.xml  macroman.xml
-    README	   ascii.xml	 cp1251.xml  cp1257.xml  cp852.xml  dec8.xml   greek.xml    hp8.xml	koi8r.xml    latin1.xml  latin5.xml  macce.xml	 swe7.xml    
 
-## Composer
+__Manually restart a process__
 
-    docker-compose run --rm composer [command] [options] [arguments]
+    root@b5feaeb8eabb:/# supervisorctl start dbgp-proxy    
 
-## Drush
+### Alpine Linux
 
-    docker-compose run --rm drush [drush command]
+Alpine Linux is a Linux distribution built around musl libc and BusyBox. 
+The image is only 5 MB in size and has access to a package repository that is much more complete than other BusyBox 
+based images. This makes Alpine Linux a great image base for utilities and even production applications.
+
+More information:
+The various versions of docker images are available here:
+
+* [Alpine Linux Images](https://hub.docker.com/_/alpine/)
+* [About Alpine Linux (in general)](https://www.alpinelinux.org/about/)
+* [Alpine Docker Image](http://gliderlabs.viewdocs.io/docker-alpine/)
+
+
+## Use Cases
+
+__XDebug Networking with Docker for Mac__
+
+In order for XDebug to work properly:
+
+1. You must create a host alias `sudo ifconfig lo0 alias 10.254.254.254`.
+2. You must tell XDebug to connect to this alias instead of the default Docker gateway address.
+3. **DO NOT ENABLE `xdebug.remote_connect_back`**. If this is enabled, XDebug ignores the remote host directive
+   (set to the host alias), and instead sees and attempts to use the Docker gateway address of `172.18.0.1` on Docker
+   Mac, resulting in **epic fail** as shown below:
+   
+        /tmp # cat xdebug.log
+        Log opened at 2016-10-09 22:25:56
+        I: Checking remote connect back address.
+        I: Checking header 'HTTP_X_FORWARDED_FOR'.
+        I: Checking header 'REMOTE_ADDR'.
+        I: Remote address found, connecting to 172.18.0.1:9000.
+        E: Could not connect to client. :-(
+        Log closed at 2016-10-09 22:25:56
+
+Make sure xdebug.remote_connect_back is set equals zero.
+
+## Additional Documentation
+
+* [Docker Compose File](https://docs.docker.com/compose/compose-file)
+* [Docker CLI](https://docs.docker.com/compose/reference/)
+* [PHP-FPM entrypoint example](https://github.com/MetalGuardian/docker-php-fpm/blob/master/Dockerfile)
+* [General PHP-FPM + Nginx Dockerization Guide with GIFs](http://geekyplatypus.com/dockerise-your-php-application-with-nginx-and-php7-fpm)
+
+## Inspiration
+
+The Docker images in Docker Hub were a great inspiration when writing this stack, and a lot of the patterns utilized
+here where freely taken from there, with particular attention to the PHP, Composer, and OpenResty project images.
+
+- OpenResty: https://hub.docker.com/r/openresty/openresty/
+- PHP-FPM (Alpine): https://github.com/docker-library/php/blob/1c56325a69718a3e3cf76179e75d070b7e23da62/5.6/alpine/Dockerfile
+- PHP-FPM: https://hub.docker.com/_/php/
+- Composer: https://hub.docker.com/r/composer/composer/
