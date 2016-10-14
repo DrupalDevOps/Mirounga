@@ -116,12 +116,12 @@ For the reference web server, this stack uses a custom image with the OpenResty 
 
 The custom image builds OpenResty from scratch to have full control of OpenResty's install location and configuration.
 
-The reason for OpenResty is that:
+The reason for using OpenResty is that:
 
 - It provides easy support for environment variables out of the box; 
-- Baking in support for environment variables on the non-OpenResty Nginx is more involved;
-- The stock, official Nginx image available in Docker Hub does not come with environment variable support out of the box;
-- Environment variables are a must killer feature when using Docker, allowing certain parameters (such as the web root, or listening port)
+- Baking in support for environment variables on the non-OpenResty Nginx distribution is more involved;
+- Nginx does not come with support for environment variables out of the box;
+- Environment variables are almost a "must have" feature when using Docker, allowing certain parameters (such as the web root, or listening port);
   to be configured at run time, as opposed to build time.
 
 The installation can be further customized by modifying the `Dockerfile` in the `build/openresty` directory.
@@ -337,6 +337,16 @@ __Manually restart a process__
 
 ### Alpine Linux
 
+The main reason for using Alpine Linux is that even for large images with many dependencies, such as when configuring
+PHP-FPM for usage with Drupal, the image size is relatively small compared to the more popular Ubuntu variants.
+
+For example, using Ubuntu as the base operating system, the PHP-FPM image in this stack would weight an average of
+800MB after everything is installed.
+By contrast, the current PHP-FPM image for this stack comes in at around 200MB.
+
+When all components of the Docker stack are taken into consideration, the hard drive footprint of Alpine Linux is
+much smaller than Ubuntu, and orders of magnitude greater when compared to a traditional Vagrant-based virtual machine.
+
 Alpine Linux is a Linux distribution built around musl libc and BusyBox. 
 The image is only 5 MB in size and has access to a package repository that is much more complete than other BusyBox 
 based images. This makes Alpine Linux a great image base for utilities and even production applications.
@@ -347,7 +357,6 @@ The various versions of docker images are available here:
 * [Alpine Linux Images](https://hub.docker.com/_/alpine/)
 * [About Alpine Linux (in general)](https://www.alpinelinux.org/about/)
 * [Alpine Docker Image](http://gliderlabs.viewdocs.io/docker-alpine/)
-
 
 ## Use Cases
 
