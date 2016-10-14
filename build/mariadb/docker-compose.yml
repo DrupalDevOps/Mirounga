@@ -1,0 +1,34 @@
+version: '2'
+services:
+
+  mysql:
+    hostname: mysql
+    image: alexanderallen/mariadb:10.1
+    environment:
+      # Allow password-less root login.
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      # Create default database and user.
+      MYSQL_DATABASE: docker
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+    expose:
+      - 3306
+    ports:
+      - 3306:3306
+    volumes:
+      - ./initdb.d:/docker-entrypoint-initdb.d
+    entrypoint:
+      - docker-entrypoint.sh
+      - mysqld
+    command:
+      - --log-error=/dev/stderr
+      - --log-output=FILE
+      # Whether to log all queries or not.
+      # Enabling the general log will slow down things.
+      #- --general-log-file=/dev/stdout
+      #- --general-log=ON
+      # Setup slow query log.
+      - --slow-query-log-file=/dev/stderr
+      - --slow-query-log=ON
+      - --log-queries-not-using-indexes=ON
+      - --long_query_time=5

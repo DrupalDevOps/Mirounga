@@ -1,0 +1,12 @@
+.idea/
+.vagrant/
+docroot/*
+.env_*
+database_backups/*
+.tmp
+hosts.dpkg-new
+ansible.cfg.dpkg-dist
+playbook.retry
+hosts.dpkg-dist
+*.sql
+tmp

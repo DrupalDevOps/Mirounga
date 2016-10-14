@@ -1,0 +1,15 @@
+version: '2'
+services:
+
+  # Provides GUI component for XHProf.
+  xhprof:
+    image: alexanderallen/xhprof
+    environment:
+      NGINX_PHPFPM_FASTCGI_PASS: phpservice:9010
+    links:
+      - php-fpm:phpservice
+    ports:
+      - 8080:80
+    volumes:
+      # Display XHProf output from other containers.
+      - ~/Sites/xhprof_run:/var/tmp/xhprof

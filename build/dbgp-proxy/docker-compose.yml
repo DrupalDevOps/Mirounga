@@ -1,0 +1,36 @@
+version: '2'
+services:
+  php-fpm:
+    build:
+      args:
+        # https://derickrethans.nl/debugging-with-multiple-users.html
+        #
+        # In order to make things work for multiple developers and one source base, you set Xdebug's xdebug.remote_host
+        # setting to the machine on which the DBGp proxy runs.
+        #
+        # This is most likely going to be on the same machine that acts as development server ...
+        #
+        # You have to configure Xdebug's xdebug.remote_host setting to the IP address of the machine that the proxy runs
+        # at.
+        #
+        # Selects the host where the debug client is running, you can either use a host name or an IP address.
+        # This setting is ignored if xdebug.remote_connect_back is enabled.
+        XDEBUG_REMOTE_HOST: dbgp-proxy
+    links:
+      # Listen to requests from DBGp proxy for XDebug.
+      - dbgp-proxy:dbgp-proxy
+
+  dbgp-proxy:
+    hostname: dbgp-proxy
+    command: /usr/bin/supervisord
+    build:
+      context: .
+      dockerfile: provisioners/docker/dbgp-proxy/Dockerfile
+      args:
+        # Where the IDE is listening.
+        DBGP_IDE_PORT: 0.0.0.0:9001
+        # Accept requests from anybody on this port. The PHP container will try to reach us here.
+        DBGP_DEBUG_LISTEN: 0.0.0.0:9000
+    ports:
+      # Listen to IDE requests sent to port 9001.
+      - 9001:9001

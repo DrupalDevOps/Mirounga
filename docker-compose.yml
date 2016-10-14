@@ -1,0 +1,92 @@
+version: '2'
+services:
+
+  mysql:
+    hostname: mysql
+    image: alexanderallen/mariadb:10.1
+    environment:
+      # Allow password-less root login.
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      # Create default database and user.
+      MYSQL_DATABASE: docker
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+    expose:
+      - 3306
+    ports:
+      - 3306:3306
+    volumes:
+      - ./build/mariadb/initdb.d:/docker-entrypoint-initdb.d
+    entrypoint:
+      - docker-entrypoint.sh
+      - mysqld
+    command:
+      - --log-error=/dev/stderr
+      - --log-output=FILE
+      # Whether to log all queries or not.
+      # Enabling the general log will slow down things.
+      #- --general-log-file=/dev/stdout
+      #- --general-log=ON
+      # Setup slow query log.
+      - --slow-query-log-file=/dev/stderr
+      - --slow-query-log=ON
+      - --log-queries-not-using-indexes=ON
+      - --long_query_time=5
+
+  memcached:
+    image: memcached:1.4.31-alpine
+    command: -p 11211 -m 16 -vvv -M
+    expose:
+      - 11211
+
+  php-fpm:
+    image: alexanderallen/php-fpm:latest
+    environment:
+      PHP_INI_MAX_EXECUTION_TIME: 0 # Set to 0 for unlimited.
+      PHP_INI_MEM_LIMIT: 256M # The default memory limit is 128M.
+      # PHP_FPM_LISTEN: 127.0.0.1:9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
+      PHP_FPM_LISTEN: 9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
+      PHP_FPM_WORKER_LOGOUTPUT: 1
+      XDEBUG_REMOTE_PORT: 9000
+      XDEBUG_IDE_KEY: 'PHPSTORM'
+      XDEBUG_CONNECT_BACK: 0 # Must be disabled in order for remote_host to work.
+      XDEBUG_REMOTE_HOST: 10.254.254.254 # Docker for Mac host alias: use it instead of the default gateway 172.18.0.1.
+    expose:
+      - 9010 # Expose PHP-FPM port to Nginx.
+    links:
+      - mysql:mysql
+      - memcached:memcached
+    volumes:
+      - ~/Sites:/www
+      - ~/Sites/xhprof_run:/var/tmp/xhprof
+
+  drush:
+    image: alexanderallen/drush:7.x
+    environment:
+      XDEBUG_SHOW_EXCEPTION_TRACE: 0
+      ## Set these two variables to debug w/ PHPStorm and XDebug.
+      # PHP_IDE_CONFIG: "serverName=docker"
+      # XDEBUG_CONFIG: "idekey=COMPOSER"
+    links:
+      - mysql:mysql
+      - memcached:memcached
+    volumes:
+      - ~/.ssh:/root/.ssh
+      - ~/.composer:/composer
+      - ~/Sites:/www
+      - ~/.drush:/root/.drush
+      - ~/Sites/xhprof_run:/var/tmp/xhprof
+
+  # XHProf has two components: a PHP-module component, and a web browser compoment.
+  # This container provides the web component.
+  xhprof:
+    image: alexanderallen/xhprof
+    environment:
+      NGINX_PHPFPM_FASTCGI_PASS: phpservice:9010
+    links:
+      - php-fpm:phpservice
+    ports:
+      - 8080:80
+    volumes:
+      # Display XHProf output from other containers.
+      - ~/Sites/xhprof_run:/var/tmp/xhprof

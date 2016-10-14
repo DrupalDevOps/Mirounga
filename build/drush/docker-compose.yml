@@ -1,0 +1,40 @@
+version: '2'
+services:
+
+  # To copy the contents of /composer to the host for debugging, use docker cp.
+  # http://stackoverflow.com/a/36246479
+  # Example:
+  #   docker-compose -f php-cli.yml run drush-7
+  #   exit
+  #   docker ps -a | head
+  #   docker cp localenv_drush-7_run_5:/composer ~/.composer
+  # or, if you have a host mount at like ~/.composer:/composer_host
+  #   docker-compose -f php-cli.yml run drush-7
+  #   rm -rf /composer_host/*
+  #   cp -rf /composer/ /composer_host/
+
+  # Just runs composer require drush on top of php-cli image.
+  # Also makes drush the entrypoint.
+  drush-7:
+    image: alexanderallen/drush:7.x
+    build:
+      args:
+        DRUSH_VERSION: 7.4.0
+        COMPOSER_GLOBAL: 1
+    volumes:
+      - ~/.composer:/composer_host
+      - ~/.drush:/root/.drush
+    depends_on:
+      - php-cli
+
+  drush-8:
+    image: alexanderallen/drush:8.x
+    build:
+      args:
+        DRUSH_VERSION: 8.1.5
+        DRUSH_ALIAS: drush8
+    volumes:
+      - ~/.drush:/root/.drush
+      - ~/Sites:/www
+    depends_on:
+      - php-cli

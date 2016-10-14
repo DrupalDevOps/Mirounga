@@ -1,0 +1,41 @@
+version: '2'
+services:
+
+  # To copy the contents of /composer to the host for debugging, use docker cp.
+  # http://stackoverflow.com/a/36246479
+  # Example:
+  #   docker-compose -f php-cli.yml run drush-7
+  #   exit
+  #   docker ps -a | head
+  #   docker cp localenv_drush-7_run_5:/composer ~/.composer
+  # or, if you have a host mount at like ~/.composer:/composer_host
+  #   docker-compose -f php-cli.yml run drush-7
+  #   rm -rf /composer_host/*
+  #   cp -rf /composer/ /composer_host/
+
+  # CREDITS:
+  #
+  # Custom Composer image inspired by
+  # - https://github.com/RobLoach/docker-composer
+  # - https://hub.docker.com/r/composer/composer/~/dockerfile/
+
+  # Adds Composer to our custom php-fpm image.
+  # - Does not start the php-fpm service.
+  # - Makes Composer the entrypoint instead of supervisor.
+  php-cli:
+    image: alexanderallen/php-cli
+    environment:
+      COMPOSER_VERSION: master
+    volumes:
+      - ~/Sites:/www
+
+#  Example on how to create a Composer container on the main compose file.
+#  composer:
+#    image: alexanderallen/php-cli
+#    links:
+#      - mysql:mysql
+#      - memcached:memcached
+#    volumes:
+#      - ~/.ssh:/root/.ssh
+#      - ~/.composer:/composer
+#      - ~/Sites:/www

@@ -1,0 +1,9 @@
+version: '2'
+services:
+  openresty:
+    cpuset: 2,3
+    image: alexanderallen/openresty:latest
+    build:
+      args:
+        RESTY_VERSION: 1.11.2.1
+        RESTY_J: 2

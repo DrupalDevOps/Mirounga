@@ -1,0 +1,17 @@
+{
+  "require-dev": {
+    "phing/phing": "2.16.x-dev"
+  },
+  "require": {
+    "drupal/coder": "*",
+    "phpunit/phpunit": "~4.0",
+    "pear/versioncontrol_git": "@dev",
+    "pdepend/pdepend": "2.x",
+    "squizlabs/php_codesniffer": "2.7.0",
+    "phpmd/phpmd": "~2.2",
+    "phploc/phploc": "~2.0.6",
+    "symfony/yaml": "~2.7",
+    "pear/net_growl": "dev-trunk",
+    "pear/pear-core-minimal": "1.10.1"
+  }
+}
