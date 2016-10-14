@@ -302,12 +302,3 @@ Check what are the available charsets
 ## Drush
 
     docker-compose run --rm drush [drush command]
-
-## DBGp Proxy
-
-Due to limitations in Docker for Mac, the DBGp service is not enabled by default. To enable it, use the compose file 
-extension syntax: 
-
-    docker-compose -f docker-compose.yml -f docker-compose.dbgp.yml up -d
-
-This will route XDebug communication through the DBGp proxy container. 
