@@ -4,6 +4,7 @@ services:
   mysql:
     hostname: mysql
     image: alexanderallen/mariadb:10.1
+    build: .
     environment:
       # Allow password-less root login.
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'

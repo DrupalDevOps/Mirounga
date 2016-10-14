@@ -24,6 +24,7 @@ services:
   # - Makes Composer the entrypoint instead of supervisor.
   php-cli:
     image: alexanderallen/php-cli
+    build: .
     environment:
       COMPOSER_VERSION: master
     volumes:

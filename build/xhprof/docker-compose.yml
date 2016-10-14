@@ -4,6 +4,7 @@ services:
   # Provides GUI component for XHProf.
   xhprof:
     image: alexanderallen/xhprof
+    build: .
     environment:
       NGINX_PHPFPM_FASTCGI_PASS: phpservice:9010
     links:
