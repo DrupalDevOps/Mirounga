@@ -5,6 +5,7 @@ Local development environment using Docker and Alpine Linux.
 
 ## Table of Contents
 
+* [Some Assembly Required](#some-assembly-required)
 * [Documentation](#documentation)
 
 ## Documentation
@@ -34,6 +35,24 @@ https://hub.docker.com/_/alpine/
 Read more about Alpine here: https://www.alpinelinux.org/about/
 
 About the Alpine Docker image: http://gliderlabs.viewdocs.io/docker-alpine/
+
+## Some Assembly Required
+
+To build the Docker images for entire stack at once:
+
+1. Change directories to the project root;
+2. Reference all the relevant build files, and;
+3. Run the `build` command:
+
+        docker-compose \
+        -f build/openresty/docker-compose.yml \
+        -f build/mariadb/docker-compose.yml \
+        -f build/php-fpm/docker-compose.yml \
+        -f build/php-cli/docker-compose.yml \
+        -f build/php-cli/docker-compose.yml \
+        -f build/drush/docker-compose.yml \
+        -f build/xhprof/docker-compose.yml \
+        build
 
 ## Memcached
 
