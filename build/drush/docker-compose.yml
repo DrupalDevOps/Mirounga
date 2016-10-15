@@ -25,8 +25,6 @@ services:
     volumes:
       - ~/.composer:/composer_host
       - ~/.drush:/root/.drush
-    depends_on:
-      - php-cli
 
   drush-8:
     image: alexanderallen/drush:8.x
@@ -38,5 +36,3 @@ services:
     volumes:
       - ~/.drush:/root/.drush
       - ~/Sites:/www
-    depends_on:
-      - php-cli
