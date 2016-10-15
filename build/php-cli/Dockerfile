@@ -30,7 +30,7 @@ RUN \
 # Since the more efficient method of agent-forwarding is not supported on all
 # Docker environments, start an ssh-agent and add a key.
 # Required for Composer repos that need SSH instead of HTTPS.
-COPY provisioners/docker/php-cli/.bashrc /root/.bashrc
+COPY .bashrc /root/.bashrc
 
 # Where all of our codebase is mounted to.
 WORKDIR /www
