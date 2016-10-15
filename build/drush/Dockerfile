@@ -10,7 +10,6 @@ ENV \
     DRUSH_ALIAS=${DRUSH_ALIAS} \
     INSTALL_PATH=${INSTALL_PATH}
 
-SHELL ["/bin/bash", "-c"]
 RUN if [ "$COMPOSER_GLOBAL" = 1 ]; then \
         composer global require drush/drush:${DRUSH_VERSION}; \
     else \
