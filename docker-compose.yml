@@ -83,6 +83,7 @@ services:
     image: alexanderallen/xhprof
     environment:
       NGINX_PHPFPM_FASTCGI_PASS: phpservice:9010
+      NGINX_HTTP_LISTEN: 80
     links:
       - php-fpm:phpservice
     ports:
