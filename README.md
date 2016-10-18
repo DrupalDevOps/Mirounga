@@ -503,7 +503,9 @@ here where freely taken from there, with particular attention to the PHP, Compos
 
 ### TO DO:
 
-- Provide an ez install script that builds and runs the images.
+- Create example website project on Github (vanilla Drupal 7), and show how to integrate it with ascii cinema.
+- Implement XHGUI interface for XHProf: https://inviqa.com/blog/profiling-xhgui
+- Provide an ez install script that builds and runs the images (done, working, verify)
 - images and ascii examples in readme
 - Ready-to-use Drupal example site, 
 - Examples for other PHP frameworks
