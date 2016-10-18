@@ -11,7 +11,7 @@ services:
   # or, if you have a host mount at like ~/.composer:/composer_host
   #   docker-compose -f php-cli.yml run drush-7
   #   rm -rf /composer_host/*
-  #   cp -rf /composer/ /composer_host/
+  #   cp -rvf /composer/* /composer_host
 
   # Just runs composer require drush on top of php-cli image.
   # Also makes drush the entrypoint.
@@ -23,8 +23,12 @@ services:
         DRUSH_VERSION: 7.4.0
         COMPOSER_GLOBAL: 1
     volumes:
-      - ~/.composer:/composer_host
       - ~/.drush:/root/.drush
+
+      # To copy the build results from the image to the host, mount this volume.
+      # - ~/.composer:/composer_host
+      # To mount the local composer install into the container, mount this volume.
+      - ~/.composer:/composer
 
   drush-8:
     image: alexanderallen/drush:8.x
