@@ -13,6 +13,12 @@ using Docker for Mac, and built 100% with Alpine Linux.
     * [Memcached](#memcached)
     * [MariaDB](#mariadb)
     * [Nginx](#nginx)
+* [XDebug](#xdebug)
+    * [Web Server Debugging](#xdebug-web-server)
+    * [CLI Debugging](#xdebug-cli)
+* [XHProf](#xhprof)
+    * Introduction / Implementation
+    * Example
 * [Advanced Usage](#advanced-usage)
     * Docker Compose
     * Docker CLI
@@ -20,7 +26,7 @@ using Docker for Mac, and built 100% with Alpine Linux.
 * [Documentation](#additional-documentation)
     * [Alpine Linux](#alpine-linux)
 * [Inspiration](#inspiration)
-* [TODO](#todo)
+* [TODO](#to-do)
 
 ## Some Assembly Required
 
@@ -174,6 +180,66 @@ This is an example Docker Compose implementation for this stack's nginx image:
          
 At the moment this stack does not provide a default Nginx service implementation in the main `docker-compose.yml` file.
 Customize the example above to suit your needs, then add to `docker-compose.yml`.
+
+## XDebug
+
+This stack provides full XDebug support and integration out of the box.
+
+XDebug provides two major components: 
+
+- Web Debugging: where you debug a web page that you are viewing in your browser, and;
+- CLI Debugging: there is no web browser involved at all, you are debugging a command-line based script such
+as Drush or Composer.
+
+### Web Server Debugging
+
+Stb.
+
+### CLI Debugging
+
+All the PHP CLI services in this stack use the custom `build/php-fpm/Dockerfile` image
+as a base image, which comes with XDebug installed. Therefore the services defined in the
+following images support XDebug out of the box:
+
+- Composer / CLI Tools services: `build/php-cli/Dockerfile`
+- Drush services: `build/drush/Dockerfile`
+
+Activating XDebug for the command line is a matter of enabling these two environment variables in
+whatever docker-compose.yml file you are using:
+
+    PHP_IDE_CONFIG: "serverName=docker"
+    XDEBUG_CONFIG: "idekey=COMPOSER"
+      
+Example Docker Compose definition for drush service, with CLI debugging enabled by default: 
+      
+      drush:
+        image: alexanderallen/drush:7.x
+        environment:
+          XDEBUG_SHOW_EXCEPTION_TRACE: 0
+          ## Set these two variables to debug w/ PHPStorm and XDebug.
+          PHP_IDE_CONFIG: "serverName=docker"
+          XDEBUG_CONFIG: "idekey=COMPOSER"
+        links:
+          - mysql:mysql
+          - memcached:memcached
+        volumes:
+          - ~/Sites:/www
+
+Note that this will cause the debugger to try to initiate a connection to your IDE for every command run
+in that drush service.
+
+As an alternative, you can instruct PHP to attempt to contact the IDE "on-demand" by setting the same envrionment
+variables manually.
+
+    Stubs.
+
+## XHProf
+    
+This stack provides full XHProf support.
+XHProf is run as it's own separate container on top of the Nginx image.
+
+Stub: What is XHProf.
+Stub: How to use XHProf.
 
 ## Advanced Usage
 
@@ -418,3 +484,10 @@ here where freely taken from there, with particular attention to the PHP, Compos
 ### TO DO:
 
 - Provide an ez install script that builds and runs the images.
+- images and ascii examples in readme
+- Ready-to-use Drupal example site, 
+- Examples for other PHP frameworks
+- Example for Drupal 8.
+- Example on how to profile Drush using XHProf
+- Provide binary "linting" container for phpcs, phpmd, for use with PHPStorm.
+
