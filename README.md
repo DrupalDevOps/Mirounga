@@ -30,7 +30,9 @@ using Docker for Mac, and built 100% with Alpine Linux.
 
 ## Some Assembly Required
 
-To build and run this project:
+__To build and run this project__:
+
+(Not very useful by itself, since the default docker-compose.yml does not set up an example web site).
 
 1. Download the git repo
     
@@ -59,6 +61,24 @@ To build and run this project:
 5. When you're done with it, clean it up:
 
         docker-compose down
+        
+__Adding your own website__
+        
+Substitute step #3 above with:
+
+    cd localenv
+    docker-compose -f ../my-awesome-sauce-site/docker-compose.yml -f docker-compose.yml up -d
+    docker-compose -f ../my-awesome-sauce-site/docker-compose.yml -f docker-compose.yml ps
+    docker-compose -f ../my-awesome-sauce-site/docker-compose.yml -f docker-compose.yml logs -f
+    ...
+    docker-compose -f ../my-awesome-sauce-site/docker-compose.yml -f docker-compose.yml down
+    
+An example in action:
+
+An example of running the stack, entering a drush container, getting the drush version, then initiating a
+CLI debugging session.
+
+[![asciicast](https://asciinema.org/a/89661.png)](https://asciinema.org/a/89661)
 
 ## Stack Components
 
