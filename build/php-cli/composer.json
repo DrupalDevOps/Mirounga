@@ -12,6 +12,7 @@
     "phploc/phploc": "~2.0.6",
     "symfony/yaml": "~2.7",
     "pear/net_growl": "dev-trunk",
-    "pear/pear-core-minimal": "1.10.1"
+    "pear/pear-core-minimal": "1.10.1",
+    "rallen-temp/xhprof-helper": "dev-master"
   }
 }
