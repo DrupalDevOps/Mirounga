@@ -22,4 +22,4 @@ RUN if [ "$COMPOSER_GLOBAL" = 1 ]; then \
 ENV PATH ${INSTALL_PATH}/${DRUSH_ALIAS}/vendor/bin:$PATH
 
 # Intend for the container to be used interactively instead of for one-off commands.
-ENTRYPOINT ["/bin/zsh", "--interactive"]
+# ENTRYPOINT ["/bin/zsh", "--interactive"]
