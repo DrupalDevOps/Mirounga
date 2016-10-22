@@ -61,7 +61,7 @@ services:
       - ~/Sites/xhprof_run:/var/tmp/xhprof
 
   drush:
-    image: alexanderallen/drush:7.x
+    image: alexanderallen/drush:8.x
     environment:
       XDEBUG_SHOW_EXCEPTION_TRACE: 0
       ## Set these two variables to debug w/ PHPStorm and XDebug.
@@ -76,6 +76,7 @@ services:
       - ~/Sites:/www
       - ~/.drush:/root/.drush
       - ~/Sites/xhprof_run:/var/tmp/xhprof
+      - ~/.acquia:/root/.acquia
 
   # XHProf has two components: a PHP-module component, and a web browser compoment.
   # This container provides the web component.
