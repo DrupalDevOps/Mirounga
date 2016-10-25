@@ -72,7 +72,6 @@ services:
       - memcached:memcached
     volumes:
       - ~/.ssh:/root/.ssh
-      - ~/.composer:/composer
       - ~/Sites:/www
       - ~/.drush:/root/.drush
       - ~/Sites/xhprof_run:/var/tmp/xhprof
