@@ -16,7 +16,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - ./build/mariadb/initdb.d:/docker-entrypoint-initdb.d
+      - /tmp/mariadb/initdb.d:/docker-entrypoint-initdb.d
     entrypoint:
       - docker-entrypoint.sh
       - mysqld
