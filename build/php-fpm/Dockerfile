@@ -1,6 +1,6 @@
 # From https://hub.docker.com/_/php/.
 
-FROM alpine:3.4
+FROM alpine:3.11
 
 LABEL InitialReleaseDate="First released on Oct 14, 2016."
 LABEL RELEASEDATE="20191222"
