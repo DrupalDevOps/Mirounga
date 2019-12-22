@@ -3,12 +3,16 @@ PHP-FPM
 
 ## Building
 
-docker-compose -f php-fpm.yml build
+From project root, run:
+
+    docker-compose -f build/php-fpm/docker-compose.yml build
 
 ## Testing
 
-    docker-compose -f php-fpm.yml up -d php-fpm
-    docker-compose -f php-fpm.yml exec --index=1 php-fpm sh
+From project root, run:
+
+    docker-compose -f build/php-fpm/docker-compose.yml run --entrypoint=sh --rm php-fpm
+
     / # php --version
     PHP 5.6.26 (cli) (built: Sep 23 2016 14:47:01)
     Copyright (c) 1997-2016 The PHP Group
