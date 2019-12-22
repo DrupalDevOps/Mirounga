@@ -79,7 +79,7 @@ RUN \
         ${PHP_VERSION}-pecl-xhprof \
         ${PHP_VERSION}-pecl-xhprof-assets \
         zlib \
-        supervisor \
+        su-exec \
     # && apk add --no-cache --virtual .xhprof-deps \
     #     graphviz \
     #     fontconfig \
@@ -121,7 +121,4 @@ COPY xdebug.ini /etc/${PHP_VERSION}/conf.d/20-xdebug.ini
 # Configure XHProf.
 # COPY xhprof.ini /etc/${PHP_VERSION}/conf.d/20-xhprof.ini
 
-# Configure Supervisor.
-COPY supervisord.conf /etc/supervisor.d/php-fpm.ini
-
-ENTRYPOINT ["/usr/bin/supervisord", "--nodaemon", "--configuration", "/etc/supervisord.conf"]
+ENTRYPOINT ["su-exec", "nobody", "/usr/sbin/php-fpm7", "--nodaemonize", "--force-stderr"]
