@@ -2,9 +2,11 @@
 
 FROM alpine:3.4
 
-MAINTAINER Richard Alexander Allen <richard.alexander.allen@gmail.com>
+LABEL InitialReleaseDate="First released on Oct 14, 2016."
+LABEL RELEASEDATE="20191222"
+LABEL MAINTAINER="14018885+AlexanderAllen@users.noreply.github.com"
 
-ARG XDEBUG_RELEASE='XDEBUG_2_4_1'
+ARG XDEBUG_RELEASE='2.9.0'
 
 ENV \
     PHP_INI_MAX_EXECUTION_TIME=30 \
