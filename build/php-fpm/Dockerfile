@@ -39,45 +39,45 @@ ENV BUILD_DEPS \
         pkgconf \
         re2c \
         git \
-        $PHP_VERSION-dev
+        ${PHP_VERSION}-dev
 
 RUN \
     cd /tmp \
     && apk add --no-cache --virtual .build-deps $BUILD_DEPS \
     && apk add --no-cache \
-        $PHP_VERSION-common \
-       # $PHP_VERSION-cli \ # not found
-        $PHP_VERSION-curl \
-        $PHP_VERSION-ctype \
-        $PHP_VERSION-dom \
-        $PHP_VERSION-fpm \
-        $PHP_VERSION-gd \
-        $PHP_VERSION-intl \
-        $PHP_VERSION-pecl-imagick \
-        $PHP_VERSION-imap \
-        $PHP_VERSION-iconv \
-        $PHP_VERSION-json \
-        $PHP_VERSION-mysqli \
-        $PHP_VERSION-pecl-mcrypt \
-        $PHP_VERSION-pecl-memcached \
-        $PHP_VERSION-pear \
-        $PHP_VERSION-phpdbg \
-        $PHP_VERSION-pspell \
-        $PHP_VERSION-phar \
-        $PHP_VERSION-pcntl \
-        $PHP_VERSION-posix \
-        $PHP_VERSION-pdo \
-        $PHP_VERSION-pdo_mysql \
-        $PHP_VERSION-openssl \
-        $PHP_VERSION-opcache \
-        $PHP_VERSION-xml \
-        $PHP_VERSION-xmlrpc \
-        $PHP_VERSION-xmlreader \
-        $PHP_VERSION-xmlwriter \
-        $PHP_VERSION-simplexml \
-        $PHP_VERSION-xsl \
-        $PHP_VERSION-pecl-xhprof \
-        $PHP_VERSION-pecl-xhprof-assets \
+        ${PHP_VERSION}-common \
+       # ${PHP_VERSION}-cli \ # not found
+        ${PHP_VERSION}-curl \
+        ${PHP_VERSION}-ctype \
+        ${PHP_VERSION}-dom \
+        ${PHP_VERSION}-fpm \
+        ${PHP_VERSION}-gd \
+        ${PHP_VERSION}-intl \
+        ${PHP_VERSION}-pecl-imagick \
+        ${PHP_VERSION}-imap \
+        ${PHP_VERSION}-iconv \
+        ${PHP_VERSION}-json \
+        ${PHP_VERSION}-mysqli \
+        ${PHP_VERSION}-pecl-mcrypt \
+        ${PHP_VERSION}-pecl-memcached \
+        ${PHP_VERSION}-pear \
+        ${PHP_VERSION}-phpdbg \
+        ${PHP_VERSION}-pspell \
+        ${PHP_VERSION}-phar \
+        ${PHP_VERSION}-pcntl \
+        ${PHP_VERSION}-posix \
+        ${PHP_VERSION}-pdo \
+        ${PHP_VERSION}-pdo_mysql \
+        ${PHP_VERSION}-openssl \
+        ${PHP_VERSION}-opcache \
+        ${PHP_VERSION}-xml \
+        ${PHP_VERSION}-xmlrpc \
+        ${PHP_VERSION}-xmlreader \
+        ${PHP_VERSION}-xmlwriter \
+        ${PHP_VERSION}-simplexml \
+        ${PHP_VERSION}-xsl \
+        ${PHP_VERSION}-pecl-xhprof \
+        ${PHP_VERSION}-pecl-xhprof-assets \
         zlib \
         supervisor \
     # && apk add --no-cache --virtual .xhprof-deps \
@@ -87,11 +87,11 @@ RUN \
     && git clone git://github.com/xdebug/xdebug.git \
     && ( \
         cd xdebug \
-        && git checkout tags/$XDEBUG_RELEASE \
+        && git checkout tags/${XDEBUG_RELEASE} \
         && phpize \
         && ./configure --enable-xdebug \
         && make \
-        && cp modules/xdebug.so /usr/lib/$PHP_VERSION/modules \
+        && cp modules/xdebug.so /usr/lib/${PHP_VERSION}/modules \
     ) \
     && rm -rf xdebug \
     # && git clone https://github.com/phacility/xhprof.git \
@@ -110,16 +110,16 @@ RUN \
     && ln -sf /dev/stdout ${PHP_FPM_ERRLOG}
 
 # Configure PHP-FPM.
-COPY php-fpm.conf /etc/$PHP_VERSION/php-fpm.conf
+COPY php-fpm.conf /etc/${PHP_VERSION}/php-fpm.conf
 
 # Configure PHP.
-COPY php.ini /etc/$PHP_VERSION/conf.d/10-custom.ini
+COPY php.ini /etc/${PHP_VERSION}/conf.d/10-custom.ini
 
 # Configure XDebug.
-COPY xdebug.ini /etc/$PHP_VERSION/conf.d/20-xdebug.ini
+COPY xdebug.ini /etc/${PHP_VERSION}/conf.d/20-xdebug.ini
 
 # Configure XHProf.
-COPY xhprof.ini /etc/$PHP_VERSION/conf.d/20-xhprof.ini
+COPY xhprof.ini /etc/${PHP_VERSION}/conf.d/20-xhprof.ini
 
 # Configure Supervisor.
 COPY supervisord.conf /etc/supervisor.d/php-fpm.ini
