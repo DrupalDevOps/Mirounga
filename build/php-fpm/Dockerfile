@@ -76,12 +76,14 @@ RUN \
         $PHP_VERSION-xmlwriter \
         $PHP_VERSION-simplexml \
         $PHP_VERSION-xsl \
+        $PHP_VERSION-pecl-xhprof \
+        $PHP_VERSION-pecl-xhprof-assets \
         zlib \
         supervisor \
-    && apk add --no-cache --virtual .xhprof-deps \
-        graphviz \
-        fontconfig \
-        font-adobe-100dpi \
+    # && apk add --no-cache --virtual .xhprof-deps \
+    #     graphviz \
+    #     fontconfig \
+    #     font-adobe-100dpi \
     && git clone git://github.com/xdebug/xdebug.git \
     && ( \
         cd xdebug \
@@ -92,17 +94,17 @@ RUN \
         && cp modules/xdebug.so /usr/lib/$PHP_VERSION/modules \
     ) \
     && rm -rf xdebug \
-    && git clone https://github.com/phacility/xhprof.git \
-    && ( \
-        cd xhprof/extension \
-        && phpize \
-        && ./configure \
-        && make \
-        && make install \
-    ) \
-    && rm -rf xhprof/extension \
-    && mv xhprof ${XHPROF_PATH} \
-    && mkdir -m +rw ${XHPROF_OUTPUT_DIR} &> /dev/null \
+    # && git clone https://github.com/phacility/xhprof.git \
+    # && ( \
+    #     cd xhprof/extension \
+    #     && phpize \
+    #     && ./configure \
+    #     && make \
+    #     && make install \
+    # ) \
+    # && rm -rf xhprof/extension \
+    # && mv xhprof ${XHPROF_PATH} \
+    # && mkdir -m +rw ${XHPROF_OUTPUT_DIR} &> /dev/null \
     && apk del .build-deps \
     && ln -sf /dev/stdout ${XDEBUG_REMOTE_LOG} \
     && ln -sf /dev/stdout ${PHP_FPM_ERRLOG}
