@@ -11,6 +11,10 @@ LABEL MAINTAINER="14018885+AlexanderAllen@users.noreply.github.com"
 ARG PHP_VERSION='php7'
 ARG XDEBUG_RELEASE='2.9.0'
 
+# Tidewall is a replacement for the original XHProf (outdated).
+# https://github.com/tideways/php-xhprof-extension/releases
+ARG XHPROF_RELEASE='v5.0.2'
+
 ENV \
     PHP_INI_MAX_EXECUTION_TIME=30 \
     PHP_INI_MEM_LIMIT=256M \
@@ -76,7 +80,6 @@ RUN \
         ${PHP_VERSION}-xmlwriter \
         ${PHP_VERSION}-simplexml \
         ${PHP_VERSION}-xsl \
-        ${PHP_VERSION}-pecl-xhprof \
         ${PHP_VERSION}-pecl-xhprof-assets \
         zlib \
         su-exec \
@@ -84,6 +87,11 @@ RUN \
     #     graphviz \
     #     fontconfig \
     #     font-adobe-100dpi \
+    # Turn OFF git "advice.detachedHead" warning before,
+    # reduces build verbosity when checking out tags.
+    && git config --global advice.detachedHead false \
+    #
+    # Build fresh xdebug release for latest fixes and features.
     && git clone git://github.com/xdebug/xdebug.git \
     && ( \
         cd xdebug \
@@ -94,15 +102,19 @@ RUN \
         && cp modules/xdebug.so /usr/lib/${PHP_VERSION}/modules \
     ) \
     && rm -rf xdebug \
-    # && git clone https://github.com/phacility/xhprof.git \
-    # && ( \
-    #     cd xhprof/extension \
-    #     && phpize \
-    #     && ./configure \
-    #     && make \
-    #     && make install \
-    # ) \
-    # && rm -rf xhprof/extension \
+    #
+    # Build fresh XHProf release.
+    # Pre-built binary also available at https://pkgs.alpinelinux.org/packages?name=*tideways*&branch=edge.
+    && git clone https://github.com/tideways/php-xhprof-extension.git \
+    && ( \
+        cd php-xhprof-extension \
+        && git checkout tags/${XHPROF_RELEASE} \
+        && phpize \
+        && ./configure \
+        && make \
+        && make install \
+    ) \
+    && rm -rf php-xhprof-extension \
     # && mv xhprof ${XHPROF_PATH} \
     # && mkdir -m +rw ${XHPROF_OUTPUT_DIR} &> /dev/null \
     && apk del .build-deps \
