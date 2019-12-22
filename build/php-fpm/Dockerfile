@@ -113,10 +113,10 @@ RUN \
         && ./configure \
         && make \
         && make install \
+        # && mv xhprof ${XHPROF_PATH} \
+        && mkdir -m +rw ${XHPROF_OUTPUT_DIR} &> /dev/null \
     ) \
     && rm -rf php-xhprof-extension \
-    # && mv xhprof ${XHPROF_PATH} \
-    # && mkdir -m +rw ${XHPROF_OUTPUT_DIR} &> /dev/null \
     && apk del .build-deps \
     && ln -sf /dev/stdout ${XDEBUG_REMOTE_LOG} \
     && ln -sf /dev/stdout ${PHP_FPM_ERRLOG}
@@ -131,6 +131,6 @@ COPY php.ini /etc/${PHP_VERSION}/conf.d/10-custom.ini
 COPY xdebug.ini /etc/${PHP_VERSION}/conf.d/20-xdebug.ini
 
 # Configure XHProf.
-# COPY xhprof.ini /etc/${PHP_VERSION}/conf.d/20-xhprof.ini
+COPY xhprof.ini /etc/${PHP_VERSION}/conf.d/20-xhprof.ini
 
 ENTRYPOINT ["su-exec", "nobody", "/usr/sbin/php-fpm7", "--nodaemonize", "--force-stderr"]
