@@ -6,6 +6,9 @@ LABEL InitialReleaseDate="First released on Oct 14, 2016."
 LABEL RELEASEDATE="20191222"
 LABEL MAINTAINER="14018885+AlexanderAllen@users.noreply.github.com"
 
+# PHP Major Version as available on pkgs.alpinelinux.org
+# Initial release was $PHP_VERSION (5.6.36).
+ARG PHP_VERSION='php7'
 ARG XDEBUG_RELEASE='2.9.0'
 
 ENV \
@@ -36,43 +39,44 @@ ENV BUILD_DEPS \
         pkgconf \
         re2c \
         git \
-        php5-dev
+        $PHP_VERSION-dev
 
 RUN \
     cd /tmp \
     && apk add --no-cache --virtual .build-deps $BUILD_DEPS \
     && apk add --no-cache \
-        php5-common \
-        php5-cli \
-        php5-curl \
-        php5-ctype \
-        php5-dom \
-        php5-fpm \
-        php5-gd \
-        php5-intl \
-        php5-imagick \
-        php5-imap \
-        php5-iconv \
-        php5-json \
-        php5-mysql \
-        php5-mcrypt \
-        php5-memcache \
-        php5-pear \
-        php5-phpdbg \
-        php5-pspell \
-        php5-phar \
-        php5-pspell \
-        php5-pcntl \
-        php5-posix \
-        php5-pdo \
-        php5-pdo_mysql \
-        php5-openssl \
-        php5-opcache \
-        php5-xml \
-        php5-xmlrpc \
-        php5-xmlreader \
-        php5-xsl \
-        php5-zlib \
+        $PHP_VERSION-common \
+       # $PHP_VERSION-cli \ # not found
+        $PHP_VERSION-curl \
+        $PHP_VERSION-ctype \
+        $PHP_VERSION-dom \
+        $PHP_VERSION-fpm \
+        $PHP_VERSION-gd \
+        $PHP_VERSION-intl \
+        $PHP_VERSION-pecl-imagick \
+        $PHP_VERSION-imap \
+        $PHP_VERSION-iconv \
+        $PHP_VERSION-json \
+        $PHP_VERSION-mysqli \
+        $PHP_VERSION-pecl-mcrypt \
+        $PHP_VERSION-pecl-memcached \
+        $PHP_VERSION-pear \
+        $PHP_VERSION-phpdbg \
+        $PHP_VERSION-pspell \
+        $PHP_VERSION-phar \
+        $PHP_VERSION-pcntl \
+        $PHP_VERSION-posix \
+        $PHP_VERSION-pdo \
+        $PHP_VERSION-pdo_mysql \
+        $PHP_VERSION-openssl \
+        $PHP_VERSION-opcache \
+        $PHP_VERSION-xml \
+        $PHP_VERSION-xmlrpc \
+        $PHP_VERSION-xmlreader \
+        $PHP_VERSION-xmlwriter \
+        $PHP_VERSION-simplexml \
+        $PHP_VERSION-xsl \
+        zlib \
         supervisor \
     && apk add --no-cache --virtual .xhprof-deps \
         graphviz \
@@ -85,7 +89,7 @@ RUN \
         && phpize \
         && ./configure --enable-xdebug \
         && make \
-        && cp modules/xdebug.so /usr/lib/php5/modules \
+        && cp modules/xdebug.so /usr/lib/$PHP_VERSION/modules \
     ) \
     && rm -rf xdebug \
     && git clone https://github.com/phacility/xhprof.git \
@@ -104,16 +108,16 @@ RUN \
     && ln -sf /dev/stdout ${PHP_FPM_ERRLOG}
 
 # Configure PHP-FPM.
-COPY php-fpm.conf /etc/php5/php-fpm.conf
+COPY php-fpm.conf /etc/$PHP_VERSION/php-fpm.conf
 
 # Configure PHP.
-COPY php.ini /etc/php5/conf.d/10-custom.ini
+COPY php.ini /etc/$PHP_VERSION/conf.d/10-custom.ini
 
 # Configure XDebug.
-COPY xdebug.ini /etc/php5/conf.d/20-xdebug.ini
+COPY xdebug.ini /etc/$PHP_VERSION/conf.d/20-xdebug.ini
 
 # Configure XHProf.
-COPY xhprof.ini /etc/php5/conf.d/20-xhprof.ini
+COPY xhprof.ini /etc/$PHP_VERSION/conf.d/20-xhprof.ini
 
 # Configure Supervisor.
 COPY supervisord.conf /etc/supervisor.d/php-fpm.ini
