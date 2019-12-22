@@ -119,7 +119,7 @@ COPY php.ini /etc/${PHP_VERSION}/conf.d/10-custom.ini
 COPY xdebug.ini /etc/${PHP_VERSION}/conf.d/20-xdebug.ini
 
 # Configure XHProf.
-COPY xhprof.ini /etc/${PHP_VERSION}/conf.d/20-xhprof.ini
+# COPY xhprof.ini /etc/${PHP_VERSION}/conf.d/20-xhprof.ini
 
 # Configure Supervisor.
 COPY supervisord.conf /etc/supervisor.d/php-fpm.ini
