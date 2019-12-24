@@ -6,6 +6,9 @@ echo "### BINARY VERSIONS ###"
 echo "#"
 echo ""
 
+php --version
+echo ""
+
 # Display Composer version.
 echo "[Composer]"
 composer --ansi --version
@@ -35,6 +38,11 @@ echo "Composer versions"
 echo "#"
 echo ""
 composer global show --name-only squizlabs/php_codesniffer
+
+echo "[Drupal]"
+drush --version
+which drush
+echo "Type 'drush list' to show list of available commands!"
 
 echo ""
 echo ""
