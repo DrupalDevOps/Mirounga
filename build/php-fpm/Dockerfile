@@ -6,7 +6,7 @@ LABEL MAINTAINER="14018885+AlexanderAllen@users.noreply.github.com"
 
 # PHP Major Version as available on pkgs.alpinelinux.org
 # Initial release was $PHP_VERSION (5.6.36).
-ARG PHP_VERSION='php7'
+ENV PHP_VERSION=php7
 
 ENV \
     PHP_INI_MAX_EXECUTION_TIME=30 \
