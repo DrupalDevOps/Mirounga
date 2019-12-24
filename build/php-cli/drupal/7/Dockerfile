@@ -18,9 +18,13 @@ COPY composer.json ${COMPOSER_HOME}/composer.json
 RUN composer global -vvv install
 
 # Download additional Drupal Security standards files.
-RUN git clone --branch master http://git.drupal.org/sandbox/coltrane/1921926.git sandbox_1921926 \
-  && mv sandbox_1921926/DrupalSecure ${COMPOSER_HOME}/vendor/drupal/coder/coder_sniffer/DrupalSecure \
-  && rm -rf sandbox_1921926
+# OUTDATED
+
+# Cloning into 'sandbox_1921926'...
+# fatal: could not read Username for 'https://git.drupalcode.org': No such device or address
+# RUN git clone --branch master http://git.drupal.org/sandbox/coltrane/1921926.git sandbox_1921926 \
+#   && mv sandbox_1921926/DrupalSecure ${COMPOSER_HOME}/vendor/drupal/coder/coder_sniffer/DrupalSecure \
+#   && rm -rf sandbox_1921926
 
 # Inform PHP Code Snifer (phpcs) about Drupal coding standards sniff files.
 RUN phpcs --config-set installed_paths ${COMPOSER_HOME}/vendor/drupal/coder/coder_sniffer
