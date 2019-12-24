@@ -1,6 +1,6 @@
 # From https://hub.docker.com/_/php/.
 
-FROM alpine:3.11
+FROM alpine:3.11 AS core
 
 LABEL InitialReleaseDate="First released on Oct 14, 2016."
 LABEL RELEASEDATE="20191222"
@@ -9,11 +9,66 @@ LABEL MAINTAINER="14018885+AlexanderAllen@users.noreply.github.com"
 # PHP Major Version as available on pkgs.alpinelinux.org
 # Initial release was $PHP_VERSION (5.6.36).
 ARG PHP_VERSION='php7'
-ARG XDEBUG_RELEASE='2.9.0'
+
+ENV \
+    PHP_INI_MAX_EXECUTION_TIME=30 \
+    PHP_INI_MEM_LIMIT=256M \
+    PHP_FPM_ERRLOG=/var/log/php-fpm.log
+
+RUN \
+    cd /tmp \
+    && apk add --no-cache \
+        ${PHP_VERSION}-common \
+       # ${PHP_VERSION}-cli \ # not found
+        ${PHP_VERSION}-curl \
+        ${PHP_VERSION}-ctype \
+        ${PHP_VERSION}-dom \
+        ${PHP_VERSION}-fpm \
+        ${PHP_VERSION}-gd \
+        ${PHP_VERSION}-intl \
+        ${PHP_VERSION}-pecl-imagick \
+        ${PHP_VERSION}-imap \
+        ${PHP_VERSION}-iconv \
+        ${PHP_VERSION}-json \
+        ${PHP_VERSION}-mysqli \
+        ${PHP_VERSION}-pecl-mcrypt \
+        ${PHP_VERSION}-pecl-memcached \
+        ${PHP_VERSION}-pear \
+        ${PHP_VERSION}-phpdbg \
+        ${PHP_VERSION}-pspell \
+        ${PHP_VERSION}-phar \
+        ${PHP_VERSION}-pcntl \
+        ${PHP_VERSION}-posix \
+        ${PHP_VERSION}-pdo \
+        ${PHP_VERSION}-pdo_mysql \
+        ${PHP_VERSION}-openssl \
+        ${PHP_VERSION}-opcache \
+        ${PHP_VERSION}-xml \
+        ${PHP_VERSION}-xmlrpc \
+        ${PHP_VERSION}-xmlreader \
+        ${PHP_VERSION}-xmlwriter \
+        ${PHP_VERSION}-simplexml \
+        ${PHP_VERSION}-xsl \
+        zlib \
+        su-exec \
+    && ln -sf /dev/stdout ${PHP_FPM_ERRLOG}
+
+# Configure PHP-FPM.
+COPY php-fpm.conf /etc/${PHP_VERSION}/php-fpm.conf
+
+# Configure PHP.
+COPY php.ini /etc/${PHP_VERSION}/conf.d/10-custom.ini
+
+ENTRYPOINT ["su-exec", "nobody", "/usr/sbin/php-fpm7", "--nodaemonize", "--force-stderr"]
+
+
+FROM core AS development
 
 # Tidewall is a replacement for the original XHProf (outdated).
 # https://github.com/tideways/php-xhprof-extension/releases
 ARG XHPROF_RELEASE='v5.0.2'
+ARG XDEBUG_RELEASE='2.9.0'
+ARG PHP_VERSION='php7'
 
 ENV \
     PHP_INI_MAX_EXECUTION_TIME=30 \
@@ -49,44 +104,12 @@ RUN \
     cd /tmp \
     && apk add --no-cache --virtual .build-deps $BUILD_DEPS \
     && apk add --no-cache \
-        ${PHP_VERSION}-common \
-       # ${PHP_VERSION}-cli \ # not found
-        ${PHP_VERSION}-curl \
-        ${PHP_VERSION}-ctype \
-        ${PHP_VERSION}-dom \
-        ${PHP_VERSION}-fpm \
-        ${PHP_VERSION}-gd \
-        ${PHP_VERSION}-intl \
-        ${PHP_VERSION}-pecl-imagick \
-        ${PHP_VERSION}-imap \
-        ${PHP_VERSION}-iconv \
-        ${PHP_VERSION}-json \
-        ${PHP_VERSION}-mysqli \
-        ${PHP_VERSION}-pecl-mcrypt \
-        ${PHP_VERSION}-pecl-memcached \
-        ${PHP_VERSION}-pear \
-        ${PHP_VERSION}-phpdbg \
-        ${PHP_VERSION}-pspell \
-        ${PHP_VERSION}-phar \
-        ${PHP_VERSION}-pcntl \
-        ${PHP_VERSION}-posix \
-        ${PHP_VERSION}-pdo \
-        ${PHP_VERSION}-pdo_mysql \
-        ${PHP_VERSION}-openssl \
-        ${PHP_VERSION}-opcache \
-        ${PHP_VERSION}-xml \
-        ${PHP_VERSION}-xmlrpc \
-        ${PHP_VERSION}-xmlreader \
-        ${PHP_VERSION}-xmlwriter \
-        ${PHP_VERSION}-simplexml \
-        ${PHP_VERSION}-xsl \
         ${PHP_VERSION}-pecl-xhprof-assets \
-        zlib \
-        su-exec \
     # && apk add --no-cache --virtual .xhprof-deps \
     #     graphviz \
     #     fontconfig \
     #     font-adobe-100dpi \
+    #
     # Turn OFF git "advice.detachedHead" warning before,
     # reduces build verbosity when checking out tags.
     && git config --global advice.detachedHead false \
@@ -118,19 +141,10 @@ RUN \
     ) \
     && rm -rf php-xhprof-extension \
     && apk del .build-deps \
-    && ln -sf /dev/stdout ${XDEBUG_REMOTE_LOG} \
-    && ln -sf /dev/stdout ${PHP_FPM_ERRLOG}
-
-# Configure PHP-FPM.
-COPY php-fpm.conf /etc/${PHP_VERSION}/php-fpm.conf
-
-# Configure PHP.
-COPY php.ini /etc/${PHP_VERSION}/conf.d/10-custom.ini
+    && ln -sf /dev/stdout ${XDEBUG_REMOTE_LOG}
 
 # Configure XDebug.
 COPY xdebug.ini /etc/${PHP_VERSION}/conf.d/20-xdebug.ini
 
 # Configure XHProf.
 COPY xhprof.ini /etc/${PHP_VERSION}/conf.d/20-xhprof.ini
-
-ENTRYPOINT ["su-exec", "nobody", "/usr/sbin/php-fpm7", "--nodaemonize", "--force-stderr"]
