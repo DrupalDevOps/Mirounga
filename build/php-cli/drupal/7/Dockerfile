@@ -7,7 +7,7 @@ FROM alexanderallen/php-cli.core:latest
 COPY composer.json ${COMPOSER_HOME}/composer.json
 
 # Install default CLI tools.
-RUN composer global install
+RUN composer global -vvv install
 
 # Download additional Drupal Security standards files.
 RUN git clone --branch master http://git.drupal.org/sandbox/coltrane/1921926.git sandbox_1921926 \
