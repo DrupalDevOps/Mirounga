@@ -1,4 +1,6 @@
-# If you come from bash you might have to change your $PATH.
+[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/issue && cat /etc/motd
+
+# If you come from bash you might have to change your $PATH
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
