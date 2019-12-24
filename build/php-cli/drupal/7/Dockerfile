@@ -3,6 +3,14 @@
 #
 FROM alexanderallen/php-cli.core:latest
 
+RUN \
+    cd /tmp \
+    && apk add --no-cache \
+      # REQ: Composer squizlabs/php_codesniffer 2.7.0 requires ext-tokenizer
+      ${PHP_VERSION}-tokenizer \
+      # REQ: Composer drupal/coder 8.3.7 requires ext-mbstring
+      ${PHP_VERSION}-mbstring
+
 # Provide optional composer example to install.
 COPY composer.json ${COMPOSER_HOME}/composer.json
 
