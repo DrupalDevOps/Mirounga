@@ -1,6 +1,6 @@
 {
   "require-dev": {
-    "phing/phing": "2.16.x-dev"
+    "phing/phing": "~2.16.0"
   },
   "require": {
     "drupal/coder": "*",
