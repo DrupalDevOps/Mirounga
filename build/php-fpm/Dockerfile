@@ -66,7 +66,6 @@ FROM core AS development
 # https://github.com/tideways/php-xhprof-extension/releases
 ARG XHPROF_RELEASE='v5.0.2'
 ARG XDEBUG_RELEASE='2.9.0'
-ARG PHP_VERSION='php7'
 
 ENV \
     XDEBUG_REMOTE_ENABLE=1 \
