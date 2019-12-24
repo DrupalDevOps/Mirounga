@@ -42,6 +42,16 @@ services:
     volumes:
       - ~/Sites:/www
 
+  # Image optimized for Drupal 7.
+  php-cli.d7:
+    image: alexanderallen/php-cli:d7
+    build:
+      context: ./drupal/7
+      dockerfile: Dockerfile
+    volumes:
+      - ~/Sites:/www
+
+
 
 #  Example on how to create a Composer container on the main compose file.
 #  composer:
