@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
-# // TODO: MOVE ALL THIS JAZZ TO BANNER, NO NEED TO EXEC ALL THIS STUFF IN HERE.
+
+echo ""
+echo "#"
+echo "### BINARY VERSIONS ###"
+echo "#"
+echo ""
+
 # Display Composer version.
 echo "[Composer]"
 composer --ansi --version
@@ -20,6 +26,21 @@ echo "[XDebug]"
 echo "To debug any PHP CLI script, use: "
 echo "export PHP_IDE_CONFIG='serverName=docker' \\"
 echo "export XDEBUG_CONFIG='idekey=${XDEBUG_IDE_KEY}'"
+echo ""
+echo ""
+
+echo ""
+echo "#"
+echo "Composer versions"
+echo "#"
+echo ""
+composer global show --name-only squizlabs/php_codesniffer
+
+echo ""
+echo ""
+
 
 # Provide the user with a Z Shell as the entrypoint.
+echo "Entering /bin/zsh shell and sourcing .zshrc"
+echo ""
 /bin/zsh --interactive
