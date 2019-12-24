@@ -1,0 +1,20 @@
+{
+  "name": "localenv cli",
+  "description": "Composer dependencies for Drupal 8 development.",
+  "require-dev": {
+    "phing/phing": "2.x"
+  },
+  "require": {
+    "drush/drush": "*",
+    "drupal/coder": "*",
+    "phpunit/phpunit": "~8.0",
+    "pear/versioncontrol_git": "@dev",
+    "pdepend/pdepend": "2.x",
+    "squizlabs/php_codesniffer": "~3.0",
+    "phpmd/phpmd": "~2.0",
+    "phploc/phploc": "~5.0",
+    "symfony/yaml": "~3.0",
+    "pear/pear-core-minimal": "1.10.1",
+    "rallen-temp/xhprof-helper": "dev-master"
+  }
+}

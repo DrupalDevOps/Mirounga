@@ -31,7 +31,7 @@ services:
     volumes:
       - ~/Sites:/www
 
-  # Image optimized for Drupal 7.
+  # Image optimized for Drupal 7, validated on 12/24/2019 - Merry XMas!
   php-cli.d7:
     image: alexanderallen/php-cli:d7
     build:
@@ -40,7 +40,14 @@ services:
     volumes:
       - ~/Sites:/www
 
-
+  # Image optimized for Drupal 8, validated on 12/24/2019 - Merry XMas!
+  php-cli.d8:
+    image: alexanderallen/php-cli:d8
+    build:
+      context: ./drupal/8
+      dockerfile: Dockerfile
+    volumes:
+      - ~/Sites:/www
 
 #  Example on how to create a Composer container on the main compose file.
 #  composer:
