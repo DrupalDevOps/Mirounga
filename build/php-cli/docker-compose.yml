@@ -19,17 +19,6 @@ services:
   # - https://github.com/RobLoach/docker-composer
   # - https://hub.docker.com/r/composer/composer/~/dockerfile/
 
-  # Adds Composer to our custom php-fpm image.
-  # - Does not start the php-fpm service.
-  # - Makes Composer the entrypoint instead of supervisor.
-  # php-cli:
-  #   image: alexanderallen/php-cli
-  #   build: .
-  #   environment:
-  #     COMPOSER_VERSION: master
-  #   volumes:
-  #     - ~/Sites:/www
-
   # Base image with minimal dependencies.
   php-cli.core:
     image: alexanderallen/php-cli.core:latest
