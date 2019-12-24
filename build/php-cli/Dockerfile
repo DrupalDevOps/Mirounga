@@ -1,4 +1,4 @@
-FROM alexanderallen/php-fpm:latest
+FROM alexanderallen/php-fpm.dev:latest as core
 
 ENV \
     SSH_PRIVATE_KEY="/root/.ssh/id_rsa" \
@@ -49,8 +49,18 @@ RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
   && php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
   && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --snapshot && rm -rf /tmp/composer-setup.php
 
-# Install default CLI tools.
+# Core image CLI entrypoint.
+ENTRYPOINT ["/bin/zsh", "--interactive"]
+
+#
+# Build stage optimized with Composer packages for Drupal development.
+#
+FROM core as drupal
+
+# Provide optional composer example to install.
 COPY composer.json ${COMPOSER_HOME}/composer.json
+
+# Install default CLI tools.
 RUN composer global install
 
 # Download additional Drupal Security standards files.
