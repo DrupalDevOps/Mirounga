@@ -31,3 +31,6 @@ RUN \
     ) \
     && rm -rf ion \
     && apk del .build-deps
+
+# Rust Ion Shell.
+ENTRYPOINT ["ion"]
