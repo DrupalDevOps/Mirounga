@@ -32,6 +32,12 @@ RUN \
         wget \
     && git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
 
+# Setup the Composer installer.
+RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
+  && curl -o /tmp/composer-setup.sig https://composer.github.io/installer.sig \
+  && php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
+  && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --snapshot && rm -rf /tmp/composer-setup.php
+
 # Configure Z shell.
 COPY .zshrc /root/.zshrc
 
@@ -43,19 +49,13 @@ COPY .bashrc /root/.bashrc
 # Where all of our codebase is mounted to.
 WORKDIR /www
 
-# Setup the Composer installer.
-RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
-  && curl -o /tmp/composer-setup.sig https://composer.github.io/installer.sig \
-  && php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
-  && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --snapshot && rm -rf /tmp/composer-setup.php
-
 # Core image CLI entrypoint.
 ENTRYPOINT ["/bin/zsh", "--interactive"]
 
 #
 # Build stage optimized with Composer packages for Drupal development.
 #
-FROM core as drupal
+FROM core as drupal7
 
 # Provide optional composer example to install.
 COPY composer.json ${COMPOSER_HOME}/composer.json
