@@ -47,6 +47,14 @@ services:
       context: ./drupal/8
       dockerfile: Dockerfile
     volumes:
+      - ~/Sites:/
+
+  php-cli.rust:
+    image: alexanderallen/php-cli:rust
+    build:
+      context: ./rust
+      dockerfile: Dockerfile
+    volumes:
       - ~/Sites:/www
 
 #  Example on how to create a Composer container on the main compose file.
