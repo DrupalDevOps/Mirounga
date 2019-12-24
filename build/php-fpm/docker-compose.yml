@@ -1,8 +1,24 @@
-version: '2'
+version: '3.4'
 services:
-  php-fpm:
-    image: alexanderallen/php-fpm:latest
-    build: .
+  php-fpm.core:
+    image: alexanderallen/php-fpm.core:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: core
+    environment:
+      PHP_INI_MAX_EXECUTION_TIME: 120 # The defualt is 30, increasing to 60.
+      PHP_INI_MEM_LIMIT: 256M # The dfeulat memory limit is 128M.
+      PHP_FPM_LISTEN: 127.0.0.1:9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
+    expose:
+      - 9010 # Expose PHP-FPM port to Nginx.
+
+  php-fpm.dev:
+    image: alexanderallen/php-fpm.dev:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
     environment:
       PHP_INI_MAX_EXECUTION_TIME: 120 # The defualt is 30, increasing to 60.
       PHP_INI_MEM_LIMIT: 256M # The dfeulat memory limit is 128M.
