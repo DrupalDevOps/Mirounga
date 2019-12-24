@@ -10,7 +10,7 @@
     "squizlabs/php_codesniffer": "2.7.0",
     "phpmd/phpmd": "~2.2",
     "phploc/phploc": "~2.0.6",
-    "symfony/yaml": "~2.7",
+    "symfony/yaml": "~3.0",
     "pear/net_growl": "dev-trunk",
     "pear/pear-core-minimal": "1.10.1",
     "rallen-temp/xhprof-helper": "dev-master"
