@@ -1,5 +1,5 @@
 {
-  "name": "localenv cli",
+  "name": "alexanderallen/php-cli.d8",
   "description": "Composer dependencies for Drupal 8 development.",
   "require-dev": {
     "phing/phing": "2.x"
