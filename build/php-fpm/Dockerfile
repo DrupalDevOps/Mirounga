@@ -1,5 +1,3 @@
-# From https://hub.docker.com/_/php/.
-
 FROM alpine:3.11 AS core
 
 LABEL InitialReleaseDate="First released on Oct 14, 2016."

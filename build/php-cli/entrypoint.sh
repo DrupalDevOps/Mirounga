@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# // TODO: MOVE ALL THIS JAZZ TO BANNER, NO NEED TO EXEC ALL THIS STUFF IN HERE.
 # Display Composer version.
 echo "[Composer]"
 composer --ansi --version
