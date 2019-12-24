@@ -5,7 +5,13 @@ ENV \
     LANG="en_US.UTF-8" \
     LC_ALL="en_US.UTF-8" \
     LANGUAGE="en_US.UTF-8" \
-    TERM="xterm"
+    TERM="xterm" \
+    # Register the COMPOSER_HOME environment variable.
+    COMPOSER_HOME=/composer \
+    # Add global binary directory to PATH.
+    PATH=/composer/vendor/bin:$PATH \
+    # Allow Composer to be run as root.
+    COMPOSER_ALLOW_SUPERUSER=1
 
 RUN \
     cd /tmp \
@@ -36,15 +42,6 @@ COPY .bashrc /root/.bashrc
 
 # Where all of our codebase is mounted to.
 WORKDIR /www
-
-# Register the COMPOSER_HOME environment variable.
-ENV COMPOSER_HOME /composer
-
-# Add global binary directory to PATH.
-ENV PATH /composer/vendor/bin:$PATH
-
-# Allow Composer to be run as root.
-ENV COMPOSER_ALLOW_SUPERUSER 1
 
 # Setup the Composer installer.
 RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
