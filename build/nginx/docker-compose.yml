@@ -1,4 +1,22 @@
 version: '3.4'
+
+#
+# README.md -
+#
+# Start nginx service
+# docker-compose -f build/nginx/docker-compose.yml up -d
+# Creating network "nginx_default" with the default driver
+# Creating nginx_nginx_1 ... done
+#
+# docker-compose -f build/nginx/docker-compose.yml ps
+#     Name              Command          State                      Ports
+# -------------------------------------------------------------------------------------------
+# nginx_nginx_1   nginx -g daemon off;   Up      127.0.0.1:443->443/tcp, 127.0.0.1:80->80/tcp
+#
+# Test
+#
+# curl localhost
+#
 services:
   nginx:
     image: alexanderallen/nginx:latest
@@ -10,21 +28,6 @@ services:
       PHP_INI_MAX_EXECUTION_TIME: 120 # The defualt is 30, increasing to 60.
       PHP_INI_MEM_LIMIT: 256M # The dfeulat memory limit is 128M.
       PHP_FPM_LISTEN: 127.0.0.1:9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
-    expose:
-      - 9010 # Expose PHP-FPM port to Nginx.
-
-  php-fpm.dev:
-    image: alexanderallen/php-fpm.dev:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: development
-    environment:
-      PHP_INI_MAX_EXECUTION_TIME: 120 # The defualt is 30, increasing to 60.
-      PHP_INI_MEM_LIMIT: 256M # The dfeulat memory limit is 128M.
-      PHP_FPM_LISTEN: 127.0.0.1:9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
-      XDEBUG_REMOTE_HOST: 10.254.254.254
-      XDEBUG_REMOTE_PORT: 9000
-      XDEBUG_IDE_KEY: ''
-    expose:
-      - 9010 # Expose PHP-FPM port to Nginx.
+    ports:
+        - 127.0.0.1:80:80
+        - 127.0.0.1:443:443
