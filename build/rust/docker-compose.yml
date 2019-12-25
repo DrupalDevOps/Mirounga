@@ -1,0 +1,9 @@
+version: '3.4'
+services:
+  rust:
+    image: alexanderallen/rust
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ~/Sites:/www

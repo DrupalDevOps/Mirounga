@@ -1,7 +1,7 @@
 #
 # Rust Ion shell https://github.com/redox-os/ion.
 #
-FROM alexanderallen/php-cli:d8
+FROM alpine:3.11 AS core
 
 ENV BUILD_DEPS \
       autoconf \
@@ -14,13 +14,22 @@ ENV BUILD_DEPS \
       re2c \
       git \
       # https://www.rust-lang.org
-      rust
+      rust \
+      cargo
+
+ENV PATH=$HOME/.cargo/bin:$PATH
 
 RUN \
     cd /tmp \
     && apk add --no-cache --virtual .build-deps $BUILD_DEPS \
-    && apk add --no-cache \
-      cargo \
+    # && apk add --no-cache \
+    && echo "" \
+    && echo "Installing mdbook" \
+    && echo "" \
+    && cargo install mdbook \
+    && echo "" \
+    && echo "Installing Ion Shell" \
+    && echo "" \
     && git clone https://gitlab.redox-os.org/redox-os/ion/ \
     && ( \
       cd ion \
@@ -28,9 +37,18 @@ RUN \
       && RUSTUP=0 make \
       && make install prefix=/usr \
       && make update-shells prefix=/usr \
+      && echo "" \
+      && echo "Building Ion Manual" \
+      && echo "" \
+      && make manual \
+      && $HOME/.cargo/bin/mdbook build -d ../public manual \
     ) \
     && rm -rf ion \
     && apk del .build-deps
+
+# RUN \
+#     cargo install mdbook
+# export PATH="$HOME/.cargo/bin:$PATH"
 
 # Rust Ion Shell.
 ENTRYPOINT ["ion"]

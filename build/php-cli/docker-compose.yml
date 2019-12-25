@@ -49,17 +49,9 @@ services:
     volumes:
       - ~/Sites:/
 
-  php-cli.rust:
-    image: alexanderallen/php-cli:rust
-    build:
-      context: ./rust
-      dockerfile: Dockerfile
-    volumes:
-      - ~/Sites:/www
-
 #  Example on how to create a Composer container on the main compose file.
 #  composer:
-#    image: alexanderallen/php-cli
+#    image: alexanderallen/php-cli:d8
 #    links:
 #      - mysql:mysql
 #      - memcached:memcached

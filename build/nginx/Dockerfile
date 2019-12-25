@@ -1,35 +1,33 @@
-FROM base:latest
-MAINTAINER Richard Alexander Allen <richard.alexander.allen@gmail.com>
+FROM nginx:1.17-alpine AS core
+# See https://github.com/nginxinc/docker-nginx/blob/a973c221f6cedede4dab3ab36d18240c4d3e3d74/mainline/alpine/Dockerfile'
+# FROM alpine:3.11 AS core
+LABEL maintainer="14018885+AlexanderAllen@users.noreply.github.com"
 
-# Define arguments used for build.
-ARG ANSIBLE_LIMIT
-ARG ANSIBLE_PLAYBOOK
 # ARG NGINX_WEB_ROOT
 ARG NGINX_HTTP_LISTEN
 ARG NGINX_PHPFPM_FASTCGI_PASS
 ARG NGINX_LOGLEVEL
 
-# Get environment variables needed by the Ansible provisioner from the build arguments.
 ENV NGINX_HTTP_LISTEN=$NGINX_HTTP_LISTEN \
     NGINX_PHPFPM_FASTCGI_PASS=$NGINX_PHPFPM_FASTCGI_PASS \
     NGINX_LOGLEVEL=$NGINX_LOGLEVEL
 
-# Make Ansible inventory available to Docker build.
-COPY inventory /etc/ansible
-COPY provisioners/ansible /opt/localenv/ansible
-
-# Install Nginx.
-RUN ansible-playbook --connection=local --limit=$ANSIBLE_LIMIT $ANSIBLE_PLAYBOOK
-
 # Copy dynamic vhost definition into container.
 # Use one container for each application, using environment variables passed to the run command.
-COPY provisioners/docker/nginx/vhost.conf /etc/nginx/sites-enabled/vhost.conf
+COPY vhost.conf /etc/nginx/sites-enabled/vhost.conf
 
-# Clean-up installation.
-RUN DEBIAN_FRONTEND=noninteractive apt-get autoclean && apt-get autoremove
+# RUN \
+#   cd /tmp \
+#   && apk add --no-cache \
+#   su-exec \
+#   nginx \
+#   net-tools
+  # or openresty
 
-# Copy supervisor configiguration.
-COPY provisioners/docker/nginx/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# ENTRYPOINT ["su-exec", "root", "/usr/sbin/nginx"]
 
-# Configurations for bash.
-RUN echo "export TERM=xterm" >> /etc/bash.bashrc
+EXPOSE 80
+
+STOPSIGNAL SIGTERM
+
+CMD ["nginx", "-g", "daemon off;"]
