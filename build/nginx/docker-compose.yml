@@ -19,7 +19,7 @@ version: '3.4'
 #
 services:
   nginx:
-    image: alexanderallen/nginx:latest
+    image: alexanderallen/nginx:1.17-alpine
     build:
       context: .
       dockerfile: Dockerfile
