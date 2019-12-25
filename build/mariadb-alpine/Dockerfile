@@ -21,9 +21,8 @@ COPY my.cnf /tmp/
 
 RUN \
   export sharedir=/usr/share/mariadb \
-  && apk add --no-cache mariadb=10.4.10-r0 \
   # Need bash for evaluating path name expansions.
-  && apk add --no-cache --virtual .build-deps bash \
+  && apk add --no-cache mariadb=10.4.10-r0 bash \
   && rm -rf /etc/my.cnf.d/* /etc/my.cnf.apk-new /usr/data/test/db.opt \
    #   /usr/share/mariadb/README* /usr/share/mariadb/COPYING* /usr/share/mariadb/*.cnf \
      /usr/share/terminfo \
@@ -33,10 +32,10 @@ RUN \
      /usr/share/perl5 \
      /usr/lib/perl5 \
   # /usr/bin @ 97MB: No need for advanced backups, compression (mbstream)
-  && /bin/bash -c 'rm -rf /usr/bin/{mariabackup,mbstream,my_print_defaults,perror,pod*,resolveip}' \
-  && /bin/bash -c 'rm -rf /usr/bin/mysql{admin,check,dump,import,show,test*}' \
+  && /bin/bash -c 'rm -rf /usr/bin/{mysql,mariabackup,mbstream,my_print_defaults,perror,pod*,resolveip,perl*,my_safe_process}' \
+  && /bin/bash -c 'rm -rf /usr/bin/mysql{admin,check,dump,import,show,test*,access,dumpslow,hotcopy,_isntall_db}' \
   && /bin/bash -c 'rm -rf ${sharedir}/{README*,COPYING*,*.cnf}' \
-  && /bin/bash -c 'rm -rf ${sharedir}/{binary-configure,mysqld_multi.server,mysql-log-rotate,mysql.server,install_spider.sql}' \
+  && /bin/bash -c 'rm -rf ${sharedir}/{binary-configure,mysqld_multi.server,mysql-log-rotate,mysql.server,install_spider.sql,fill_help_tables.sql}' \
   && find ${sharedir} -mindepth 1 -type d ! -name 'charsets' ! -name 'english' -print0 | xargs -0 rm -rf \
   && touch ${sharedir}/mysql_system_tables_data.sql \
   && mkdir /run/mysqld \
@@ -48,8 +47,11 @@ RUN \
               do eval rm /usr/bin/${p}; done \
   # Not using pam for authentication.
   && /bin/bash -c 'rm -rf /lib/{libpam*,security}' \
-  # APK cleanup and removal - container not running as root.
-  && apk del .build-deps && rm -rf /lib/apk
+  # APK cleanup, remove changes in new layer ~1.3MB.
+  && apk del --purge bash && rm -rf /lib/apk/db \
+  # Compression, PCRE, libstdc++, libxml, ssl, tls.
+  && rm -rf /usr/lib/libxml* /usr/lib/libpcre* /usr/lib/libstd* /usr/lib/libpanel* /usr/lib/libncurses* /usr/lib/libme* /usr/lib/liblzma* \
+    /usr/lib/libgcc* /usr/lib/libform* /usr/lib/libbz* /usr/lib/libaio* /usr/lib/libz* /usr/lib/mariadb
 
 USER mysql
 
