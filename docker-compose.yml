@@ -34,7 +34,9 @@ services:
       - --long_query_time=5
 
   memcached:
-    image: memcached:1.4.31-alpine
+    # Memcached 1.5.20 released Nov 11, 2019.
+    # https://hub.docker.com/_/memcached
+    image: memcached:1.5.20-alpine
     command: -p 11211 -m 16 -vvv -M
     expose:
       - 11211
