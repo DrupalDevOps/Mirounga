@@ -1,5 +1,5 @@
 FROM mariadb:10.1
-MAINTAINER Richard Alexander Allen <richard.alexander.allen@gmail.com>
+LABEL maintainer="AlexanderAllen <14018885+AlexanderAllen@users.noreply.github.com>"
 
 # Redirect database logs to Docker log collector.
 USER mysql

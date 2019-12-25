@@ -1,5 +1,5 @@
 FROM ubuntu:xenial-20160818
-MAINTAINER Richard Alexander Allen <richard.alexander.allen@gmail.com>
+LABEL maintainer="AlexanderAllen <14018885+AlexanderAllen@users.noreply.github.com>"
 
 ARG ANSIBLE_LIMIT
 ARG ANSIBLE_PLAYBOOK

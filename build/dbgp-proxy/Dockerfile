@@ -1,5 +1,5 @@
 FROM base
-MAINTAINER Richard Alexander Allen <richard.alexander.allen@gmail.com>
+LABEL maintainer="AlexanderAllen <14018885+AlexanderAllen@users.noreply.github.com>"
 
 # Where the IDE will connect to.
 ARG DBGP_IDE_PORT

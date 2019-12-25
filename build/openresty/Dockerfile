@@ -3,7 +3,7 @@
 
 FROM alpine:3.4
 
-MAINTAINER Richard Alexander Allen <richard.alexander.allen@gmail.com>
+LABEL maintainer="AlexanderAllen <14018885+AlexanderAllen@users.noreply.github.com>"
 
 # Docker Build Arguments
 ARG NGINX_PATH="/etc/nginx"
