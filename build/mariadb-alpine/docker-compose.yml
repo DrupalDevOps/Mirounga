@@ -18,11 +18,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      # target: core
       args:
        CLIENT_USER: drupal
-    # environment:
-    #   # MYSQL_ROOT_PASSWORD: root
-    #   CONTAINER_USER: drupal
     ports:
       - "3306:3306"

@@ -31,16 +31,9 @@ RUN \
   # Run install script as root before optimizing the image.
   && ./opt/docker/install \
   #
-  # Now you can start deleting.
+  # Cleanup after install.
   #
-  && rm -rf /etc/my.cnf.d/* /etc/my.cnf.apk-new /usr/data/test/db.opt \
-   #   /usr/share/mariadb/README* /usr/share/mariadb/COPYING* /usr/share/mariadb/*.cnf \
-     /usr/share/terminfo \
-     # /usr/mysql-test dir is 321MB on 10.4
-     /usr/mysql-test \
-     # Is PERL required for operation? Also seems there's two of them.
-     /usr/share/perl5 \
-     /usr/lib/perl5 \
+  && rm -rf /etc/my.cnf.d/* /etc/my.cnf.apk-new /usr/data/test/db.opt /usr/share/terminfo /usr/mysql-test /usr/share/perl5 /usr/lib/perl5 \
   # /usr/bin @ 97MB: No need for advanced backups, compression (mbstream)
   && /bin/bash -c 'rm -rf /usr/bin/{mysql,mariabackup,mbstream,perror,pod*,resolveip,perl*,my_safe_process}' \
   && /bin/bash -c 'rm -rf /usr/bin/mysql{admin,check,dump,import,show,test*,access,dumpslow,hotcopy,_isntall_db}' \
