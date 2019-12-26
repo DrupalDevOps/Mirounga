@@ -18,18 +18,10 @@ ARG CLIENT_USER=docker
 # Before 5.6.8, it is a shell script and is available only on Unix platforms.
 # Therefore: to reduce image size, run installation script inside the build, then remove Perl when install is complete.
 
-# One-time install script (during build only).
-COPY scripts/install /opt/docker/install
-COPY my.cnf /tmp/
-
-
 RUN \
   export sharedir=/usr/share/mariadb \
   # Need bash for evaluating path name expansions.
   && apk add --no-cache mariadb=10.4.10-r0 bash su-exec \
-  #
-  # Run install script as root before optimizing the image. the problem is that the data dir is now init'd in the image and cant mount it.
-  # && ./opt/docker/install \
   #
   # Cleanup after install.
   #
@@ -58,6 +50,8 @@ RUN \
   #   && rm -rf /usr/lib/libxml* /usr/lib/libpcre* /usr/lib/libstd* /usr/lib/libpanel* /usr/lib/libncurses* /usr/lib/libme* /usr/lib/liblzma* \
   #     /usr/lib/libgcc* /usr/lib/libform* /usr/lib/libbz* /usr/lib/libaio* /usr/lib/libz*
 
+COPY scripts/install /opt/docker/install
+COPY my.cnf /tmp/
 COPY scripts/entrypoint /opt/docker/entrypoint
 
 # This is not super helpful; mysqld might be running but not accepting connections.
