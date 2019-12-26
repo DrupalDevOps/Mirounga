@@ -13,6 +13,19 @@ if [ -z "$(ls -A /var/lib/mysql/)" ]; then
   echo "RUNNING INSTALL SCRIPT"
   echo ""
 
+  # We already nuked the possible MySQL client locations from Docker image layer during build, therefore
+  # apk add mariadb-client won't extract /usr/bin/mysql to that location.
+  echo "Download MySQL client"
+  # apk add -q --no-cache mariadb-client
+  ( \
+    cd /root \
+    && apk --no-cache fetch mariadb-client \
+    && tar -xzf mariadb-client* \
+    && mv ./usr/bin/mysql /usr/bin  \
+    && ls -la /usr/bin/mysql \
+    && rm -rf ./usr \
+  )
+
   # This needs to be run both for initialization and general startup
   # sed into /tmp/ since the user won't have access to create new
   # files in /etc/
@@ -92,5 +105,8 @@ if [ -z "$(ls -A /var/lib/mysql/)" ]; then
 
   # Kill temporary database process.
   kill -s TERM "${PID}"
+
+  # Cleanup.
+  rm /usr/bin/mysql
 
 fi

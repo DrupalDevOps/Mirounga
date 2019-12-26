@@ -27,7 +27,7 @@ RUN \
   #
   && rm -rf /etc/my.cnf.d/* /etc/my.cnf.apk-new /usr/data/test/db.opt /usr/share/terminfo /usr/mysql-test /usr/share/perl5 /usr/lib/perl5 \
   # /usr/bin @ 97MB: No need for advanced backups, compression (mbstream)
-  && /bin/bash -c 'rm -rf /usr/bin/{mariabackup,mbstream,perror,pod*,resolveip,perl*,my_safe_process}' \
+  && /bin/bash -c 'rm -rf /usr/bin/{mysql,mariabackup,mbstream,perror,pod*,resolveip,perl*,my_safe_process}' \
   && /bin/bash -c 'rm -rf /usr/bin/mysql{admin,check,dump,import,show,test*,access,dumpslow,hotcopy,_isntall_db}' \
   && /bin/bash -c 'rm -rf ${sharedir}/{README*,COPYING*,*.cnf}' \
   && /bin/bash -c 'rm -rf ${sharedir}/{binary-configure,mysqld_multi.server,mysql-log-rotate,mysql.server,install_spider.sql}' \
@@ -44,7 +44,7 @@ RUN \
   # Not using pam for authentication.
   && /bin/bash -c 'rm -rf /lib/{libpam*,security}' \
   # APK cleanup, remove changes in new layer ~1.3MB.
-  && apk del --purge bash && rm -rf /lib/apk/db
+  && apk del -q --no-cache --purge bash
   # Compression, PCRE, libstdc++, libxml, ssl, tls.
   # Apparently all these new libs are installed AND needed by the new mariadb version.
   #   && rm -rf /usr/lib/libxml* /usr/lib/libpcre* /usr/lib/libstd* /usr/lib/libpanel* /usr/lib/libncurses* /usr/lib/libme* /usr/lib/liblzma* \
