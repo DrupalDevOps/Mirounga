@@ -6,86 +6,91 @@
 
 set -eox pipefail
 
-echo ""
-echo "RUNNING INSTALL SCRIPT"
-echo ""
+# No previous installation
+if [ -z "$(ls -A /var/lib/mysql/)" ]; then
 
-# This needs to be run both for initialization and general startup
-# sed into /tmp/ since the user won't have access to create new
-# files in /etc/
-cp /tmp/my.cnf /etc/my.cnf.d/
-[[ -n "${SKIP_INNODB}" ]] || [[ -f "/var/lib/mysql/noinnodb" ]] &&
-  sed -i -e '/\[mariadb\]/a skip_innodb = yes\ndefault_storage_engine = MyISAM\ndefault_tmp_storage_engine = MyISAM' \
-      -e '/^innodb/d' /etc/my.cnf.d/my.cnf
-[[ -n "${SKIP_INNODB}" ]] && touch /var/lib/mysql/noinnodb
+  echo ""
+  echo "RUNNING INSTALL SCRIPT"
+  echo ""
 
-
-# Install program mysql_install_db executes template tables under /usr/share/mariadb/*.sql during bootstrap.
-# Customize these before invoking the boostrap.
-# echo "flush privileges;" > /usr/share/mariadb/mysql_system_tables_data.sql
-# echo "SET PASSWORD = PASSWORD('root');" > /usr/share/mariadb/mysql_system_tables_data.sql
-
-# Confirm.
-# cat /usr/share/mariadb/mysql_system_tables_data.sql | last -n 10
+  # This needs to be run both for initialization and general startup
+  # sed into /tmp/ since the user won't have access to create new
+  # files in /etc/
+  cp /tmp/my.cnf /etc/my.cnf.d/
+  [[ -n "${SKIP_INNODB}" ]] || [[ -f "/var/lib/mysql/noinnodb" ]] &&
+    sed -i -e '/\[mariadb\]/a skip_innodb = yes\ndefault_storage_engine = MyISAM\ndefault_tmp_storage_engine = MyISAM' \
+        -e '/^innodb/d' /etc/my.cnf.d/my.cnf
+  [[ -n "${SKIP_INNODB}" ]] && touch /var/lib/mysql/noinnodb
 
 
-# Set root explicit root password if specified, otherwise set to blank.
-ROOTPW="''"
-[[ -n "${MYSQL_ROOT_PASSWORD}" ]] && ROOTPW="PASSWORD('${MYSQL_ROOT_PASSWORD}')"
+  # Install program mysql_install_db executes template tables under /usr/share/mariadb/*.sql during bootstrap.
+  # Customize these before invoking the boostrap.
+  # echo "flush privileges;" > /usr/share/mariadb/mysql_system_tables_data.sql
+  # echo "SET PASSWORD = PASSWORD('root');" > /usr/share/mariadb/mysql_system_tables_data.sql
 
-# This gives ERROR: 1471  The target table user of the INSERT is not insertable-into
-# echo "INSERT INTO user VALUES ('%','root',${ROOTPW},'Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0,'','','N', 'N','', 0);" > /usr/share/mariadb/mysql_system_tables_data.sql
+  # Confirm.
+  # cat /usr/share/mariadb/mysql_system_tables_data.sql | last -n 10
 
-# https://mariadb.com/kb/en/mysql_install_db/#options
-# You must be ROOT to use the "--user=" option
-# The --user flag indicates what user the mysqld deamon will run under.
-INSTALL_OPTS="--user=${CONTAINER_USER}"
 
-# /usr/share/mariadb/mysql_ssystem_tabls_data.sql:
-# A "cross bootstrap" database is when creating data on a Unix host which will later be included in a Windows zip file.
-# INSTALL_OPTS="${INSTALL_OPTS} --cross-bootstrap"
+  # Set root explicit root password if specified, otherwise set to blank.
+  ROOTPW="''"
+  [[ -n "${MYSQL_ROOT_PASSWORD}" ]] && ROOTPW="PASSWORD('${MYSQL_ROOT_PASSWORD}')"
 
-# This is an internal option, care document why we are using it and what it does?
-INSTALL_OPTS="${INSTALL_OPTS} --rpm"
+  # This gives ERROR: 1471  The target table user of the INSERT is not insertable-into
+  # echo "INSERT INTO user VALUES ('%','root',${ROOTPW},'Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0,'','','N', 'N','', 0);" > /usr/share/mariadb/mysql_system_tables_data.sql
 
-# https://github.com/MariaDB/server/commit/b9f3f068
-# https://mariadb.com/kb/en/mysql_install_db/#user-accounts-created-by-default
-INSTALL_OPTS="${INSTALL_OPTS} --auth-root-authentication-method=socket"
-INSTALL_OPTS="${INSTALL_OPTS} --skip-test-db"
-INSTALL_OPTS="${INSTALL_OPTS} --datadir=/var/lib/mysql"
-/usr/bin/mysql_install_db ${INSTALL_OPTS} --verbose
+  # https://mariadb.com/kb/en/mysql_install_db/#options
+  # You must be ROOT to use the "--user=" option
+  # The --user flag indicates what user the mysqld deamon will run under.
+  INSTALL_OPTS="--user=${CONTAINER_USER}"
 
-# Create parent directory for file socket and ensure database has filesystem permissions to it.
-# mkdir -p /run/mysqld
-# chown --recursive ${CONTAINER_USER}:${CONTAINER_USER} /run/mysqld
+  # /usr/share/mariadb/mysql_ssystem_tabls_data.sql:
+  # A "cross bootstrap" database is when creating data on a Unix host which will later be included in a Windows zip file.
+  # INSTALL_OPTS="${INSTALL_OPTS} --cross-bootstrap"
 
-# Local connection file socket.
-SOCKET="/run/mysqld/mysql.sock"
+  # This is an internal option, care document why we are using it and what it does?
+  INSTALL_OPTS="${INSTALL_OPTS} --rpm"
 
-# Start temporary database process, send to background, and run any available initialization steps.
-# /usr/bin/mysqld --user=mysql --skip-networking --socket=/run/mysqld/mysql.sock &> /dev/null &
-su-exec ${CONTAINER_USER} /usr/bin/mysqld --user=mysql --skip-networking --socket=${SOCKET} &
-PID="$!"
+  # https://github.com/MariaDB/server/commit/b9f3f068
+  # https://mariadb.com/kb/en/mysql_install_db/#user-accounts-created-by-default
+  INSTALL_OPTS="${INSTALL_OPTS} --auth-root-authentication-method=socket"
+  INSTALL_OPTS="${INSTALL_OPTS} --skip-test-db"
+  INSTALL_OPTS="${INSTALL_OPTS} --datadir=/var/lib/mysql"
+  /usr/bin/mysql_install_db ${INSTALL_OPTS} --verbose
 
-# Give enough time for process to start.
-sleep 1
+  # Create parent directory for file socket and ensure database has filesystem permissions to it.
+  # mkdir -p /run/mysqld
+  # chown --recursive ${CONTAINER_USER}:${CONTAINER_USER} /run/mysqld
 
-# Connect to local socket as system user ROOT per latest documentation, then change password.
-# Need at least one default "localhost" account, read https://stackoverflow.com/a/10236195.
-# This sets the password for the default accounts created by mysql_install_db.
-mysql --socket=${SOCKET} -e "SET PASSWORD = ${ROOTPW};"
-su-exec mysql mysql --socket=${SOCKET} -e "SET PASSWORD = ${ROOTPW};"
+  # Local connection file socket.
+  SOCKET="/run/mysqld/mysql.sock"
 
-# This sets a second, non-default root account - this is the account you'll be actually using.
-# This is taken from https://mariadb.com/kb/en/mysql_install_db/#user-accounts-created-by-default.
-mysql --socket=${SOCKET} -e "
-CREATE USER '${CLIENT_USER}'@'%' IDENTIFIED VIA unix_socket OR mysql_native_password USING ${ROOTPW};
-GRANT ALL PRIVILEGES ON *.* TO '${CLIENT_USER}'@'%' IDENTIFIED BY ${ROOTPW} WITH GRANT OPTION;
-GRANT PROXY ON ''@'%' TO '${CLIENT_USER}'@'%' IDENTIFIED BY ${ROOTPW} WITH GRANT OPTION;"
+  # Start temporary database process, send to background, and run any available initialization steps.
+  # /usr/bin/mysqld --user=mysql --skip-networking --socket=/run/mysqld/mysql.sock &> /dev/null &
+  su-exec ${CONTAINER_USER} /usr/bin/mysqld --user=mysql --skip-networking --socket=${SOCKET} &
+  PID="$!"
 
-# Print confirmation of newly created user accounts.
-# We should end up with 3 accounts: two socket-only accounts created by mysql_install_db and a docker@% account.
-mysql --socket=${SOCKET} -e "use mysql; select Host,User,plugin,Password from user;"
+  # Give enough time for process to start.
+  sleep 1
 
-# Kill temporary database process.
-kill -s TERM "${PID}"
+  # Connect to local socket as system user ROOT per latest documentation, then change password.
+  # Need at least one default "localhost" account, read https://stackoverflow.com/a/10236195.
+  # This sets the password for the default accounts created by mysql_install_db.
+  mysql --socket=${SOCKET} -e "SET PASSWORD = ${ROOTPW};"
+  su-exec mysql mysql --socket=${SOCKET} -e "SET PASSWORD = ${ROOTPW};"
+
+  # This sets a second, non-default root account - this is the account you'll be actually using.
+  # This is taken from https://mariadb.com/kb/en/mysql_install_db/#user-accounts-created-by-default.
+  mysql --socket=${SOCKET} -e "
+  CREATE USER '${CLIENT_USER}'@'%' IDENTIFIED VIA unix_socket OR mysql_native_password USING ${ROOTPW};
+  GRANT ALL PRIVILEGES ON *.* TO '${CLIENT_USER}'@'%' IDENTIFIED BY ${ROOTPW} WITH GRANT OPTION;
+  GRANT PROXY ON ''@'%' TO '${CLIENT_USER}'@'%' IDENTIFIED BY ${ROOTPW} WITH GRANT OPTION;"
+
+  # Print confirmation of newly created user accounts.
+  # We should end up with 3 accounts: two socket-only accounts created by mysql_install_db and a docker@% account.
+  mysql --socket=${SOCKET} -e "use mysql; select Host,User,plugin,Password from user;"
+
+  # Kill temporary database process.
+  kill -s TERM "${PID}"
+
+fi
