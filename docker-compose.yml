@@ -14,11 +14,8 @@ services:
     links:
       - php-fpm:phpservice
     volumes:
-      # - ~/Sites:/www
-      # - /mnt/c/Users/richa/Sites:/www
       - /c/Users/richa/Sites:/www
-    # volumes:
-    #   - ./build/nginx/vhost.conf:/etc/nginx/conf.d/default.conf
+      - /c/Users/richa/Sites/localenv/build/nginx/vhost.conf:/etc/nginx/conf.d/default.conf
 
   mysql:
     hostname: mysql
@@ -118,6 +115,13 @@ services:
 # Docker via WSL does not seem to like reading mounts on WSL's /mnt/*mount*
 # But seems perfectly fine reading drives mounted from /mnt/*mount* to /*mount*.
 # cmd.exe does not seem to have this issue, but instead it uses drive letter paths such as C:/ and D:/
+#
+# As a result, none of these mounts seem to work:
+#
+# volumes:
+#  - ~/Sites:/www
+#  - /mnt/c/Users/richa/Sites:/www
+#
 #
 ## Docker client on WSL volume path problems
 # https://superuser.com/a/1203233
