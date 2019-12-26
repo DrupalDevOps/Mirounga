@@ -12,10 +12,14 @@ ENV NGINX_HTTP_LISTEN=$NGINX_HTTP_LISTEN \
     NGINX_PHPFPM_FASTCGI_PASS=$NGINX_PHPFPM_FASTCGI_PASS \
     NGINX_LOGLEVEL=$NGINX_LOGLEVEL
 
+RUN rm /etc/nginx/conf.d/default.conf
+
 # Copy dynamic vhost definition into container.
 # Use one container for each application, using environment variables passed to the run command.
 #   include /etc/nginx/conf.d/*.conf;
-COPY vhost.conf /etc/nginx/conf.d/vhost.conf
+COPY vhost.conf /etc/nginx/conf.d/default.conf
+
+
 
 # RUN \
 #   cd /tmp \

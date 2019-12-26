@@ -13,8 +13,8 @@ services:
     # Nginx service talks to php-fpm service via alias phpservice.
     links:
       - php-fpm:phpservice
-    volumes:
-      - ./build/nginx/vhost.conf:/etc/nginx/conf.d/default.conf
+    # volumes:
+    #   - ./build/nginx/vhost.conf:/etc/nginx/conf.d/default.conf
 
   mysql:
     hostname: mysql
@@ -25,23 +25,23 @@ services:
     # Map the Docker hosts' 3306 port to container's 3306 for SQL GUI/console access.
     ports:
       - 3306:3306
-    volumes:
-      - /tmp/mariadb/initdb.d:/docker-entrypoint-initdb.d
-    entrypoint:
-      - docker-entrypoint.sh
-      - mysqld
-    command:
-      - --log-error=/dev/stderr
-      - --log-output=FILE
-      # Whether to log all queries or not.
-      # Enabling the general log will slow down things.
-      #- --general-log-file=/dev/stdout
-      #- --general-log=ON
-      # Setup slow query log.
-      - --slow-query-log-file=/dev/stderr
-      - --slow-query-log=ON
-      - --log-queries-not-using-indexes=ON
-      - --long_query_time=5
+    # volumes:
+    #   - /tmp/mariadb/initdb.d:/docker-entrypoint-initdb.d
+    # entrypoint:
+    #   - docker-entrypoint.sh
+    #   - mysqld
+    # command:
+    #   - --log-error=/dev/stderr
+    #   - --log-output=FILE
+    #   # Whether to log all queries or not.
+    #   # Enabling the general log will slow down things.
+    #   #- --general-log-file=/dev/stdout
+    #   #- --general-log=ON
+    #   # Setup slow query log.
+    #   - --slow-query-log-file=/dev/stderr
+    #   - --slow-query-log=ON
+    #   - --log-queries-not-using-indexes=ON
+    #   - --long_query_time=5
 
   memcached:
     # Memcached 1.5.20 released Nov 11, 2019.
