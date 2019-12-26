@@ -14,7 +14,8 @@ ENV NGINX_HTTP_LISTEN=$NGINX_HTTP_LISTEN \
 
 # Copy dynamic vhost definition into container.
 # Use one container for each application, using environment variables passed to the run command.
-COPY vhost.conf /etc/nginx/sites-enabled/vhost.conf
+#   include /etc/nginx/conf.d/*.conf;
+COPY vhost.conf /etc/nginx/conf.d/vhost.conf
 
 # RUN \
 #   cd /tmp \
