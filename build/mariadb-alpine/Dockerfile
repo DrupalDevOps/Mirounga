@@ -4,7 +4,7 @@ FROM alpine:3.11
 # MAINTAINER Johan Bergström <bugs@bergstroem.nu>
 
 # System user used to run the MySQL server.
-ARG CONTAINER_USER=mysql
+ENV CONTAINER_USER=mysql
 # Username used to log in to the database using MySQL client.
 ARG CLIENT_USER=docker
 
@@ -28,19 +28,20 @@ RUN \
   # Need bash for evaluating path name expansions.
   && apk add --no-cache mariadb=10.4.10-r0 bash su-exec \
   #
-  # Run install script as root before optimizing the image.
-  && ./opt/docker/install \
+  # Run install script as root before optimizing the image. the problem is that the data dir is now init'd in the image and cant mount it.
+  # && ./opt/docker/install \
   #
   # Cleanup after install.
   #
   && rm -rf /etc/my.cnf.d/* /etc/my.cnf.apk-new /usr/data/test/db.opt /usr/share/terminfo /usr/mysql-test /usr/share/perl5 /usr/lib/perl5 \
   # /usr/bin @ 97MB: No need for advanced backups, compression (mbstream)
-  && /bin/bash -c 'rm -rf /usr/bin/{mysql,mariabackup,mbstream,perror,pod*,resolveip,perl*,my_safe_process}' \
+  && /bin/bash -c 'rm -rf /usr/bin/{mariabackup,mbstream,perror,pod*,resolveip,perl*,my_safe_process}' \
   && /bin/bash -c 'rm -rf /usr/bin/mysql{admin,check,dump,import,show,test*,access,dumpslow,hotcopy,_isntall_db}' \
   && /bin/bash -c 'rm -rf ${sharedir}/{README*,COPYING*,*.cnf}' \
   && /bin/bash -c 'rm -rf ${sharedir}/{binary-configure,mysqld_multi.server,mysql-log-rotate,mysql.server,install_spider.sql}' \
   && find ${sharedir} -mindepth 1 -type d ! -name 'charsets' ! -name 'english' -print0 | xargs -0 rm -rf \
   && touch ${sharedir}/mysql_system_tables_data.sql \
+  && mkdir -p /run/mysqld \
   # Grant permissions to container user, container won't be running as root.
   && chown --recursive ${CONTAINER_USER}:${CONTAINER_USER} /etc/my.cnf.d/ /run/mysqld ${sharedir}/mysql_system_tables_data.sql /usr/lib/mariadb \
   && for p in aria* myisam* mysqld_* innochecksum \
@@ -68,4 +69,4 @@ HEALTHCHECK --start-period=3s CMD pgrep mysqld
 VOLUME ["/var/lib/mysql"]
 
 EXPOSE 3306
-ENTRYPOINT [ "/opt/docker/entrypoint", "mysql" ]
+ENTRYPOINT [ "/opt/docker/entrypoint" ]

@@ -56,15 +56,15 @@ INSTALL_OPTS="${INSTALL_OPTS} --datadir=/var/lib/mysql"
 /usr/bin/mysql_install_db ${INSTALL_OPTS} --verbose
 
 # Create parent directory for file socket and ensure database has filesystem permissions to it.
-mkdir /run/mysqld
-chown --recursive ${CONTAINER_USER}:${CONTAINER_USER} /run/mysqld
+# mkdir -p /run/mysqld
+# chown --recursive ${CONTAINER_USER}:${CONTAINER_USER} /run/mysqld
 
 # Local connection file socket.
 SOCKET="/run/mysqld/mysql.sock"
 
 # Start temporary database process, send to background, and run any available initialization steps.
 # /usr/bin/mysqld --user=mysql --skip-networking --socket=/run/mysqld/mysql.sock &> /dev/null &
-/usr/bin/mysqld --user=mysql --skip-networking --socket=${SOCKET} &
+su-exec ${CONTAINER_USER} /usr/bin/mysqld --user=mysql --skip-networking --socket=${SOCKET} &
 PID="$!"
 
 # Give enough time for process to start.
