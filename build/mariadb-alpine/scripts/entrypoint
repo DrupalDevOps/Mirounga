@@ -1,3 +1,4 @@
+#!/bin/sh
 set -eo pipefail
 
 echo ""
@@ -15,4 +16,4 @@ MYSQLD_OPTS="${MYSQLD_OPTS} --skip-slave-start"
 MYSQLD_OPTS="${MYSQLD_OPTS} --debug-gdb"
 
 # Do we really have to run this as root? Why can't we use su-exec.
-su-exec ${CONTAINER_USER} /usr/bin/mysqld ${MYSQLD_OPTS}
+su-exec $1 /usr/bin/mysqld ${MYSQLD_OPTS}

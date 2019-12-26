@@ -45,7 +45,6 @@ RUN \
   && /bin/bash -c 'rm -rf ${sharedir}/{binary-configure,mysqld_multi.server,mysql-log-rotate,mysql.server,install_spider.sql}' \
   && find ${sharedir} -mindepth 1 -type d ! -name 'charsets' ! -name 'english' -print0 | xargs -0 rm -rf \
   && touch ${sharedir}/mysql_system_tables_data.sql \
-  && mkdir /run/mysqld \
   # Grant permissions to container user, container won't be running as root.
   && chown --recursive ${CONTAINER_USER}:${CONTAINER_USER} /etc/my.cnf.d/ /run/mysqld ${sharedir}/mysql_system_tables_data.sql /usr/lib/mariadb \
   && for p in aria* myisam* mysqld_* innochecksum \
@@ -62,9 +61,7 @@ RUN \
   #   && rm -rf /usr/lib/libxml* /usr/lib/libpcre* /usr/lib/libstd* /usr/lib/libpanel* /usr/lib/libncurses* /usr/lib/libme* /usr/lib/liblzma* \
   #     /usr/lib/libgcc* /usr/lib/libform* /usr/lib/libbz* /usr/lib/libaio* /usr/lib/libz*
 
-# COPY entrypoint.sh /entrypoint.sh
-
-# USER ${CONTAINER_USER}
+COPY scripts/entrypoint /opt/docker/entrypoint
 
 # This is not super helpful; mysqld might be running but not accepting connections.
 # Since we have no clients, we can't really connect to it and check.
@@ -73,15 +70,6 @@ RUN \
 HEALTHCHECK --start-period=3s CMD pgrep mysqld
 
 VOLUME ["/var/lib/mysql"]
-# ENTRYPOINT ["/run.sh"]
-# ENTRYPOINT ["entrypoint.sh"]
+
 EXPOSE 3306
-ENTRYPOINT [ "su-exec", "mysql", "/usr/bin/mysqld", "--skip-name-resolve", "--skip-host-cache", "--skip-slave-start", "--debug-gdb" ]
-
-# MYSQLD_OPTS="${MYSQLD_OPTS} --skip-name-resolve"
-# MYSQLD_OPTS="${MYSQLD_OPTS} --skip-host-cache"
-# MYSQLD_OPTS="${MYSQLD_OPTS} --skip-slave-start"
-# # Listen to signals, most importantly CTRL+C
-# MYSQLD_OPTS="${MYSQLD_OPTS} --debug-gdb"
-
-# Do we really have to run this as root? Why can't we use su-exec.
+ENTRYPOINT [ "/opt/docker/entrypoint", "mysql" ]

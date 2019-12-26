@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.6'
 
 #
 # README.md -
@@ -21,8 +21,8 @@ services:
       # target: core
       # args:
       #   CONTAINER_USER: drupal
-    environment:
-      # MYSQL_ROOT_PASSWORD: root
-      CONTAINER_USER: drupal
+    # environment:
+    #   # MYSQL_ROOT_PASSWORD: root
+    #   CONTAINER_USER: drupal
     ports:
-      - 127.0.0.1:3306:3306
+      - "3306:3306"

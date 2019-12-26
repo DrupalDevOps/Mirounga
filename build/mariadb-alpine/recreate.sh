@@ -8,4 +8,4 @@ docker-compose down \
 && docker-compose build mariadb \
 && docker-compose up -d \
 && docker-compose ps \
-&& docker-compose logs
+&& docker-compose logs -f
