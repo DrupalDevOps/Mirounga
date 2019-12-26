@@ -11,33 +11,38 @@ cp /tmp/my.cnf /etc/my.cnf.d/
   sed -i -e '/\[mariadb\]/a skip_innodb = yes\ndefault_storage_engine = MyISAM\ndefault_tmp_storage_engine = MyISAM' \
       -e '/^innodb/d' /etc/my.cnf.d/my.cnf
 
-MYSQLD_OPTS="--user=mysql"
-MYSQLD_OPTS="${MYSQLD_OPTS} --skip-name-resolve"
-MYSQLD_OPTS="${MYSQLD_OPTS} --skip-host-cache"
-MYSQLD_OPTS="${MYSQLD_OPTS} --skip-slave-start"
-# Listen to signals, most importantly CTRL+C
-MYSQLD_OPTS="${MYSQLD_OPTS} --debug-gdb"
+# #
+# # Daemon options
+# #
+# MYSQLD_OPTS="--user=${CONTAINER_USER}"
+# MYSQLD_OPTS="${MYSQLD_OPTS} --skip-name-resolve"
+# MYSQLD_OPTS="${MYSQLD_OPTS} --skip-host-cache"
+# MYSQLD_OPTS="${MYSQLD_OPTS} --skip-slave-start"
+# # Listen to signals, most importantly CTRL+C
+# MYSQLD_OPTS="${MYSQLD_OPTS} --debug-gdb"
 
 # No previous installation
 if [ -z "$(ls -A /var/lib/mysql/)" ]; then
   ROOTPW="''"
   [[ -n "${SKIP_INNODB}" ]] && touch /var/lib/mysql/noinnodb
   [[ -n "${MYSQL_ROOT_PASSWORD}" ]] && ROOTPW="PASSWORD('${MYSQL_ROOT_PASSWORD}')"
-  echo "INSERT INTO user VALUES ('%','root',${ROOTPW},'Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0,'','','N', 'N','', 0);" > /usr/share/mariadb/mysql_system_tables_data.sql
+  # ERROR: 1471  The target table user of the INSERT is not insertable-into
+  # echo "INSERT INTO user VALUES ('%','root',${ROOTPW},'Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0,'','','N', 'N','', 0);" > /usr/share/mariadb/mysql_system_tables_data.sql
 
-  INSTALL_OPTS="--user=mysql"
-  INSTALL_OPTS="${INSTALL_OPTS} --cross-bootstrap"
-  INSTALL_OPTS="${INSTALL_OPTS} --rpm"
-  # https://github.com/MariaDB/server/commit/b9f3f068
-  INSTALL_OPTS="${INSTALL_OPTS} --auth-root-authentication-method=normal"
-  INSTALL_OPTS="${INSTALL_OPTS} --skip-test-db"
-  INSTALL_OPTS="${INSTALL_OPTS} --datadir=/var/lib/mysql"
-  /usr/bin/mysql_install_db ${INSTALL_OPTS}
+  # INSTALL_OPTS="--user=${CONTAINER_USER}"
+  # INSTALL_OPTS="${INSTALL_OPTS} --cross-bootstrap"
+  # INSTALL_OPTS="${INSTALL_OPTS} --rpm"
+  # # https://github.com/MariaDB/server/commit/b9f3f068
+  # INSTALL_OPTS="${INSTALL_OPTS} --auth-root-authentication-method=normal"
+  # # INSTALL_OPTS="${INSTALL_OPTS} --auth-root-socket-user=mysql"
+  # INSTALL_OPTS="${INSTALL_OPTS} --skip-test-db"
+  # INSTALL_OPTS="${INSTALL_OPTS} --datadir=/var/lib/mysql"
+  # /usr/bin/mysql_install_db ${INSTALL_OPTS}
 
   [[ -n "${MYSQL_DATABASE}" ]] && echo "create database if not exists \`${MYSQL_DATABASE}\` character set utf8 collate utf8_general_ci; " >> /tmp/init
   if [ -n "${MYSQL_USER}" -a -n "${MYSQL_DATABASE}" ]; then
     echo "grant all on \`${MYSQL_DATABASE}\`.* to '${MYSQL_USER}'@'%' identified by '${MYSQL_PASSWORD}'; " >> /tmp/init
-  fi 
+  fi
   echo "flush privileges;" >> /tmp/init
 
   # Execute custom scripts provided by a user. This will spawn a mysqld and

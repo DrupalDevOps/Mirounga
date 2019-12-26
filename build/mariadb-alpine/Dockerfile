@@ -3,7 +3,7 @@ FROM alpine:3.11
 # Maintainer is deprecated, use LABEL.
 # MAINTAINER Johan Bergström <bugs@bergstroem.nu>
 
-ARG CONTAINER_USER
+ARG CONTAINER_USER=mysql
 
 # Build-time metadata as defined at http://label-schema.org
 # DEPRECATED IN FAVOUR OF OCI IMAGE SPEC !!!
@@ -16,25 +16,17 @@ ARG CONTAINER_USER
 # Therefore: to reduce image size, run installation script inside the build, then remove Perl when install is complete.
 
 # One-time install script (during build only).
-# COPY mysql_install /mysql_install
-# COPY my.cnf /tmp/
-
-# COPY foo /tmp/
-
-
-COPY bla bla
-
-
-
+COPY scripts/install /opt/docker/install
+COPY my.cnf /tmp/
 
 
 RUN \
   export sharedir=/usr/share/mariadb \
   # Need bash for evaluating path name expansions.
-  && apk add --no-cache mariadb=10.4.10-r0 bash \
+  && apk add --no-cache mariadb=10.4.10-r0 bash su-exec \
   #
   # Run install script as root before optimizing the image.
-  && ./install.sh \
+  && ./opt/docker/install \
   #
   # Now you can start deleting.
   #
@@ -70,9 +62,7 @@ RUN \
   #   && rm -rf /usr/lib/libxml* /usr/lib/libpcre* /usr/lib/libstd* /usr/lib/libpanel* /usr/lib/libncurses* /usr/lib/libme* /usr/lib/liblzma* \
   #     /usr/lib/libgcc* /usr/lib/libform* /usr/lib/libbz* /usr/lib/libaio* /usr/lib/libz*
 
-# Runtime script.
-COPY run.sh /run.sh
-COPY entrypoint.sh /entrypoint.sh
+# COPY entrypoint.sh /entrypoint.sh
 
 # USER ${CONTAINER_USER}
 
@@ -84,5 +74,14 @@ HEALTHCHECK --start-period=3s CMD pgrep mysqld
 
 VOLUME ["/var/lib/mysql"]
 # ENTRYPOINT ["/run.sh"]
-ENTRYPOINT ["entrypoint.sh"]
+# ENTRYPOINT ["entrypoint.sh"]
 EXPOSE 3306
+ENTRYPOINT [ "su-exec", "mysql", "/usr/bin/mysqld", "--skip-name-resolve", "--skip-host-cache", "--skip-slave-start", "--debug-gdb" ]
+
+# MYSQLD_OPTS="${MYSQLD_OPTS} --skip-name-resolve"
+# MYSQLD_OPTS="${MYSQLD_OPTS} --skip-host-cache"
+# MYSQLD_OPTS="${MYSQLD_OPTS} --skip-slave-start"
+# # Listen to signals, most importantly CTRL+C
+# MYSQLD_OPTS="${MYSQLD_OPTS} --debug-gdb"
+
+# Do we really have to run this as root? Why can't we use su-exec.
