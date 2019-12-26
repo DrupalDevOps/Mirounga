@@ -72,17 +72,19 @@ sleep 1
 
 # Connect to local socket as system user ROOT per latest documentation, then change password.
 # Need at least one default "localhost" account, read https://stackoverflow.com/a/10236195.
+# This sets the password for the default accounts created by mysql_install_db.
 mysql --socket=${SOCKET} -e "SET PASSWORD = ${ROOTPW};"
+su-exec mysql mysql --socket=${SOCKET} -e "SET PASSWORD = ${ROOTPW};"
 
-# This sets the second root account.
-mysql --socket=${SOCKET} -e "CREATE USER 'root'@'%';
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY ${ROOTPW} WITH GRANT OPTION;
-GRANT PROXY ON ''@'%' TO 'root'@'localhost' IDENTIFIED BY ${ROOTPW} WITH GRANT OPTION;
-"
+# This sets a second, non-default root account - this is the account you'll be actually using.
+# This is taken from https://mariadb.com/kb/en/mysql_install_db/#user-accounts-created-by-default.
+mysql --socket=${SOCKET} -e "
+CREATE USER '${CLIENT_USER}'@'%' IDENTIFIED VIA unix_socket OR mysql_native_password USING ${ROOTPW};
+GRANT ALL PRIVILEGES ON *.* TO '${CLIENT_USER}'@'%' IDENTIFIED BY ${ROOTPW} WITH GRANT OPTION;
+GRANT PROXY ON ''@'%' TO '${CLIENT_USER}'@'%' IDENTIFIED BY ${ROOTPW} WITH GRANT OPTION;"
 
-# GRANT ALL ON *.* to root@'%' IDENTIFIED BY ${ROOTPW};"
-
-# Verify.
+# Print confirmation of newly created user accounts.
+# We should end up with 3 accounts: two socket-only accounts created by mysql_install_db and a docker@% account.
 mysql --socket=${SOCKET} -e "use mysql; select Host,User,plugin,Password from user;"
 
 # Kill temporary database process.

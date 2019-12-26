@@ -3,7 +3,10 @@ FROM alpine:3.11
 # Maintainer is deprecated, use LABEL.
 # MAINTAINER Johan Bergström <bugs@bergstroem.nu>
 
+# System user used to run the MySQL server.
 ARG CONTAINER_USER=mysql
+# Username used to log in to the database using MySQL client.
+ARG CLIENT_USER=docker
 
 # Build-time metadata as defined at http://label-schema.org
 # DEPRECATED IN FAVOUR OF OCI IMAGE SPEC !!!

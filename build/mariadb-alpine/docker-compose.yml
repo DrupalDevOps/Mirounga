@@ -19,8 +19,8 @@ services:
       context: .
       dockerfile: Dockerfile
       # target: core
-      # args:
-      #   CONTAINER_USER: drupal
+      args:
+       CLIENT_USER: drupal
     # environment:
     #   # MYSQL_ROOT_PASSWORD: root
     #   CONTAINER_USER: drupal
