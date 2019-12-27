@@ -107,30 +107,3 @@ services:
   #   volumes:
   #     # Display XHProf output from other containers.
   #     - ~/Sites/xhprof_run:/var/tmp/xhprof
-
-
-
-# WINDOWS 10 WSL DOCKER COMPOSE VOLUME MOUNT DOCUMENTATION
-#
-# Docker via WSL does not seem to like reading mounts on WSL's /mnt/*mount*
-# But seems perfectly fine reading drives mounted from /mnt/*mount* to /*mount*.
-# cmd.exe does not seem to have this issue, but instead it uses drive letter paths such as C:/ and D:/
-#
-# As a result, none of these mounts seem to work:
-#
-# volumes:
-#  - ~/Sites:/www
-#  - /mnt/c/Users/richa/Sites:/www
-#
-#
-## Docker client on WSL volume path problems
-# https://superuser.com/a/1203233
-#
-#sudo mkdir -p /c
-#sudo /bin/mount --bind /mnt/c /c
-#sudo mkdir -p /d
-#sudo /bin/mount --bind /mnt/d /d
-#
-# If you need to reset your WSL password
-# https://winaero.com/blog/reset-password-wsl-linux-distro-windows-10/
-#
