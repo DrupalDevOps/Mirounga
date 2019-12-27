@@ -50,7 +50,8 @@ RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
 WORKDIR /www
 
 # Core image CLI entrypoint.
-ENTRYPOINT ["/bin/zsh", "--interactive"]
+# ENTRYPOINT ["/bin/zsh", "--interactive"]
+ENTRYPOINT ["/bin/sh", "--interactive"]
 
 
 #
@@ -82,4 +83,8 @@ RUN phpcs --config-set installed_paths ${COMPOSER_HOME}/vendor/drupal/coder/code
 
 # Provide a dynamic entrypoint into the container.
 COPY common/entrypoint.sh /root/entrypoint.sh
-# ENTRYPOINT ["/root/entrypoint.sh"]
+
+ENTRYPOINT ["/bin/bash"]
+
+# SSH Agent setup.
+COPY common/.bashrc /root/.bashrc

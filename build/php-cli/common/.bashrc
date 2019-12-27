@@ -33,3 +33,17 @@
 # if [ -f "/root/.drush/drush.prompt.sh" ] ; then
 #   source /root/.drush/drush.prompt.sh
 # fi
+
+# Agent
+mkdir /root/.ssh
+chown 700 /root/.ssh
+cp /root/.ssh-host/{id_rsa,id_rsa.pub} /root/.ssh
+chmod 600 /root/.ssh/id_rsa /root/.ssh/id_rsa.pub
+
+
+# Start agent.
+eval $(ssh-agent -s)
+# ssh-add — < /g/EigeneDateien/ssh/id_rsa
+# ssh-add - < /root/.ssh/id_rsa
+ssh-add
+ssh-add -l
