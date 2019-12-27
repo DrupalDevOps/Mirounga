@@ -1,8 +1,20 @@
 #!/bin/sh
 
 # Script to install / initialize MySQL during Docker build.
-# MySQL install requires Perl.
-# Remove Perl after running this script from system to reduce image size.
+# MySQL install script mysql_install_db runs succesfully without Perl (removed from image).
+#
+# This script:
+#
+# - Downloads temporary mysql client pre-compiled binary from Alpine's APK repositories.
+# - Deletes the rest of the APK package.
+# - Uses the temporary mysql client to run mysql_install_db initialization program.
+# - mysql_install_db initializes the database (REQUIRED) at RUNTIME using --bootstrap mode.
+# - Starts temporary mysqld daemon to run additional initialization steps (user accounts setup).
+# - Sets password for default accounts created by mysql_install_db program.
+# - Creates additional acount for access outside the Docker container w/ optional password.
+# - Prints confirmation of accounts created.
+# - Kills temporary mysql daemon.
+# - Deletes RUNTIME temporary mysql client from container.
 
 set -eox pipefail
 
