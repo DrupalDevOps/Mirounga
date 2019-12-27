@@ -31,27 +31,17 @@ services:
     volumes:
       - ~/Sites:/www
 
-  # Image optimized for Drupal 7, validated on 12/24/2019 - Merry XMas!
-  # php-cli.d7:
-  #   image: alexanderallen/php-cli:d7
-  #   build:
-  #     context: ./drupal/7
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - ~/Sites:/www
-
-  # Image optimized for Drupal 8, validated on 12/24/2019 - Merry XMas!
-  php-cli.d8:
-    image: alexanderallen/php-cli:d8
+  # Drush version for Drupal 8.4+, but not backwards compat with 8.3- and below.
+  # https://docs.drush.org/en/master/install/
+  drush9:
+    image: alexanderallen/php-cli:drush9
     build:
-      context: ./drupal/8
+      context: .
       dockerfile: Dockerfile
-    volumes:
-      - ~/Sites:/www
-
-#  Example on how to create a Composer container on the main compose file.
-#  composer:
-#    image: alexanderallen/php-cli:d8
+      # Build target drush9 might be compatible with DRUSH_VERSION 10.
+      target: drush9
+      args:
+        DRUSH_VERSION: 9
 #    links:
 #      - mysql:mysql
 #      - memcached:memcached

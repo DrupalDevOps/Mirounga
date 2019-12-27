@@ -39,15 +39,47 @@ RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
   && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --snapshot && rm -rf /tmp/composer-setup.php
 
 # Configure Z shell.
-COPY .zshrc /root/.zshrc
+COPY common/.zshrc /root/.zshrc
 
 # Since the more efficient method of agent-forwarding is not supported on all
 # Docker environments, start an ssh-agent and add a key.
 # Required for Composer repos that need SSH instead of HTTPS.
-COPY .bashrc /root/.bashrc
+COPY common/.bashrc /root/.bashrc
 
 # Where all of our codebase is mounted to.
 WORKDIR /www
 
 # Core image CLI entrypoint.
 ENTRYPOINT ["/bin/zsh", "--interactive"]
+
+
+#
+# Build stage optimized with Composer packages for Drupal development.
+#
+FROM alexanderallen/php-cli.core:latest as drush9
+
+# Specifies which composer.json file to use for build.
+ARG DRUSH_VERSION
+RUN \
+  cd /tmp \
+  && apk add --no-cache \
+  # REQ: Composer squizlabs/php_codesniffer 2.7.0 requires ext-tokenizer
+  ${PHP_VERSION}-tokenizer \
+  # REQ: Composer drupal/coder 8.3.7 requires ext-mbstring
+  ${PHP_VERSION}-mbstring
+
+# Provide optional composer example to install.
+COPY drush/${DRUSH_VERSION}/composer.json ${COMPOSER_HOME}/composer.json
+
+# Install default CLI tools.
+RUN composer global -vvv install
+
+# Configure Drush 9 and above.
+COPY common/drush.yml /root/.drush/drush.yml
+
+# Inform PHP Code Snifer (phpcs) about Drupal coding standards sniff files.
+RUN phpcs --config-set installed_paths ${COMPOSER_HOME}/vendor/drupal/coder/coder_sniffer
+
+# Provide a dynamic entrypoint into the container.
+COPY common/entrypoint.sh /root/entrypoint.sh
+ENTRYPOINT ["/root/entrypoint.sh"]

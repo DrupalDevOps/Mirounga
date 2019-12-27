@@ -1,0 +1,20 @@
+{
+  "name": "alexanderallen/php-cli.drush9",
+  "description": "Composer dependencies for Drupal 8.4+ development.",
+  "require-dev": {
+    "phing/phing": "2.x"
+  },
+  "require": {
+    "drush/drush": "~9.0",
+    "drupal/coder": "*",
+    "phpunit/phpunit": "~8.0",
+    "pear/versioncontrol_git": "@dev",
+    "pdepend/pdepend": "2.x",
+    "squizlabs/php_codesniffer": "~3.0",
+    "phpmd/phpmd": "~2.0",
+    "phploc/phploc": "~5.0",
+    "symfony/yaml": "~3.0",
+    "pear/pear-core-minimal": "1.10.1",
+    "acquia/acsf-tools": "~9.0"
+  }
+}
