@@ -39,12 +39,12 @@ RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
   && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --snapshot && rm -rf /tmp/composer-setup.php
 
 # Configure Z shell.
-COPY common/.zshrc /root/.zshrc
+# COPY common/.zshrc /root/.zshrc
 
 # Since the more efficient method of agent-forwarding is not supported on all
 # Docker environments, start an ssh-agent and add a key.
 # Required for Composer repos that need SSH instead of HTTPS.
-COPY common/.bashrc /root/.bashrc
+# COPY common/.bashrc /root/.bashrc
 
 # Where all of our codebase is mounted to.
 WORKDIR /www
@@ -74,12 +74,12 @@ COPY drush/${DRUSH_VERSION}/composer.json ${COMPOSER_HOME}/composer.json
 # Install default CLI tools.
 RUN composer global -vvv install
 
-# Configure Drush 9 and above.
-COPY common/drush.yml /root/.drush/drush.yml
+# Configure Drush 9 and above. Can be done by drush core:init instead.
+# COPY common/drush.yml /root/.drush/drush.yml
 
 # Inform PHP Code Snifer (phpcs) about Drupal coding standards sniff files.
 RUN phpcs --config-set installed_paths ${COMPOSER_HOME}/vendor/drupal/coder/coder_sniffer
 
 # Provide a dynamic entrypoint into the container.
 COPY common/entrypoint.sh /root/entrypoint.sh
-ENTRYPOINT ["/root/entrypoint.sh"]
+# ENTRYPOINT ["/root/entrypoint.sh"]

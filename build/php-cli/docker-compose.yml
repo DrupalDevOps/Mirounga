@@ -42,10 +42,14 @@ services:
       target: drush9
       args:
         DRUSH_VERSION: 9
-#    links:
-#      - mysql:mysql
-#      - memcached:memcached
-#    volumes:
-#      - ~/.ssh:/root/.ssh
-#      - ~/.composer:/composer
-#      - ~/Sites:/www
+    # links:
+    #   - mysql:mysql
+    #   - memcached:memcached
+    # volumes:
+    #   # WIN10 WSL
+    #   - /c/Users/richa/.ssh:/root/.ssh
+    #   - /c/Users/richa/Sites:/www
+      # OSX
+      #- ~/.ssh:/root/.ssh
+      #- ~/.composer:/composer
+      #- ~/Sites:/www
