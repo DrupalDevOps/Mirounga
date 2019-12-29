@@ -18,21 +18,23 @@ RUN rm /etc/nginx/conf.d/default.conf
 # Use one container for each application, using environment variables passed to the run command.
 #   include /etc/nginx/conf.d/*.conf;
 COPY vhost.conf /etc/nginx/conf.d/default.conf
+COPY etc/nginx/nginx.conf etc/nginx/nginx.conf
+COPY entrypoint.sh /entrypoint.sh
 
+ENV NGINX_HTTP_LISTEN 8080
 
+RUN \
+  cd /tmp \
+  && apk add --no-cache su-exec \
+  # On Alpine /dev/pts has by default group tty, but needs tty allocated in Docker compose or run in order to work
+  # for logs forwarding.
+  && addgroup nobody tty \
+  # Create .pid directory accessible by non root.
+  && mkdir /var/run/nginx \
+  && chmod -R o+rwx /var/run/nginx /var/cache/nginx /entrypoint.sh
 
-# RUN \
-#   cd /tmp \
-#   && apk add --no-cache \
-#   su-exec \
-#   nginx \
-#   net-tools
-  # or openresty
-
-# ENTRYPOINT ["su-exec", "root", "/usr/sbin/nginx"]
-
-EXPOSE 80
+EXPOSE ${NGINX_HTTP_LISTEN}
 
 STOPSIGNAL SIGTERM
 
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT [ "/entrypoint.sh" ]

@@ -8,7 +8,7 @@ services:
       PHP_INI_MEM_LIMIT: 256M # The dfeulat memory limit is 128M.
       PHP_FPM_LISTEN: 127.0.0.1:9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
     ports:
-      - 127.0.0.1:80:80
+      - 127.0.0.1:80:8080
       - 127.0.0.1:443:443
     # Nginx service talks to php-fpm service via alias phpservice.
     links:
