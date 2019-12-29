@@ -10,3 +10,6 @@ playbook.retry
 hosts.dpkg-dist
 *.sql
 tmp
+
+# https://docs.docker.com/compose/extends/#different-environments
+docker-compose.override.yml
