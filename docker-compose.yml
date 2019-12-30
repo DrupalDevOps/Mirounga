@@ -1,12 +1,5 @@
 version: '3.5'
-# networks:
-#   localenv:
-#     driver: bridge
-
 networks:
-  # localenv:
-  #   name: localenv
-  #   driver: bridge
   default:
     external: true
     name: localenv
