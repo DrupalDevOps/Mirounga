@@ -31,7 +31,7 @@ RUN \
   && addgroup nobody tty \
   # Create .pid directory accessible by non root.
   && mkdir /var/run/nginx \
-  && chmod -R o+rwx /var/run/nginx /var/cache/nginx /entrypoint.sh
+  && chmod -R o+rwx /var/run/nginx /var/log/nginx /var/cache/nginx /entrypoint.sh
 
 EXPOSE ${NGINX_HTTP_LISTEN}
 
