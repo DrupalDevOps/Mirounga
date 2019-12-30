@@ -16,8 +16,8 @@ services:
       - 127.0.0.1:80:8080
       - 127.0.0.1:443:443
     # Nginx service talks to php-fpm service via alias phpservice.
-    links:
-      - php-fpm:phpservice
+    # links:
+    #   - php-fpm:phpservice
     volumes:
       - ./app:/app
 
@@ -25,8 +25,8 @@ services:
     hostname: mysql
     image: alexanderallen/mariadb-alpine:10.4.10-r0
     # Allow PHP-FPM access to database on 3306.
-    expose:
-      - 3306
+    # expose:
+    #   - 3306
     # Map the Docker hosts' 3306 port to container's 3306 for SQL GUI/console access.
     ports:
       - 3306:3306
@@ -36,8 +36,8 @@ services:
     # https://hub.docker.com/_/memcached
     image: memcached:1.5.20-alpine
     command: -p 11211 -m 16 -vvv -M
-    expose:
-      - 11211
+    # expose:
+    #   - 11211
 
   php-fpm:
     image: alexanderallen/php-fpm.dev:latest
@@ -52,11 +52,11 @@ services:
       XDEBUG_CONNECT_BACK: 0 # Must be disabled in order for remote_host to work.
       XDEBUG_REMOTE_HOST: 10.254.254.254 # Docker for Mac host alias: use it instead of the default gateway 172.18.0.1.
     # Nginx service talks to PHP-FPM on this port.
-    expose:
-      - 9010
     # PHP-FPM service talks to mysql and memcached services.
     links:
       - mysql:mysql
       - memcached:memcached
+    # expose:
+    #   - 9010
     volumes:
       - ./app:/app
