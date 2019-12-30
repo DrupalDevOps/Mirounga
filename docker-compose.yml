@@ -8,16 +8,16 @@ services:
 
   nginx:
     image: alexanderallen/nginx:1.17-alpine
-    environment:
-      PHP_INI_MAX_EXECUTION_TIME: 120 # The defualt is 30, increasing to 60.
-      PHP_INI_MEM_LIMIT: 256M # The dfeulat memory limit is 128M.
-      PHP_FPM_LISTEN: 127.0.0.1:9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
     ports:
-      - 127.0.0.1:80:8080
-      - 127.0.0.1:443:443
+      - 80:8080
+      - 443:443
     volumes:
       - ./app:/app
-    # todo: helthcheck
+    healthcheck:
+      test: curl --fail -s http://localhost:80 || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 2
 
   mysql:
     hostname: mysql
