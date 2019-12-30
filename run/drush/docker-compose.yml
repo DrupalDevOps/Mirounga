@@ -1,0 +1,24 @@
+version: '3.5'
+
+networks:
+  default:
+    external: true
+    name: localenv
+
+secrets:
+  ssh_private:
+    file: /c/Users/richa/.ssh/id_rsa
+  ssh_public:
+    file: /c/Users/richa/.ssh/id_rsa.pub
+
+services:
+
+  drush:
+    image: alexanderallen/php-cli:drush9
+    secrets:
+      - ssh_private
+      - ssh_public
+    environment:
+      XDEBUG_SHOW_EXCEPTION_TRACE: 0
+    volumes:
+      - /c/Users/richa/Sites:/www
