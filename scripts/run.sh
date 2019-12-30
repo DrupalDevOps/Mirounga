@@ -16,7 +16,7 @@ if ! (($NETEXISTS)) ; then
   echo "Create user-defined network"
   docker network create $USER_NETWORK
 else
-  echo "Docker network ${NETEXISTS} already exists, joining."
+  echo "Docker network ${USER_NETWORK} already exists, joining."
 fi
 
 # Bring down stack if it exists.
