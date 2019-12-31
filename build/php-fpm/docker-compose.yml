@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   php-fpm.core:
-    image: alexanderallen/php-fpm.core:latest
+    image: alexanderallen/php-fpm.core:7-alpine
     build:
       context: .
       dockerfile: Dockerfile
