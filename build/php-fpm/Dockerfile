@@ -13,40 +13,112 @@ ENV \
     PHP_INI_MEM_LIMIT=256M \
     PHP_FPM_ERRLOG=/var/log/php-fpm.log
 
+# For OFFICIAL Drupal 8 requirements see
+# https://www.drupal.org/docs/8/system-requirements/php-requirements
+#
+# For OFFICIAL list of required extensions, see
+# https://git.drupalcode.org/project/drupal/blob/8.7.x/core/composer.json
+#
+# "ext-date": "*",
+# "ext-dom": "*",
+# "ext-filter": "*",
+# "ext-gd": "*",
+# "ext-hash": "*",
+# "ext-json": "*",
+# "ext-pcre": "*",
+# "ext-PDO": "*",
+# "ext-session": "*",
+# "ext-SimpleXML": "*",
+# "ext-SPL": "*",
+# "ext-tokenizer": "*",
+# "ext-xml": "*",
+
+
 RUN \
     cd /tmp \
     && apk add --no-cache \
-        ${PHP_VERSION}-common \
+        # php7 -> 4.6MB; /usr -> 11MB
+        ${PHP_VERSION} \
        # ${PHP_VERSION}-cli \ # not found
         ${PHP_VERSION}-curl \
-        ${PHP_VERSION}-ctype \
-        ${PHP_VERSION}-dom \
+        #
+        # https://pkgs.alpinelinux.org/package/edge/community/x86_64/php7-ctype
+        # required by drupal7 package (not using that), php7-pecl-xhprof (maybe maybe not, can be moved to dev image)
+        #${PHP_VERSION}-ctype \
+        #
+        # 16 MB. Alpine says 5MB installed size. I say it takes more.
         ${PHP_VERSION}-fpm \
+        #
+        # 23 MB. /usr/x11 1.3MB
+        # https://www.drupal.org/docs/8/system-requirements/php-requirements#image
+        # An image library for PHP such as the GD library is a required extension in Drupal 8, and is needed for image manipulation
+        # ${PHP_VERSION}-gd \
+        # ${PHP_VERSION}-pecl-imagick \
+        #
+        # ${PHP_VERSION}-intl \
+        #
+        # Required in Drupal core composer.json.
+        ${PHP_VERSION}-dom \
         ${PHP_VERSION}-gd \
-        ${PHP_VERSION}-intl \
-        ${PHP_VERSION}-pecl-imagick \
-        ${PHP_VERSION}-imap \
-        ${PHP_VERSION}-iconv \
         ${PHP_VERSION}-json \
-        ${PHP_VERSION}-mysqli \
-        ${PHP_VERSION}-pecl-mcrypt \
-        ${PHP_VERSION}-pecl-memcached \
-        ${PHP_VERSION}-pear \
-        ${PHP_VERSION}-phpdbg \
-        ${PHP_VERSION}-pspell \
-        ${PHP_VERSION}-phar \
-        ${PHP_VERSION}-pcntl \
-        ${PHP_VERSION}-posix \
         ${PHP_VERSION}-pdo \
         ${PHP_VERSION}-pdo_mysql \
-        ${PHP_VERSION}-openssl \
-        ${PHP_VERSION}-opcache \
-        ${PHP_VERSION}-xml \
-        ${PHP_VERSION}-xmlrpc \
-        ${PHP_VERSION}-xmlreader \
-        ${PHP_VERSION}-xmlwriter \
+        ${PHP_VERSION}-session \
         ${PHP_VERSION}-simplexml \
-        ${PHP_VERSION}-xsl \
+        ${PHP_VERSION}-tokenizer \
+        ${PHP_VERSION}-xml \
+        #
+        # Would allow to send emails. Not required.
+        # https://www.php.net/manual/en/intro.imap.php
+        # ${PHP_VERSION}-imap \
+        #
+        # https://www.php.net/manual/en/function.iconv.php
+        # iconv — Convert string to requested character encoding
+        # ${PHP_VERSION}-iconv \
+        #
+        # Should be baked in with PHP core already - not needed.
+        # https://www.drupal.org/docs/8/system-requirements/php-requirements#json
+        # ${PHP_VERSION}-json \
+        #
+        # ${PHP_VERSION}-mysqli \
+        # ${PHP_VERSION}-pecl-mcrypt \
+        # ${PHP_VERSION}-pecl-memcached \
+        # ${PHP_VERSION}-pear \
+        #
+        # # PHP DBG is a command line debugger, and it's a 40MB extension.
+        # If you really want it, consider adding to the dev image.
+        # # https://pkgs.alpinelinux.org/package/edge/community/x86_64/php7-dbg
+        # # ${PHP_VERSION}-phpdbg \
+        #
+        # Spelling - we dont need this.
+        # https://www.php.net/manual/en/intro.pspell.php
+        # ${PHP_VERSION}-pspell \
+        # ${PHP_VERSION}-phar \
+        # ${PHP_VERSION}-pcntl \
+        # ${PHP_VERSION}-posix \
+        #
+        # https://www.drupal.org/docs/8/system-requirements/php-requirements#database
+        # The PHP Data Objects (PDO) extension must be activated for Drupal 8 to install and run correctly.
+        # ${PHP_VERSION}-pdo \
+        # ${PHP_VERSION}-pdo_mysql \
+        #
+        # Recommended but apparently not required. Allows Drupal to make https requests.
+        # https://www.drupal.org/docs/8/system-requirements/php-requirements#openssl
+        # ${PHP_VERSION}-openssl \
+        #
+        # ${PHP_VERSION}-opcache \
+        #
+        # https://www.drupal.org/docs/8/system-requirements/php-requirements#xml
+        # Required by xsl, xmlreader
+        # Enabling the XML extension also enables PHP DOM. DOM is now a systems requirement.
+        # ${PHP_VERSION}-dom \
+        # #
+        # ${PHP_VERSION}-xml \
+        # ${PHP_VERSION}-xmlrpc \
+        # ${PHP_VERSION}-xmlreader \
+        # ${PHP_VERSION}-xmlwriter \
+        # ${PHP_VERSION}-simplexml \
+        # ${PHP_VERSION}-xsl \
         zlib \
         su-exec \
     && ln -sf /dev/stdout ${PHP_FPM_ERRLOG}
@@ -93,6 +165,8 @@ ENV BUILD_DEPS \
         re2c \
         git \
         ${PHP_VERSION}-dev
+
+# DOG5992373
 
 RUN \
     cd /tmp \
