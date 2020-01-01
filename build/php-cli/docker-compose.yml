@@ -21,7 +21,7 @@ services:
 
   # Base image with minimal dependencies.
   php-cli.core:
-    image: alexanderallen/php-cli.core:latest
+    image: alexanderallen/php7-cli.core:alpine-3.11
     build:
       context: .
       dockerfile: Dockerfile
@@ -34,7 +34,7 @@ services:
   # Drush version for Drupal 8.4+, but not backwards compat with 8.3- and below.
   # https://docs.drush.org/en/master/install/
   drush9:
-    image: alexanderallen/php-cli:drush9
+    image: alexanderallen/php7-cli.drush9:alpine-3.11
     build:
       context: .
       dockerfile: Dockerfile

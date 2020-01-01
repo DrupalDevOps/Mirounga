@@ -1,4 +1,4 @@
-FROM alexanderallen/php-fpm.dev:latest as core
+FROM alexanderallen/php7-fpm.core:alpine-3.11 as core
 
 ENV \
     SSH_PRIVATE_KEY="/root/.ssh/id_rsa" \
@@ -57,7 +57,7 @@ ENTRYPOINT ["/bin/sh", "--interactive"]
 #
 # Build stage optimized with Composer packages for Drupal development.
 #
-FROM alexanderallen/php-cli.core:latest as drush9
+FROM alexanderallen/php7-cli.core:alpine-3.11 as drush9
 
 # Specifies which composer.json file to use for build.
 ARG DRUSH_VERSION
