@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   php-fpm.core:
-    image: alexanderallen/php-fpm.core:7-alpine
+    image: alexanderallen/php7-fpm.core:alpine-3.11
     build:
       context: .
       dockerfile: Dockerfile
@@ -14,7 +14,7 @@ services:
       - 9010 # Expose PHP-FPM port to Nginx.
 
   php-fpm.dev:
-    image: alexanderallen/php-fpm.dev:latest
+    image: alexanderallen/php7-fpm.dev:alpine-3.11
     build:
       context: .
       dockerfile: Dockerfile
