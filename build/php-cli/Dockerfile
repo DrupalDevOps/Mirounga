@@ -16,6 +16,8 @@ ENV \
 RUN \
     cd /tmp \
     && apk add --no-cache \
+        php7-mbstring \
+        php7-phar \
         bash \
         git \
         mysql-client \
