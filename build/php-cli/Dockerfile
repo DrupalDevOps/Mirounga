@@ -16,7 +16,6 @@ ENV \
 RUN \
     cd /tmp \
     && apk add --no-cache \
-        php7-mbstring \
         php7-phar \
         bash \
         git \
@@ -67,9 +66,7 @@ RUN \
   cd /tmp \
   && apk add --no-cache \
   # REQ: Composer squizlabs/php_codesniffer 2.7.0 requires ext-tokenizer
-  ${PHP_VERSION}-tokenizer \
-  # REQ: Composer drupal/coder 8.3.7 requires ext-mbstring
-  ${PHP_VERSION}-mbstring
+  ${PHP_VERSION}-tokenizer
 
 # Provide optional composer example to install.
 COPY drush/${DRUSH_VERSION}/composer.json ${COMPOSER_HOME}/composer.json
