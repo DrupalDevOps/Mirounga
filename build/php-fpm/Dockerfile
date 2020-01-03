@@ -55,7 +55,13 @@ RUN \
         # ${PHP_VERSION}-gd \
         # ${PHP_VERSION}-pecl-imagick \
         #
-        # ${PHP_VERSION}-intl \
+        # Composer itself refuses to install without mbstring.
+        # Composer package drupal/coder 8.3.7 requires ext-mbstring.
+        # Drupal web installer complains about missing mbstring extension as well.
+        ${PHP_VERSION}-mbstring \
+        #
+        # The Drupal installer complains when you don't have opcache enabled.
+        ${PHP_VERSION}-opcache \
         #
         # Required in Drupal core composer.json.
         ${PHP_VERSION}-dom \
@@ -105,8 +111,6 @@ RUN \
         # Recommended but apparently not required. Allows Drupal to make https requests.
         # https://www.drupal.org/docs/8/system-requirements/php-requirements#openssl
         # ${PHP_VERSION}-openssl \
-        #
-        # ${PHP_VERSION}-opcache \
         #
         # https://www.drupal.org/docs/8/system-requirements/php-requirements#xml
         # Required by xsl, xmlreader
