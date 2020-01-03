@@ -13,3 +13,6 @@ tmp
 
 # https://docs.docker.com/compose/extends/#different-environments
 docker-compose.override.yml
+
+# Ignore contents of /app
+app/*
