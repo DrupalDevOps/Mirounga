@@ -3,9 +3,7 @@
   "description": "Composer dependencies for Drupal 8.4+ development.",
   "require": {
     "drush/drush": "~9.0",
-    "drupal/coder": "*",
     "symfony/yaml": "~3.0",
-    "pear/pear-core-minimal": "1.10.1",
-    "acquia/acsf-tools": "~9.0"
+    "pear/pear-core-minimal": "1.10.1"
   }
 }
