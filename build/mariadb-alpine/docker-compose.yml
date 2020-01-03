@@ -19,7 +19,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-       CLIENT_USER: drupal
+       CLIENT_USER: docker
     ports:
       - "3306:3306"
     volumes:
