@@ -61,7 +61,12 @@ RUN \
 COPY drush/${DRUSH_VERSION}/composer.json ${COMPOSER_HOME}/composer.json
 
 # Install default CLI tools.
-RUN composer global -vvv install
+RUN composer global -vvv \
+    --no-cache \
+    install \
+    --no-dev \
+    # Good for production or when shipping code inside containers, since code is not expected to change.
+    --optimize-autoloader
 
 # Configure Drush 9 and above. Can be done by drush core:init instead.
 # COPY common/drush.yml /root/.drush/drush.yml
