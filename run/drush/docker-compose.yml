@@ -14,7 +14,7 @@ secrets:
 services:
 
   drush:
-    image: alexanderallen/php-cli:drush9
+    image: alexanderallen/php7-cli.drush9:alpine-3.11
     secrets:
       - ssh_private
       - ssh_public
