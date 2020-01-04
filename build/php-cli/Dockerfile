@@ -30,17 +30,11 @@ RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
 # Configure Z shell.
 # COPY common/.zshrc /root/.zshrc
 
-# Since the more efficient method of agent-forwarding is not supported on all
-# Docker environments, start an ssh-agent and add a key.
-# Required for Composer repos that need SSH instead of HTTPS.
-# COPY common/.bashrc /root/.bashrc
-
 # Where all of our codebase is mounted to.
 WORKDIR /www
 
 # Core image CLI entrypoint.
-# ENTRYPOINT ["/bin/zsh", "--interactive"]
-ENTRYPOINT ["/bin/sh", "--interactive"]
+ENTRYPOINT ["/bin/bash", "--interactive"]
 
 
 #
