@@ -34,7 +34,7 @@ RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
 WORKDIR /www
 
 # Core image CLI entrypoint.
-ENTRYPOINT ["/bin/bash", "--interactive"]
+ENTRYPOINT ["/bin/bash"]
 
 
 #
