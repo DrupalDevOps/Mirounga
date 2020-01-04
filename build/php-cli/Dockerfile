@@ -1,7 +1,6 @@
 FROM alexanderallen/php7-fpm.core:alpine-3.11 as core
 
 ENV \
-  SSH_PRIVATE_KEY="/root/.ssh/id_rsa" \
   LANG="en_US.UTF-8" \
   LC_ALL="en_US.UTF-8" \
   LANGUAGE="en_US.UTF-8" \
