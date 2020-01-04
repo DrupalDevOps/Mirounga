@@ -1,16 +1,19 @@
 FROM alexanderallen/php7-fpm.core:alpine-3.11 as core
 
+ARG PUID=1000
+ARG PGID=1000
+
 ENV \
+  DOCKER_USER=docker \
   LANG="en_US.UTF-8" \
   LC_ALL="en_US.UTF-8" \
   LANGUAGE="en_US.UTF-8" \
   TERM="xterm" \
   # Register the COMPOSER_HOME environment variable.
-  COMPOSER_HOME=/composer \
+  COMPOSER_HOME=/opt/composer
   # Add global binary directory to PATH.
-  PATH=/composer/vendor/bin:$PATH \
-  # Allow Composer to be run as root.
-  COMPOSER_ALLOW_SUPERUSER=1
+
+ENV PATH=${COMPOSER_HOME}/vendor/bin:$PATH
 
 RUN \
   cd /tmp \
@@ -22,10 +25,18 @@ RUN \
     curl
 
 # Setup the Composer installer.
-RUN curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
+RUN \
+  mkdir -p ${COMPOSER_HOME} \
+  && curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
   && curl -o /tmp/composer-setup.sig https://composer.github.io/installer.sig \
   && php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
   && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --snapshot && rm -rf /tmp/composer-setup.php
+
+# Setup group and user for use with exec.
+RUN \
+  addgroup -g ${PGID} ${DOCKER_USER} \
+  && adduser -D -u ${PUID} -G ${DOCKER_USER} ${DOCKER_USER} \
+  && chown -R ${DOCKER_USER}:${DOCKER_USER} ${COMPOSER_HOME}
 
 # Configure Z shell.
 # COPY common/.zshrc /root/.zshrc
@@ -49,6 +60,8 @@ RUN \
   && apk add --no-cache \
     # Currently mounting keys to containers due to lack of agent socket support.
     openssh-client
+
+USER ${DOCKER_USER}
 
 # Provide optional composer example to install.
 COPY drush/${DRUSH_VERSION}/composer.json ${COMPOSER_HOME}/composer.json
