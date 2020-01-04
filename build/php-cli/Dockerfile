@@ -5,14 +5,14 @@ ARG PGID=1000
 
 ENV \
   DOCKER_USER=docker \
+  # Used for global composer commands.
+  COMPOSER_HOME=/opt/composer  \
   LANG="en_US.UTF-8" \
   LC_ALL="en_US.UTF-8" \
   LANGUAGE="en_US.UTF-8" \
-  TERM="xterm" \
-  # Register the COMPOSER_HOME environment variable.
-  COMPOSER_HOME=/opt/composer
-  # Add global binary directory to PATH.
+  TERM="xterm"
 
+# Add composer binary directory to PATH.
 ENV PATH=${COMPOSER_HOME}/vendor/bin:$PATH
 
 RUN \
@@ -24,7 +24,7 @@ RUN \
     # Used for Composer install.
     curl
 
-# Setup the Composer installer.
+# Install Composer.
 RUN \
   mkdir -p ${COMPOSER_HOME} \
   && curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
@@ -38,14 +38,11 @@ RUN \
   && adduser -D -u ${PUID} -G ${DOCKER_USER} ${DOCKER_USER} \
   && chown -R ${DOCKER_USER}:${DOCKER_USER} ${COMPOSER_HOME}
 
-# Configure Z shell.
-# COPY common/.zshrc /root/.zshrc
-
 # Where all of our codebase is mounted to.
 WORKDIR /www
-
-# Core image CLI entrypoint.
 ENTRYPOINT ["/bin/bash"]
+
+
 
 
 #
@@ -61,12 +58,13 @@ RUN \
     # Currently mounting keys to containers due to lack of agent socket support.
     openssh-client
 
-USER ${DOCKER_USER}
-
 # Provide optional composer example to install.
 COPY drush/${DRUSH_VERSION}/composer.json ${COMPOSER_HOME}/composer.json
 
-# Install default CLI tools.
+# Switch to non-root user before running drush commands.
+USER ${DOCKER_USER}
+
+# Install drush globally and anything else defined in the composer manifest.
 RUN composer global -vvv \
     --no-cache \
     install \
@@ -77,13 +75,11 @@ RUN composer global -vvv \
 # Configure Drush 9 and above. Can be done by drush core:init instead.
 # COPY common/drush.yml /root/.drush/drush.yml
 
-# Provide a dynamic entrypoint into the container.
-COPY common/entrypoint.sh /root/entrypoint.sh
+# Starts SSH agent.
+COPY common/.bashrc /home/${DOCKER_USER}/.bashrc
 
-ENTRYPOINT ["/bin/bash"]
 
-# SSH Agent setup.
-COPY common/.bashrc /root/.bashrc
+
 
 
 FROM drush9 as qa-tools
