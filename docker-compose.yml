@@ -22,9 +22,10 @@ services:
   mysql:
     hostname: mysql
     image: alexanderallen/mariadb-alpine:10.4.10-r0
-    # Map the Docker hosts' 3306 port to container's 3306 for SQL GUI/console access.
     ports:
       - 3306:3306
+    volumes:
+      - mysql:/var/lib/mysql
 
   memcached:
     # Memcached 1.5.20 released Nov 11, 2019.
@@ -47,3 +48,6 @@ services:
     volumes:
       - ./app:/app
     # todo: healthcheck
+
+volumes:
+  mysql:
