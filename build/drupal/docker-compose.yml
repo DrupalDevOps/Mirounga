@@ -1,0 +1,14 @@
+version: '3.4'
+services:
+
+  drupal.prod:
+    image: alexanderallen/drupal-8.prod:alpine-3.11
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    volumes:
+      - app:/app
+
+volumes:
+  app:
