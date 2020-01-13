@@ -1,4 +1,6 @@
-version: '3.5'
+# Staying on version 2.x for performance tuning cpu, memory resources.
+# Ver. 3.x is meant for swarms and is not 100% backwards-compat.
+version: '2.4'
 networks:
   default:
     external: true
@@ -6,18 +8,24 @@ networks:
 
 services:
 
+  # The Drupal image declared the /app volume with source code.
+  drupal:
+    image: alexanderallen/drupal-8.prod:alpine-3.11
+    volumes:
+      - app:/app
+
   nginx:
     image: alexanderallen/nginx:1.17-alpine
     ports:
       - 80:8080
       - 443:443
-    volumes:
-      - ./app:/app
     healthcheck:
       test: curl --fail -s http://localhost:80 || exit 1
       interval: 30s
       timeout: 10s
       retries: 2
+    volumes:
+      - app:/app
 
   mysql:
     hostname: mysql
@@ -34,6 +42,7 @@ services:
     command: -p 11211 -m 16 -vvv -M
 
   php-fpm:
+    # Prod image.
     image: alexanderallen/php7-fpm.core:alpine-3.11
     environment:
       PHP_INI_MAX_EXECUTION_TIME: 0 # Set to 0 for unlimited.
@@ -41,13 +50,10 @@ services:
       # PHP_FPM_LISTEN: 127.0.0.1:9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
       PHP_FPM_LISTEN: 9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
       PHP_FPM_WORKER_LOGOUTPUT: 1
-      XDEBUG_REMOTE_PORT: 9000
-      XDEBUG_IDE_KEY: 'PHPSTORM'
-      XDEBUG_CONNECT_BACK: 0 # Must be disabled in order for remote_host to work.
-      XDEBUG_REMOTE_HOST: 10.254.254.254 # Docker for Mac host alias: use it instead of the default gateway 172.18.0.1.
     volumes:
-      - ./app:/app
+      - app:/app
     # todo: healthcheck
 
 volumes:
   mysql:
+  app:
