@@ -19,7 +19,6 @@ RUN rm /etc/nginx/conf.d/default.conf
 #   include /etc/nginx/conf.d/*.conf;
 COPY vhost.conf /etc/nginx/conf.d/default.conf
 COPY etc/nginx/nginx.conf etc/nginx/nginx.conf
-COPY entrypoint.sh /entrypoint.sh
 
 ENV NGINX_HTTP_LISTEN 8080
 
@@ -31,10 +30,10 @@ RUN \
   && addgroup nobody tty \
   # Create .pid directory accessible by non root.
   && mkdir /var/run/nginx \
-  && chmod -R o+rwx /var/run/nginx /var/log/nginx /var/cache/nginx /entrypoint.sh
+  && chmod -R o+rwx /var/run/nginx /var/cache/nginx
 
 EXPOSE ${NGINX_HTTP_LISTEN}
 
 STOPSIGNAL SIGTERM
 
-ENTRYPOINT [ "/entrypoint.sh" ]
+ENTRYPOINT [ "exec su-exec nobody /usr/sbin/nginx -g 'daemon off;'" ]
