@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Drush script using production configuration.
+
+# Start local stack on which to run Drush on.
 ./scripts/start.sh
 
-docker-compose -f run/drush/docker-compose.yml run --rm drush
+# Merge Drush compose onto existing stack definition.
+# Paths are relative to project root, when invoking script from project root.
+docker-compose \
+-f docker-compose.yml \
+-f docker-compose.drupal.prod.yaml \
+-f run/drush/docker-compose.yml \
+run --rm drush
