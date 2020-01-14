@@ -36,4 +36,4 @@ EXPOSE ${NGINX_HTTP_LISTEN}
 
 STOPSIGNAL SIGTERM
 
-ENTRYPOINT [ "exec su-exec nobody /usr/sbin/nginx -g 'daemon off;'" ]
+ENTRYPOINT [ "su-exec", "nobody", "/usr/sbin/nginx", "-g", "daemon off;" ]
