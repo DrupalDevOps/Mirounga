@@ -8,12 +8,6 @@ networks:
 
 services:
 
-  # Drupal image provides app volume, which contains the application code.
-  drupal:
-    image: alexanderallen/drupal-8.prod:alpine-3.11
-    volumes:
-      - app:/app
-
   nginx:
     image: alexanderallen/nginx:1.17-alpine
     tty: true
@@ -25,8 +19,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 2
-    volumes:
-      - app:/app
 
   mysql:
     hostname: mysql
@@ -51,10 +43,7 @@ services:
       # PHP_FPM_LISTEN: 127.0.0.1:9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
       PHP_FPM_LISTEN: 9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
       PHP_FPM_WORKER_LOGOUTPUT: 1
-    volumes:
-      - app:/app
     # todo: healthcheck
 
 volumes:
   mysql:
-  app:
