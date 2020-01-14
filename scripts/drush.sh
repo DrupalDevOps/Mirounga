@@ -9,6 +9,6 @@
 # Paths are relative to project root, when invoking script from project root.
 docker-compose \
 -f docker-compose.yml \
--f docker-compose.drupal.prod.yaml \
+-f run/drupal/docker-compose.prod.yml \
 -f run/drush/docker-compose.yml \
 run --rm drush

@@ -9,20 +9,18 @@
 # Latest compose reference: https://docs.docker.com/compose/compose-file/#network-configuration-reference
 
 # Create user-defined bridge.
-USER_NETWORK=localenv
+# USER_NETWORK=localenv
 
-NETEXISTS=`docker network ls | grep -c $USER_NETWORK`
-if ! (($NETEXISTS)) ; then
-  echo "Create user-defined network"
-  docker network create $USER_NETWORK
-else
-  echo "Docker network ${USER_NETWORK} already exists, joining."
-fi
+# NETEXISTS=`docker network ls | grep -c $USER_NETWORK`
+# if ! (($NETEXISTS)) ; then
+#   echo "Create user-defined network"
+#   docker network create $USER_NETWORK
+# else
+#   echo "Docker network ${USER_NETWORK} already exists, joining."
+# fi
 
-# Start stack.
+# Bring down stack if it exists.
 docker-compose \
 -f docker-compose.yml \
 -f run/drupal/docker-compose.prod.yml \
-up -d
-
-docker-compose ps
+down
