@@ -3,16 +3,18 @@
 #
 FROM alexanderallen/php7-cli.drush9:alpine-3.11 as intermediate
 
+ARG DOCKER_USER=nobody
+
 # Volume by default creates dir as root if it doesn't exist.
 # When running container as non root,
 # create or chmod dir as desired user before declaring volume.
 USER root
 
 # Create intermediate build directory where to run create-project from.
-RUN mkdir /source && chown docker:docker /source
+RUN mkdir /source && chown ${DOCKER_USER}:${DOCKER_USER} /source
 
 # Ensure any sources are downloaded as desired non-root user.
-USER docker
+USER ${DOCKER_USER}
 WORKDIR /source
 
 # https://getcomposer.org/doc/03-cli.md#create-project

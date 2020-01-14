@@ -1,10 +1,9 @@
 FROM alexanderallen/php7-fpm.core:alpine-3.11 as core
 
-ARG PUID=1000
-ARG PGID=1000
+ARG DOCKER_USER=nobody
 
 ENV \
-  DOCKER_USER=docker \
+  DOCKER_USER=${DOCKER_USER} \
   # Used for global composer commands.
   COMPOSER_HOME=/opt/composer  \
   LANG="en_US.UTF-8" \
@@ -32,11 +31,7 @@ RUN \
   && php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
   && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --snapshot && rm -rf /tmp/composer-setup.php
 
-# Setup group and user for use with exec.
-RUN \
-  addgroup -g ${PGID} ${DOCKER_USER} \
-  && adduser -D -u ${PUID} -G ${DOCKER_USER} ${DOCKER_USER} \
-  && chown -R ${DOCKER_USER}:${DOCKER_USER} ${COMPOSER_HOME}
+RUN chown -R ${DOCKER_USER}:${DOCKER_USER} ${COMPOSER_HOME}
 
 # Where all of our codebase is mounted to.
 WORKDIR /www
@@ -52,13 +47,11 @@ FROM core as drush9
 
 # Specifies which composer.json file to use for build.
 ARG DRUSH_VERSION
-RUN \
-  cd /tmp \
-  && apk add --no-cache \
-    # Currently mounting keys to containers due to lack of agent socket support.
-    openssh-client
 
-# Provide optional composer example to install.
+# Currently mounting keys to containers due to lack of agent socket support.
+RUN apk add --no-cache openssh-client
+
+# Composer manifest for global Drush install.
 COPY drush/${DRUSH_VERSION}/composer.json ${COMPOSER_HOME}/composer.json
 
 # Switch to non-root user before running drush commands.
@@ -80,6 +73,13 @@ COPY common/.bashrc /home/${DOCKER_USER}/.bashrc
 
 
 
+FROM drush9 as drush9-devel
+RUN \
+  cd /tmp \
+  apk add --no-cache \
+  ${PHP_VERSION}-pecl-xdebug \
+  ${PHP_VERSION}-pecl-xhprof-assets \
+  ${PHP_VERSION}-tideways_xhprof
 
 
 FROM drush9 as qa-tools
@@ -98,9 +98,6 @@ FROM drush9 as cli-tools
 RUN \
   cd /tmp \
   && apk add --no-cache \
-  php7-phar \
-  bash \
-  git \
   mysql-client \
   tar \
   tree \
@@ -108,9 +105,7 @@ RUN \
   vim \
   zsh \
   && apk add --no-cache --virtual .networking \
-  curl \
   net-tools \
   nmap \
-  openssh-client \
   wget \
   && git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
