@@ -20,5 +20,5 @@ else
 fi
 
 # Bring down stack if it exists.
-docker-compose up -d
+docker-compose -f docker-compose.yml -f docker-compose.drupal.prod.yaml up -d
 docker-compose ps

@@ -1,0 +1,19 @@
+version: '2.4'
+services:
+
+  # Drupal image provides app volume, which contains the application code.
+  drupal:
+    image: alexanderallen/drupal-8.prod:alpine-3.11
+    volumes:
+      - app:/app
+
+  nginx:
+    volumes:
+      - app:/app
+
+  php-fpm:
+    volumes:
+      - app:/app
+
+volumes:
+  app:
