@@ -48,26 +48,14 @@ if [ -z "$(ls -A /var/lib/mysql/)" ]; then
   [[ -n "${SKIP_INNODB}" ]] && touch /var/lib/mysql/noinnodb
 
 
-  # Install program mysql_install_db executes template tables under /usr/share/mariadb/*.sql during bootstrap.
-  # Customize these before invoking the boostrap.
-  # echo "flush privileges;" > /usr/share/mariadb/mysql_system_tables_data.sql
-  # echo "SET PASSWORD = PASSWORD('root');" > /usr/share/mariadb/mysql_system_tables_data.sql
-
-  # Confirm.
-  # cat /usr/share/mariadb/mysql_system_tables_data.sql | last -n 10
-
-
   # Set root explicit root password if specified, otherwise set to blank.
   ROOTPW="''"
   [[ -n "${MYSQL_ROOT_PASSWORD}" ]] && ROOTPW="PASSWORD('${MYSQL_ROOT_PASSWORD}')"
 
-  # This gives ERROR: 1471  The target table user of the INSERT is not insertable-into
-  # echo "INSERT INTO user VALUES ('%','root',${ROOTPW},'Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','','','','',0,0,0,0,'','','N', 'N','', 0);" > /usr/share/mariadb/mysql_system_tables_data.sql
-
   # https://mariadb.com/kb/en/mysql_install_db/#options
   # You must be ROOT to use the "--user=" option
   # The --user flag indicates what user the mysqld deamon will run under.
-  INSTALL_OPTS="--user=${CONTAINER_USER}"
+  INSTALL_OPTS="--user=${DAEMON_USER}"
 
   # /usr/share/mariadb/mysql_ssystem_tabls_data.sql:
   # A "cross bootstrap" database is when creating data on a Unix host which will later be included in a Windows zip file.
@@ -92,7 +80,7 @@ if [ -z "$(ls -A /var/lib/mysql/)" ]; then
 
   # Start temporary database process, send to background, and run any available initialization steps.
   # /usr/bin/mysqld --user=mysql --skip-networking --socket=/run/mysqld/mysql.sock &> /dev/null &
-  su-exec ${CONTAINER_USER} /usr/bin/mysqld --user=mysql --skip-networking --socket=${SOCKET} &
+  su-exec ${DAEMON_USER} /usr/bin/mysqld --user=mysql --skip-networking --socket=${SOCKET} &
   PID="$!"
 
   # Give enough time for process to start.

@@ -4,7 +4,7 @@ FROM alpine:3.11
 # MAINTAINER Johan Bergström <bugs@bergstroem.nu>
 
 # System user used to run the MySQL server.
-ENV CONTAINER_USER=mysql
+ENV DAEMON_USER=mysql
 # Username used to log in to the database using MySQL client.
 ARG CLIENT_USER=docker
 
@@ -35,7 +35,7 @@ RUN \
   && touch ${sharedir}/mysql_system_tables_data.sql \
   && mkdir -p /run/mysqld \
   # Grant permissions to container user, container won't be running as root.
-  && chown --recursive ${CONTAINER_USER}:${CONTAINER_USER} /etc/my.cnf.d/ /run/mysqld ${sharedir}/mysql_system_tables_data.sql /usr/lib/mariadb \
+  && chown --recursive ${DAEMON_USER}:${DAEMON_USER} /etc/my.cnf.d/ /run/mysqld ${sharedir}/mysql_system_tables_data.sql /usr/lib/mariadb \
   && for p in aria* myisam* mysqld_* innochecksum \
               mysqlslap replace wsrep* msql2mysql sst_dump \
               resolve_stack_dump mysqlbinlog myrocks_hotbackup test-connect-t \
