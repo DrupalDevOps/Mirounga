@@ -19,10 +19,14 @@ else
   echo "Docker network ${USER_NETWORK} already exists, joining."
 fi
 
-# Start stack.
+# Start stack by default on production configuration (minimal containers w/ no debugging).
+# Switch ENVIRONMENT to dev to enable debugging.
+ENV=${ENVIRONMENT:-prod}
+echo "Running Docker Compose for ${ENV} environment."
+
 docker-compose \
 -f docker-compose.yml \
--f run/drupal/docker-compose.prod.yml \
+-f run/drupal/docker-compose.${ENV}.yml \
 up -d
 
 docker-compose ps

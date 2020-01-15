@@ -1,11 +1,11 @@
 version: '3.4'
 services:
-  php-fpm.core:
-    image: alexanderallen/php7-fpm.core:alpine-3.11
+  php-fpm.prod:
+    image: alexanderallen/php7-fpm.prod:alpine-3.11
     build:
       context: .
       dockerfile: Dockerfile
-      target: core
+      target: prod
     environment:
       PHP_INI_MAX_EXECUTION_TIME: 120 # The defualt is 30, increasing to 60.
       PHP_INI_MEM_LIMIT: 256M # The dfeulat memory limit is 128M.
@@ -18,7 +18,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: development
+      target: dev
     environment:
       PHP_INI_MAX_EXECUTION_TIME: 120 # The defualt is 30, increasing to 60.
       PHP_INI_MEM_LIMIT: 256M # The dfeulat memory limit is 128M.

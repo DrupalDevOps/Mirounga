@@ -1,7 +1,14 @@
 version: '2.4'
+
+# Dev stack
+#
+# - Drupal source code does not change with the environment.
+# - Uses PHP FPM image with debugging tools enabled.
+# - MUST use MOUNTED volumes instead of NAMED volumes in order to view and debug sources from host IDEs.
+# - However with VSC it may be possible to avoid mounts https://code.visualstudio.com/docs/remote/containers-advanced
+
 services:
 
-  # Drupal image provides app volume, which contains the application code.
   drupal:
     image: alexanderallen/drupal-8.prod:alpine-3.11
     volumes:

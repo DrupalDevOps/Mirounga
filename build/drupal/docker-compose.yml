@@ -1,6 +1,7 @@
 version: '3.4'
 services:
 
+  # Drupal build uses Composer to install Drupal dependencies, Drush to install Drupal.
   drupal.prod:
     image: alexanderallen/drupal-8.prod:alpine-3.11
     build:

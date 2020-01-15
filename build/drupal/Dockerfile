@@ -1,7 +1,7 @@
 #
 # Production version Drupal image.
 #
-FROM alexanderallen/php7-cli.drush9:alpine-3.11 as intermediate
+FROM alexanderallen/php7-cli-drush9.prod:alpine-3.11 as intermediate
 
 ARG DOCKER_USER=nobody
 

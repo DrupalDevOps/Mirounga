@@ -36,8 +36,8 @@ services:
     command: -p 11211 -m 16 -vvv -M
 
   php-fpm:
-    # Prod image.
-    image: alexanderallen/php7-fpm.core:alpine-3.11
+    # Prod image. alexanderallen/php7-fpm.prod:alpine-3.11
+    image: "alexanderallen/php7-fpm.${ENVIRONMENT:-prod}:alpine-3.11"
     environment:
       PHP_INI_MAX_EXECUTION_TIME: 0 # Set to 0 for unlimited.
       PHP_INI_MEM_LIMIT: 256M # The default memory limit is 128M.

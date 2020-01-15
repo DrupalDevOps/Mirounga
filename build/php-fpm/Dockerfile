@@ -1,4 +1,4 @@
-FROM alpine:3.11 AS core
+FROM alpine:3.11 AS prod
 
 LABEL InitialReleaseDate="First released on Oct 14, 2016."
 LABEL RELEASEDATE="20191222"
@@ -11,7 +11,9 @@ ENV PHP_VERSION=php7
 ENV \
     PHP_INI_MAX_EXECUTION_TIME=30 \
     PHP_INI_MEM_LIMIT=256M \
-    PHP_FPM_ERRLOG=/var/log/php-fpm.log
+    PHP_FPM_ERRLOG=/var/log/php-fpm.log \
+    PHP_FPM_SLOWLOG=/var/log/php-fpm.slow.log \
+    PHP_FPM_SLOWLOG_TIMEOUT=0
 
 # For OFFICIAL Drupal 8 requirements see
 # https://www.drupal.org/docs/8/system-requirements/php-requirements
@@ -37,27 +39,13 @@ ENV \
 RUN \
     cd /tmp \
     && apk add --no-cache \
-        # php7 -> 4.6MB; /usr -> 11MB
         ${PHP_VERSION} \
        # ${PHP_VERSION}-cli \ # not found
         ${PHP_VERSION}-curl \
         #
-        # https://pkgs.alpinelinux.org/package/edge/community/x86_64/php7-ctype
-        # required by drupal7 package (not using that), php7-pecl-xhprof (maybe maybe not, can be moved to dev image)
-        #${PHP_VERSION}-ctype \
-        #
-        # 16 MB. Alpine says 5MB installed size. I say it takes more.
         ${PHP_VERSION}-fpm \
         #
-        # 23 MB. /usr/x11 1.3MB
-        # https://www.drupal.org/docs/8/system-requirements/php-requirements#image
-        # An image library for PHP such as the GD library is a required extension in Drupal 8, and is needed for image manipulation
-        # ${PHP_VERSION}-gd \
-        # ${PHP_VERSION}-pecl-imagick \
-        #
-        # Composer itself refuses to install without mbstring.
-        # Composer package drupal/coder 8.3.7 requires ext-mbstring.
-        # Drupal web installer complains about missing mbstring extension as well.
+        # Required by Composer and Drupal installer.
         ${PHP_VERSION}-mbstring \
         #
         # The Drupal installer complains when you don't have opcache enabled.
@@ -125,7 +113,8 @@ RUN \
         # ${PHP_VERSION}-xsl \
         zlib \
         su-exec \
-    && ln -sf /dev/stdout ${PHP_FPM_ERRLOG}
+    && ln -sf /dev/stdout ${PHP_FPM_ERRLOG} \
+    && ln -sf /dev/stdout ${PHP_FPM_SLOWLOG}
 
 # Configure PHP-FPM.
 COPY php-fpm.conf /etc/${PHP_VERSION}/php-fpm.conf
@@ -136,7 +125,7 @@ COPY php.ini /etc/${PHP_VERSION}/conf.d/10-custom.ini
 ENTRYPOINT ["su-exec", "nobody", "/usr/sbin/php-fpm7", "--nodaemonize", "--force-stderr"]
 
 
-FROM core AS development
+FROM prod AS dev
 
 # Tidewall is a replacement for the original XHProf (outdated).
 # https://github.com/tideways/php-xhprof-extension/releases
@@ -169,8 +158,6 @@ ENV BUILD_DEPS \
         re2c \
         git \
         ${PHP_VERSION}-dev
-
-# DOG5992373
 
 RUN \
     cd /tmp \

@@ -19,13 +19,13 @@ services:
   # - https://github.com/RobLoach/docker-composer
   # - https://hub.docker.com/r/composer/composer/~/dockerfile/
 
-  # Base image with minimal dependencies.
-  php-cli.core:
-    image: alexanderallen/php7-cli.core:alpine-3.11
+  # Base Composer image with minimal dependencies.
+  php-cli.prod:
+    image: alexanderallen/php7-cli.prod:alpine-3.11
     build:
       context: .
       dockerfile: Dockerfile
-      target: core
+      target: composer-prod
     environment:
       COMPOSER_VERSION: master
     volumes:
@@ -33,23 +33,22 @@ services:
 
   # Drush version for Drupal 8.4+, but not backwards compat with 8.3- and below.
   # https://docs.drush.org/en/master/install/
-  drush9:
-    image: alexanderallen/php7-cli.drush9:alpine-3.11
+  drush9-prod:
+    image: alexanderallen/php7-cli-drush9.prod:alpine-3.11
     build:
       context: .
       dockerfile: Dockerfile
       # Build target drush9 might be compatible with DRUSH_VERSION 10.
-      target: drush9
+      target: drush9-prod
       args:
         DRUSH_VERSION: 9
-    # links:
-    #   - mysql:mysql
-    #   - memcached:memcached
-    # volumes:
-    #   # WIN10 WSL
-    #   - /c/Users/richa/.ssh:/root/.ssh
-    #   - /c/Users/richa/Sites:/www
-      # OSX
-      #- ~/.ssh:/root/.ssh
-      #- ~/.composer:/composer
-      #- ~/Sites:/www
+
+  drush9-devel:
+    image: alexanderallen/php7-cli-drush9.dev:alpine-3.11
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Target including xdebug, xhprof, and any other perf tools.
+      target: drush9-dev
+      args:
+        DRUSH_VERSION: 9

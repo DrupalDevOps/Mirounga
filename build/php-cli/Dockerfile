@@ -1,4 +1,4 @@
-FROM alexanderallen/php7-fpm.core:alpine-3.11 as core
+FROM alexanderallen/php7-fpm.prod:alpine-3.11 as composer-prod
 
 ARG DOCKER_USER=nobody
 
@@ -43,7 +43,7 @@ ENTRYPOINT ["/bin/bash"]
 #
 # Build stage optimized with Composer packages for Drupal development.
 #
-FROM core as drush9
+FROM composer-prod as drush9-prod
 
 # Specifies which composer.json file to use for build.
 ARG DRUSH_VERSION
@@ -73,7 +73,7 @@ COPY common/.bashrc /home/${DOCKER_USER}/.bashrc
 
 
 
-FROM drush9 as drush9-devel
+FROM drush9-prod as drush9-dev
 RUN \
   cd /tmp \
   apk add --no-cache \
@@ -81,6 +81,16 @@ RUN \
   ${PHP_VERSION}-pecl-xhprof-assets \
   ${PHP_VERSION}-tideways_xhprof
 
+
+
+
+
+
+
+
+#########################################################
+# Targets below this line not yet built or implemented. #
+#########################################################
 
 FROM drush9 as qa-tools
 RUN \
