@@ -52,6 +52,8 @@ RUN \
         su-exec \
     && ln -sf /dev/stdout ${PHP_FPM_ERRLOG} \
     && ln -sf /dev/stdout ${PHP_FPM_SLOWLOG}
+    # Cleanup defualt pool configuration.
+    && rm /etc/php7/php-fpm.d/www.conf \
 
 # Configure PHP-FPM.
 COPY php-fpm.conf /etc/${PHP_VERSION}/php-fpm.conf
