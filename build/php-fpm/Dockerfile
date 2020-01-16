@@ -56,6 +56,10 @@ RUN \
 # Configure PHP-FPM.
 COPY php-fpm.conf /etc/${PHP_VERSION}/php-fpm.conf
 
+# FPM pool configuration and any other customizations.
+# Include defined in main configuration file.
+COPY php-fpm.d/ /etc/php7/php-fpm.d/
+
 # Configure PHP.
 COPY php.ini /etc/${PHP_VERSION}/conf.d/10-custom.ini
 
