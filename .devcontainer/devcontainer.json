@@ -19,7 +19,7 @@
     // You can edit these settings after create using File > Preferences > Settings > Remote.
     "settings": {
       // If you are using an Alpine-based image, change this to /bin/ash
-      "terminal.integrated.shell.linux": "/bin/bash"
+      "terminal.integrated.shell.linux": "/bin/ash"
     },
     // Uncomment the next line if you want start specific services in your Docker Compose config.
     // "runServices": [],
