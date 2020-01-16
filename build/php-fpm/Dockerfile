@@ -157,7 +157,12 @@ ENV BUILD_DEPS \
         pkgconf \
         re2c \
         git \
-        ${PHP_VERSION}-dev
+        ${PHP_VERSION}-dev \
+        # Microsoft Visual Studio Code Remote Development Requirements
+        # https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack
+        # https://code.visualstudio.com/docs/remote/linux#_remote-host-container-wsl-linux-prerequisites
+        libstdc++ \
+        libgcc
 
 RUN \
     cd /tmp \
