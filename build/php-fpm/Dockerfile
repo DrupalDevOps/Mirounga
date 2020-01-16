@@ -15,6 +15,15 @@ ENV \
     PHP_FPM_SLOWLOG=/dev/stderr \
     # Slowlog timeout value of 0 means 'off'.
     PHP_FPM_SLOWLOG_TIMEOUT=0 \
+    PHP_FPM_LISTEN=127.0.0.1:9010 \
+    # Use environment variables to speed up FPM optimization cycles.
+    PHP_FPM_PM_MANAGER=dynamic \
+    PHP_FPM_CHILDREN_MAX=5 \
+    PHP_FPM_CHILDREN_START=2 \
+    PHP_FPM_CHILDREN_SPARE_MIN=1 \
+    PHP_FPM_CHILDREN_SPARE_MAX=3 \
+    PHP_FPM_MAX_REQUESTS=0
+
 
 # For OFFICIAL Drupal 8 requirements see
 # https://www.drupal.org/docs/8/system-requirements/php-requirements

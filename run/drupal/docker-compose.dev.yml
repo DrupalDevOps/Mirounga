@@ -1,4 +1,4 @@
-version: '2.4'
+version: '3.7'
 
 # Dev stack
 #
@@ -10,7 +10,8 @@ version: '2.4'
 services:
 
   drupal:
-    image: alexanderallen/drupal-8.prod:alpine-3.11
+    # The codebase is environment-agnostic and therefore hardcoded to prod.
+    image: "alexanderallen/drupal-8.prod:alpine-3.11"
     volumes:
       - app:/app
 
@@ -19,7 +20,18 @@ services:
       - app:/app
 
   php-fpm:
-    image: alexanderallen/php7-fpm.dev:alpine-3.11
+    # Allow nobody user logging to /dev/stdout.
+    tty: true
+    image: "alexanderallen/php7-fpm.${ENVIRONMENT:-dev}:alpine-3.11"
+    environment:
+      PHP_FPM_SLOWLOG_TIMEOUT: 3
+      # Use environment variables to speed up FPM optimization cycles.
+      PHP_FPM_PM_MANAGER: dynamic
+      PHP_FPM_CHILDREN_MAX: 5
+      # Default Value: min_spare_servers + (max_spare_servers - min_spare_servers) / 2
+      PHP_FPM_CHILDREN_START: 2
+      PHP_FPM_CHILDREN_SPARE_MIN: 1
+      PHP_FPM_CHILDREN_SPARE_MAX: 3
     volumes:
       - app:/app
 
