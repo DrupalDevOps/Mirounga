@@ -36,7 +36,7 @@ services:
     command: -p 11211 -m 16 -vvv -M
 
   php-fpm:
-    # Prod image. alexanderallen/php7-fpm.prod:alpine-3.11
+    # By default use prod image.
     image: "alexanderallen/php7-fpm.${ENVIRONMENT:-prod}:alpine-3.11"
     # Allow nobody user logging to /dev/stdout.
     tty: true
