@@ -38,6 +38,8 @@ services:
   php-fpm:
     # Prod image. alexanderallen/php7-fpm.prod:alpine-3.11
     image: "alexanderallen/php7-fpm.${ENVIRONMENT:-prod}:alpine-3.11"
+    # Allow nobody user logging to /dev/stdout.
+    tty: true
     environment:
       PHP_INI_MAX_EXECUTION_TIME: 0 # Set to 0 for unlimited.
       PHP_INI_MEM_LIMIT: 256M # The default memory limit is 128M.

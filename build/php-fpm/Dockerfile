@@ -11,9 +11,10 @@ ENV PHP_VERSION=php7
 ENV \
     PHP_INI_MAX_EXECUTION_TIME=30 \
     PHP_INI_MEM_LIMIT=256M \
-    PHP_FPM_ERRLOG=/var/log/php-fpm.log \
-    PHP_FPM_SLOWLOG=/var/log/php-fpm.slow.log \
-    PHP_FPM_SLOWLOG_TIMEOUT=0
+    PHP_FPM_ERRLOG=/dev/stderr \
+    PHP_FPM_SLOWLOG=/dev/stderr \
+    # Slowlog timeout value of 0 means 'off'.
+    PHP_FPM_SLOWLOG_TIMEOUT=0 \
 
 # For OFFICIAL Drupal 8 requirements see
 # https://www.drupal.org/docs/8/system-requirements/php-requirements
@@ -50,10 +51,10 @@ RUN \
         #
         zlib \
         su-exec \
-    && ln -sf /dev/stdout ${PHP_FPM_ERRLOG} \
-    && ln -sf /dev/stdout ${PHP_FPM_SLOWLOG}
     # Cleanup defualt pool configuration.
     && rm /etc/php7/php-fpm.d/www.conf \
+    # Allow php-fpm to log to /dev/std{out,err} as nobody.
+    && addgroup nobody tty
 
 # Configure PHP-FPM.
 COPY php-fpm.conf /etc/${PHP_VERSION}/php-fpm.conf
