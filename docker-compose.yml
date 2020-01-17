@@ -29,6 +29,15 @@ services:
     volumes:
       - mysql:/var/lib/mysql
 
+  pma:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - 8080:80
+    environment:
+      PMA_USER: docker
+      PMA_PASSWORD:
+      PMA_HOST: mysql
+
   memcached:
     # Memcached 1.5.20 released Nov 11, 2019.
     # https://hub.docker.com/_/memcached
