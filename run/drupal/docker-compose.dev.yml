@@ -9,31 +9,55 @@ version: '3.7'
 
 services:
 
-  drupal:
-    # The codebase is environment-agnostic and therefore hardcoded to prod.
-    image: "alexanderallen/drupal-8.prod:alpine-3.11"
+  # drupal:
+  #   # The codebase is environment-agnostic and therefore hardcoded to prod.
+  #   image: "alexanderallen/drupal-8.prod:alpine-3.11"
+  #   volumes:
+  #     - app:/app
+
+  # Automatically install or update local source on launch for development.
+  drush:
+    image: alexanderallen/php7-cli-drush9.dev:alpine-3.11
+    environment:
+      INSTALL_DRUPAL: 1
+    working_dir: /app
     volumes:
-      - app:/app
+      - ./app:/app
 
   nginx:
     volumes:
-      - app:/app
+      - ./app:/app
 
   php-fpm:
     # Allow nobody user logging to /dev/stdout.
     tty: true
     image: "alexanderallen/php7-fpm.${ENVIRONMENT:-dev}:alpine-3.11"
     environment:
-      PHP_FPM_SLOWLOG_TIMEOUT: 3
+      PHP_FPM_SLOWLOG_TIMEOUT: 0
       # Use environment variables to speed up FPM optimization cycles.
       PHP_FPM_PM_MANAGER: dynamic
-      PHP_FPM_CHILDREN_MAX: 5
+      PHP_FPM_CHILDREN_MAX: 15
       # Default Value: min_spare_servers + (max_spare_servers - min_spare_servers) / 2
-      PHP_FPM_CHILDREN_START: 2
-      PHP_FPM_CHILDREN_SPARE_MIN: 1
-      PHP_FPM_CHILDREN_SPARE_MAX: 3
+      PHP_FPM_CHILDREN_START: 7
+      PHP_FPM_CHILDREN_SPARE_MIN: 5
+      PHP_FPM_CHILDREN_SPARE_MAX: 10
+
+      # - /c/Users/richa/Sites:/www
+      # - ~/Sites/xhprof_run:/var/tmp/xhprof
+      # See these issues:
+      # * https://github.com/docker/for-linux/issues/264#issuecomment-564047473
+      # XDEBUG_REMOTE_HOST: 10.254.254.254 # Docker for Mac host alias: use it instead of the default gateway 172.18.0.1.
+      XDEBUG_REMOT_HOST: host.docker.internal
+      XDEBUG_REMOTE_PORT: 9000
+      XDEBUG_IDE_KEY: 'PHPSTORM'
+      # XDEBUG_CONNECT_BACK: 0 # Must be disabled in order for remote_host to work.
+
+
+      XDEBUG_REMOTE_ENABLE: 1
+      XDEBUG_DEFAULT_ENABLE: 1
+
     volumes:
-      - app:/app
+      - ./app:/app
 
 volumes:
   app:
