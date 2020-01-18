@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "felixfbecker.php-debug",
+    "dbaeumer.vscode-eslint",
+    "msjsdiag.debugger-for-chrome"
+  ]
+}

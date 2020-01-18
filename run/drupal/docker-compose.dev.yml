@@ -44,17 +44,36 @@ services:
 
       # - /c/Users/richa/Sites:/www
       # - ~/Sites/xhprof_run:/var/tmp/xhprof
+
       # See these issues:
       # * https://github.com/docker/for-linux/issues/264#issuecomment-564047473
       # XDEBUG_REMOTE_HOST: 10.254.254.254 # Docker for Mac host alias: use it instead of the default gateway 172.18.0.1.
-      XDEBUG_REMOT_HOST: host.docker.internal
+      XDEBUG_REMOTE_HOST: host.docker.internal
+
+      # Must be disabled (set to 0) in order for remote_host to work.
+      # https://stackoverflow.com/a/55856941/467453
+      # Recommended: DISABLE ON DOCKER
+      # When enabled on Docker, XDebug connects to the Docker VM instead of the IDE client.
+      XDEBUG_CONNECT_BACK: 0
+
+      # Forward XDebug connection logs to Docker for debugging
+      XDEBUG_REMOTE_LOG: /dev/stdout
+
       XDEBUG_REMOTE_PORT: 9000
       XDEBUG_IDE_KEY: 'PHPSTORM'
-      # XDEBUG_CONNECT_BACK: 0 # Must be disabled in order for remote_host to work.
-
-
       XDEBUG_REMOTE_ENABLE: 1
-      XDEBUG_DEFAULT_ENABLE: 1
+
+      # If this setting is 1, then stacktraces will be shown by default on an error event.
+      # It will also make xdebug logs extremely noisey and print caught exceptions as well.
+      XDEBUG_DEFAULT_ENABLE: 0
+
+      # If this setting is set to 1 then errors will always be displayed, no matter what the setting of PHP's
+      # ; display_errors is.
+      XDEBUG_FORCE_DISPLAY_ERRORS: 1
+
+      # ; When this setting is set to 1, Xdebug will show a stack trace whenever an exception is raised - even if this exception
+      # ; is actually caught.
+      XDEBUG_SHOW_EXCEPTION_TRACE: 0
 
     volumes:
       - ./app:/app

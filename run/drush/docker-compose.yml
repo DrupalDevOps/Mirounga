@@ -32,4 +32,4 @@ services:
       #- ../../app:/app
       - /c/Users/richa/Sites:/www
       # Named volume expected to be already declared in separate compose file.
-      - app:/app
+      # - app:/app

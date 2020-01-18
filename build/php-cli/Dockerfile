@@ -33,8 +33,6 @@ RUN \
 
 RUN chown -R ${DOCKER_USER}:${DOCKER_USER} ${COMPOSER_HOME}
 
-# Where all of our codebase is mounted to.
-WORKDIR /www
 ENTRYPOINT ["/bin/bash"]
 
 
