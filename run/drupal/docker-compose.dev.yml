@@ -28,6 +28,43 @@ services:
     volumes:
       - ./app:/app
 
+  # mysql logging options
+  mysql:
+    # Allocate tty for non-root user logging into docker logs at /dev/std{out,err}.
+    tty: true
+    entrypoint: /opt/docker/entrypoint
+    command:
+      # https://mariadb.com/kb/en/server-system-variables/#log_error
+      # https://mariadb.com/kb/en/error-log/
+      # https://mariadb.com/kb/en/error-log/#writing-the-error-log-to-stderr-on-unix
+
+      # On Unix, if the log_error system variable is not set, then errors are written to stderr,
+      # which usually means that the log messages are output to the terminal that started mysqld.
+      # - --log-error
+      # - --log-output=FILE
+
+      # Whether to log all queries or not.
+      # Enabling the general log will slow down things.
+      #- --general-log-file=/dev/stdout
+      #- --general-log=ON
+
+      # Setup slow query log.
+      # https://mariadb.com/kb/en/server-system-variables/#slow_query_log
+      - --slow-query-log
+      - --slow-query-log-file=/dev/stderr
+
+      # https://mariadb.com/kb/en/server-system-variables/#log_slow_verbosity
+      - --log-slow-verbosity=query_plan,explain
+
+      # https://mariadb.com/kb/en/server-system-variables/#log_queries_not_using_indexes
+      # Queries that don't use an index, or that perform a full index scan where the index doesn't limit the number of rows,
+      # will be logged to the slow query log (regardless of time taken).
+      # The slow query log needs to be enabled for this to have an effect.
+      - --log-queries-not-using-indexes=1
+
+      # https://mariadb.com/kb/en/server-system-variables/#long_query_time
+      - --long-query-time=1
+
   php-fpm:
     # Allow nobody user logging to /dev/stdout.
     tty: true
@@ -61,6 +98,9 @@ services:
 
       XDEBUG_REMOTE_PORT: 9000
       XDEBUG_IDE_KEY: 'PHPSTORM'
+
+      # ; This switch controls whether Xdebug should try to contact a debug client which is listening on the host and port as
+      # ; set with the settings xdebug.remote_host and xdebug.remote_port
       XDEBUG_REMOTE_ENABLE: 1
 
       # If this setting is 1, then stacktraces will be shown by default on an error event.
