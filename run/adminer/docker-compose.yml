@@ -1,0 +1,15 @@
+version: '3.7'
+networks:
+  default:
+    external: true
+    name: localenv
+
+services:
+
+  # Does not support passwordless mysql logins by default.
+  adminer:
+    image: adminer
+    links:
+      - mysql:db
+    ports:
+      - 8081:8080
