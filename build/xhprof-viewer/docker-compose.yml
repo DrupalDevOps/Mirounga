@@ -1,0 +1,6 @@
+services:
+  xhprof-viewer:
+    image: alexanderallen/xhprof-viewer:1.17-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile
