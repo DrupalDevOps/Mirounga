@@ -44,11 +44,14 @@ RUN \
   # Not using pam for authentication.
   && /bin/bash -c 'rm -rf /lib/{libpam*,security}' \
   # APK cleanup, remove changes in new layer ~1.3MB.
-  && apk del -q --no-cache --purge bash
+  && apk del -q --no-cache --purge bash \
   # Compression, PCRE, libstdc++, libxml, ssl, tls.
   # Apparently all these new libs are installed AND needed by the new mariadb version.
   #   && rm -rf /usr/lib/libxml* /usr/lib/libpcre* /usr/lib/libstd* /usr/lib/libpanel* /usr/lib/libncurses* /usr/lib/libme* /usr/lib/liblzma* \
   #     /usr/lib/libgcc* /usr/lib/libform* /usr/lib/libbz* /usr/lib/libaio* /usr/lib/libz*
+  #
+  # Allow server user to log to /dev/stdout and /dev/stderr.
+  && addgroup ${DAEMON_USER} tty
 
 COPY scripts/install /opt/docker/install
 COPY my.cnf /tmp/
