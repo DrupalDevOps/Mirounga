@@ -1,0 +1,32 @@
+version: '3.7'
+
+networks:
+  default:
+    external: true
+    name: localenv
+
+# You need to be on 3.x or greater to use secrets.
+# They're not available on 2.x.
+secrets:
+  ssh_private:
+    file: /c/Users/richa/.ssh/id_rsa
+  ssh_public:
+    file: /c/Users/richa/.ssh/id_rsa.pub
+
+services:
+
+  drush:
+    # Without xdebug.
+    # image: alexanderallen/php7-cli.drush9:alpine-3.11
+    # With xdebug and tools.
+    image: alexanderallen/php7-cli-drush9.dev:alpine-3.11
+    secrets:
+      - ssh_private
+      - ssh_public
+    environment:
+      XDEBUG_SHOW_EXCEPTION_TRACE: 0
+    # Optional. Point working directory to named volume containg code.
+    working_dir: /app
+    volumes:
+      # Named volume expected to be already declared in separate compose file.
+      - app:/app
