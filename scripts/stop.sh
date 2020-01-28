@@ -2,7 +2,7 @@
 
 # Bring down stack if it exists.
 ENV=${ENVIRONMENT:-prod}
-echo "Stopping and removing Docker Compose ${ENV} environment."
+echo "Stopping Docker Compose ${ENV} environment."
 
 docker-compose \
 -f docker-compose.yml \
