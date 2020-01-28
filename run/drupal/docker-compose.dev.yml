@@ -16,11 +16,11 @@ services:
       INSTALL_DRUPAL: 1
     working_dir: /app
     volumes:
-      - ./app:/app
+      - "${PROJECT_SRC:-../app}:/app"
 
   nginx:
     volumes:
-      - ./app:/app
+      - "${PROJECT_SRC:-../app}:/app"
 
   # mysql logging options
   mysql:
@@ -110,4 +110,4 @@ services:
       XDEBUG_SHOW_EXCEPTION_TRACE: 0
 
     volumes:
-      - ./app:/app
+      - "${PROJECT_SRC:-../app}:/app"
