@@ -15,6 +15,8 @@ services:
     ports:
       - 80:8080
       - 443:443
+    volumes:
+      - drawer:/sock
     healthcheck:
       test: curl --fail -s http://localhost:80 || exit 1
       interval: 30s
@@ -50,12 +52,18 @@ services:
     # Allow nobody user logging to /dev/stdout.
     tty: true
     environment:
+      PHP_FPM_LISTEN: /sock/docker.sock
+
       PHP_INI_MAX_EXECUTION_TIME: 0 # Set to 0 for unlimited.
       PHP_INI_MEM_LIMIT: 256M # The default memory limit is 128M.
       # PHP_FPM_LISTEN: 127.0.0.1:9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
       PHP_FPM_LISTEN: 9010 # The default port is 9000, which conflicts with XDebug. Move to 9010.
       PHP_FPM_WORKER_LOGOUTPUT: 1
+
     # todo: healthcheck
+    volumes:
+      - drawer:/sock
 
 volumes:
   mysql:
+  drawer:
