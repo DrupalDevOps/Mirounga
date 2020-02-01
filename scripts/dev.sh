@@ -17,6 +17,14 @@ case $1 in
     ./scripts/start.sh
     ;;
 
+  "drush")
+    ./scripts/drush.sh "$@"
+    ;;
+
+  "destroy")
+    ./scripts/destroy.sh
+    ;;
+
   *)
     docker-compose ps
     ;;
