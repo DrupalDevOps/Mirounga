@@ -15,7 +15,7 @@ ENV \
     PHP_FPM_SLOWLOG=/dev/stderr \
     # Slowlog timeout value of 0 means 'off'.
     PHP_FPM_SLOWLOG_TIMEOUT=0 \
-    PHP_FPM_LISTEN=127.0.0.1:9010 \
+    PHP_FPM_LISTEN=unix:/sock/docker.sock \
     # Use environment variables to speed up FPM optimization cycles.
     PHP_FPM_PM_MANAGER=dynamic \
     PHP_FPM_CHILDREN_MAX=5 \
@@ -63,7 +63,15 @@ RUN \
     # Cleanup defualt pool configuration.
     && rm /etc/php7/php-fpm.d/www.conf \
     # Allow php-fpm to log to /dev/std{out,err} as nobody.
-    && addgroup nobody tty
+    && addgroup nobody tty \
+    #
+    # Initialize PHP-FPM socket volume
+    # https://github.com/docker/compose/issues/3270#issuecomment-543603959
+    && mkdir /sock \
+    && chown -R nobody:nobody /sock
+
+# Socket volume.
+VOLUME ["/sock"]
 
 # Configure PHP-FPM.
 COPY php-fpm.conf /etc/${PHP_VERSION}/php-fpm.conf
