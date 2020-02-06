@@ -4,6 +4,9 @@ export ENVIRONMENT=dev
 
 export PROJECT_ROOT="./run/example"
 
+# Location to mount into the containers (php-fpm, nginx, drush).
+export PROJECT_DEST="/app"
+
 # - "/home/${USER}/Projects/app:/app"
 
 # The WSL instance where VS Code Remote points to.
