@@ -41,7 +41,7 @@ services:
       #   target: /home/nobody/Workloads
       #   consistency: consistent
 
-      - "${PROJECT_ROOT}:/app"
+      - "${PROJECT_ROOT}:${PROJECT_DEST}"
 
     # WSL mounts files as current WSL user, even if user is specified here.
     # This just specifies container user, not mounts user.

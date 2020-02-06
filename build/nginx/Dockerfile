@@ -16,9 +16,12 @@ RUN rm /etc/nginx/conf.d/default.conf
 
 # Copy dynamic vhost definition into container.
 # Use one container for each application, using environment variables passed to the run command.
-#   include /etc/nginx/conf.d/*.conf;
-COPY vhost.conf /etc/nginx/conf.d/default.conf
-COPY etc/nginx/nginx.conf etc/nginx/nginx.conf
+
+# VHost config file, included by main config (include /etc/nginx/conf.d/*.conf;).
+COPY etc/nginx/conf.d/vhost.conf /etc/nginx/conf.d/default.conf
+
+# Main config file.
+COPY etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
 ENV NGINX_HTTP_LISTEN 8080
 
