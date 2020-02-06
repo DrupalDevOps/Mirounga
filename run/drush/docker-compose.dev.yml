@@ -25,7 +25,27 @@ services:
       - ssh_public
     environment:
       XDEBUG_SHOW_EXCEPTION_TRACE: 0
-    # Optional. Point working directory to named volume containg code.
-    working_dir: /app
+
+    # The Drush Dev container should not make assumptions regarding working_dir, as it can
+    # be used to work on any number of projects simulataneously.
+    working_dir: /
+
     volumes:
-      - "${PROJECT_SRC:-../app}:/app"
+
+      # WSL2 to DD bind, performant.
+      # $USER variable assumes compose run within WSL and not WIN10.
+      # - type: bind
+      #   # Bind from WSL.user to continer.
+      #   source: "/home/${USER}/Workloads"
+      #   # Nobody doesn't have a home in alpine.
+      #   target: /home/nobody/Workloads
+      #   consistency: consistent
+
+      - "${PROJECT_ROOT}:/app"
+
+    # WSL mounts files as current WSL user, even if user is specified here.
+    # This just specifies container user, not mounts user.
+    user: nobody
+
+
+    tty: true

@@ -9,18 +9,11 @@ version: '3.7'
 
 services:
 
-  # Automatically install or update local source on launch for development.
-  drush:
-    image: alexanderallen/php7-cli-drush9.dev:alpine-3.11
-    environment:
-      INSTALL_DRUPAL: 1
-    working_dir: /app
-    volumes:
-      - "${PROJECT_SRC:-../app}:/app"
-
   nginx:
     volumes:
-      - "${PROJECT_SRC:-../app}:/app"
+      - "${PROJECT_ROOT}:/app"
+
+      - ./build/nginx/vhost.conf:/etc/nginx/conf.d/default.conf
 
   # mysql logging options
   mysql:
@@ -59,6 +52,13 @@ services:
       # https://mariadb.com/kb/en/server-system-variables/#long_query_time
       - --long-query-time=1
 
+      # https://www.drupal.org/project/drupal/issues/1059718
+      # https://mariadb.com/kb/en/server-system-variables/#max_allowed_packet
+      - --max-allowed-packet=128M
+
+      # https://mariadb.com/kb/en/innodb-system-variables/#innodb_buffer_pool_size
+      - --innodb-buffer-pool-size=256M
+
   php-fpm:
     # Allow nobody user logging to /dev/stdout.
     tty: true
@@ -79,7 +79,7 @@ services:
       # See these issues:
       # * https://github.com/docker/for-linux/issues/264#issuecomment-564047473
       # XDEBUG_REMOTE_HOST: 10.254.254.254 # Docker for Mac host alias: use it instead of the default gateway 172.18.0.1.
-      XDEBUG_REMOTE_HOST: host.docker.internal
+      XDEBUG_REMOTE_HOST: ${XDEBUG_REMOTE_HOST}
 
       # Must be disabled (set to 0) in order for remote_host to work.
       # https://stackoverflow.com/a/55856941/467453
@@ -110,4 +110,4 @@ services:
       XDEBUG_SHOW_EXCEPTION_TRACE: 0
 
     volumes:
-      - "${PROJECT_SRC:-../app}:/app"
+      - "${PROJECT_ROOT}:/app"

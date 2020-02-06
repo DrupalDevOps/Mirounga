@@ -2,6 +2,19 @@
 
 export ENVIRONMENT=dev
 
+export PROJECT_ROOT="./run/example"
+
+# - "/home/${USER}/Projects/app:/app"
+
+# The WSL instance where VS Code Remote points to.
+# The WSL instance must have PHP and XDebug installed.
+# On WSL distributions, usually it's the eth0 result of ifconfig.
+export XDEBUG_REMOTE_HOST=172.27.233.110
+
+# If the shell running docker compose is the WSL host for VSC and XDebug:
+# ifconfig eth0 | grep "inet " | awk -F'[: ]+' '{ print $4 }'
+# https://unix.stackexchange.com/a/87470/5626
+
 case $1 in
 
   "start")
@@ -12,12 +25,14 @@ case $1 in
     ./scripts/stop.sh
     ;;
 
+  # You can use restart instead of destroy to update mounts.
   "restart")
     ./scripts/stop.sh
     ./scripts/start.sh
     ;;
 
   "drush")
+    shift;
     ./scripts/drush.sh "$@"
     ;;
 

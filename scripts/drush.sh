@@ -14,4 +14,4 @@ docker-compose \
 -f docker-compose.yml \
 -f run/drupal/docker-compose.${ENV}.yml \
 -f run/drush/docker-compose.${ENV}.yml \
-run --rm drush
+run --rm drush "$@"
