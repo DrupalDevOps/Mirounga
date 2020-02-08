@@ -2,10 +2,10 @@
 
 export ENVIRONMENT=dev
 
-export PROJECT_ROOT="./run/example"
+export PROJECT_ROOT="./run/sites"
 
 # Location to mount into the containers (php-fpm, nginx, drush).
-export PROJECT_DEST="/app"
+export PROJECT_DEST="/sites"
 
 # - "/home/${USER}/Projects/app:/app"
 
@@ -22,6 +22,7 @@ case $1 in
 
   "start")
     ./scripts/start.sh
+    docker-compose logs nginx
     ;;
 
   "stop")
