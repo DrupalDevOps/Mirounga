@@ -31,8 +31,9 @@ case $1 in
 
   # You can use restart instead of destroy to update mounts.
   "restart")
-    ./scripts/stop.sh
-    ./scripts/start.sh
+    ./scripts/stop.sh;
+    ./scripts/start.sh;
+    docker-compose logs -f nginx php-fpm
     ;;
 
   "drush")
