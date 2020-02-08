@@ -15,12 +15,14 @@ services:
     volumes:
       - "${PROJECT_ROOT}:${PROJECT_DEST}"
       # Virtual host.
-      - ./build/nginx/etc/nginx/conf.d/vhost.conf:/etc/nginx/conf.d/default.conf
+      - ./build/nginx/etc/nginx/conf.d/:/etc/nginx/conf.d/
       # Main config.
       - ./build/nginx/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
       # NJS Scripting.
       - ./build/nginx/http.js:/etc/nginx/http.js
 
+      # Server includes.
+      - ./build/nginx/etc/nginx/inc/:/etc/nginx/inc/
 
   # mysql logging options
   mysql:
@@ -118,3 +120,7 @@ services:
 
     volumes:
       - "${PROJECT_ROOT}:${PROJECT_DEST}"
+
+    # extra_hosts:
+    #   - sitea:127.0.0.1
+    #   - siteb:127.0.0.1
