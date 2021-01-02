@@ -57,6 +57,7 @@ RUN \
         ${PHP_VERSION}-simplexml \
         ${PHP_VERSION}-tokenizer \
         ${PHP_VERSION}-xml \
+        ${PHP_VERSION}-ctype \
         #
         zlib \
         su-exec \
