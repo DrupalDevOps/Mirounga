@@ -20,3 +20,10 @@ else
 fi
 
 # && docker-compose -f ./build/xhprof-viewer/docker-compose.yml build \
+
+# Cleanup <3
+#
+# Remove dangling/intermidiate images from build.
+# https://docs.docker.com/config/pruning/
+
+docker image prune --force
