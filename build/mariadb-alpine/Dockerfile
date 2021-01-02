@@ -21,7 +21,7 @@ ARG CLIENT_USER=docker
 RUN \
   export sharedir=/usr/share/mariadb \
   # Need bash for evaluating path name expansions.
-  && apk add --no-cache mariadb=10.4.10-r0 bash su-exec \
+  && apk add --no-cache mariadb bash su-exec \
   #
   # Cleanup after install.
   #
