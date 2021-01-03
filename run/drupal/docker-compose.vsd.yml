@@ -24,7 +24,9 @@ services:
       - "${PROJECT_ROOT}:${PROJECT_DEST}"
     # Allow nobody user logging to /dev/stdout.
     tty: true
-    image: "alexanderallen/php7-fpm.${ENVIRONMENT:-dev}:alpine-3.11"
+
+    # The prod image is not setup for xdebug, use the dev image.
+    image: "alexanderallen/php7-fpm.dev:alpine-3.11"
     environment:
       PHP_FPM_SLOWLOG_TIMEOUT: 0
       # Use environment variables to speed up FPM optimization cycles.
