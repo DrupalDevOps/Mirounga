@@ -5,7 +5,7 @@ version: '3.7'
 networks:
   default:
     external: true
-    name: localenv
+    name: ${COMPOSE_NETWORK:-localenv}
 
 services:
 
