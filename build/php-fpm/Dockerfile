@@ -34,9 +34,20 @@ ENV \
 
 RUN \
     cd /tmp \
+    #
+    # Setup base user for the rest of the images.
+    # Default nobody user has a non-friendly uid/gid (nobody:x:65534:65534:nobody:/:/sbin/nologin)
+    # WSL users use uid/gid 1000, new default alpine user uses uid/gid 1000. So let's reset nobody to be uid/gid 1000.
+    && id nobody \
+    && deluser nobody \
+    && adduser --disabled-password --gecos 'Klaes Ashford' --uid 1000 nobody \
+    # Add nobody user to group tty, allowing php-fpm to log into /dev/std[out|err] as non-root.
+    && addgroup nobody tty \
+    # Confirm new uid/gid is 1000.
+    && groups nobody && id nobody \
+    \
     && apk add --no-cache \
         ${PHP_VERSION} \
-       # ${PHP_VERSION}-cli \ # not found
         ${PHP_VERSION}-curl \
         #
         ${PHP_VERSION}-fpm \
@@ -63,8 +74,6 @@ RUN \
         su-exec \
     # Cleanup defualt pool configuration.
     && rm /etc/php7/php-fpm.d/www.conf \
-    # Allow php-fpm to log to /dev/std{out,err} as nobody.
-    && addgroup nobody tty \
     #
     # Initialize PHP-FPM socket volume
     # https://github.com/docker/compose/issues/3270#issuecomment-543603959

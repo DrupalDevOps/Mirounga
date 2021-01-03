@@ -33,7 +33,16 @@ RUN \
   && addgroup nobody tty \
   # Create .pid directory accessible by non root.
   && mkdir /var/run/nginx \
-  && chmod -R o+rwx /var/run/nginx /var/cache/nginx
+  && chmod -R o+rwx /var/run/nginx /var/cache/nginx \
+  #
+  # Reset anonymous user nobody to uid/gid 1000.
+  && id nobody \
+  && deluser nobody \
+  && adduser --disabled-password --gecos 'Camina Drummer' --uid 1000 nobody \
+  # Add nobody user to group tty, allowing php-fpm to log into /dev/std[out|err] as non-root.
+  && addgroup nobody tty \
+  # Confirm new uid/gid is 1000.
+  && groups nobody && id nobody
 
 EXPOSE ${NGINX_HTTP_LISTEN}
 
