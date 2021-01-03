@@ -52,6 +52,17 @@ RUN apk add --no-cache openssh-client
 # Composer manifest for global Drush install.
 COPY drush/${DRUSH_VERSION}/composer.json ${COMPOSER_HOME}/composer.json
 
+# Install Drupal console (separate from Drush).
+#
+# https://drupalconsole.com/docs/en/getting/launcher
+# You must execute the launcher within a drupal site directory or use --root=/path/to/drupal8.dev
+# to specify your drupal site path.
+#
+RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
+  && mv drupal.phar /opt/drupal \
+  && chmod +x /opt/drupal \
+  && chown -R ${DOCKER_USER}:${DOCKER_USER} /opt/drupal /opt
+
 # Switch to non-root user before running drush commands.
 USER ${DOCKER_USER}
 
