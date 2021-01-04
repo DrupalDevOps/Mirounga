@@ -7,8 +7,11 @@ function foo(r) {
 
   // https://nginx.org/en/docs/njs/reference.html#core_global
   r.warn("ENV VARS currently available to Nginx:");
-  r.warn(process.env);
-  return "foo";
+  // r.warn(njs.dump(process.env));
+  ngx.log(ngx.INFO, njs.dump(process.env));
+
+  var dest = process.env.PROJECT_DEST;
+  return dest;
 }
 
 function getLocation(r) {
