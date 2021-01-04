@@ -23,6 +23,9 @@ COPY etc/nginx/conf.d/vhost.conf /etc/nginx/conf.d/default.conf
 # Main config file.
 COPY etc/nginx/nginx.conf /etc/nginx/nginx.conf
 
+# Requires NJS 0.4.0+, included with nginx:1.19-alpine,
+COPY etc/nginx/http.js /etc/nginx/http.js
+
 ENV NGINX_HTTP_LISTEN 8080
 
 RUN \
