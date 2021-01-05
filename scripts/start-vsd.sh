@@ -29,11 +29,11 @@ echo "XDebug will contact IDE at ${XDEBUG_REMOTE_HOST}"
 #export PROJECT_ROOT=`pwd`
 
 # export PROJECT_ROOT="/home/wsl/drupal-8.8.1"
-export PROJECT_ROOT="/home/wsl/hello-php"
+# export PROJECT_ROOT="/home/wsl/hello-php"
 
 
 # Location to mount into the containers (php-fpm, nginx, drush).
-export PROJECT_DEST="/sites"
+# export PROJECT_DEST="/sites"
 
 #
 # === END DOCKER COMPOSE VARIALBES ===
@@ -48,19 +48,17 @@ export COMPOSE_NETWORK=VSD
 NETEXISTS=`docker network ls | grep -c $COMPOSE_NETWORK`
 if ! (($NETEXISTS)) ; then
   echo "Create user-defined network"
-  docker network create $COMPOSE_NETWORK
+  docker network create --driver bridge --attachable $COMPOSE_NETWORK
+  docker network inspect $COMPOSE_NETWORK | grep Attachable
 else
   echo "Docker network ${COMPOSE_NETWORK} already exists, joining."
 fi
 
-# Start stack by default on production configuration (minimal containers w/ no debugging).
-# Switch ENVIRONMENT to dev to enable debugging.
-ENV=${ENVIRONMENT:-vsd}
-echo "Running Docker Compose for ${ENV} environment."
+echo "Running Docker Compose for VSD environment."
 
 docker-compose \
 -f docker-compose.yml \
--f run/drupal/docker-compose.${ENV}.yml \
+-f run/drupal/docker-compose.vsd.yml \
 up -d
 
 docker-compose ps

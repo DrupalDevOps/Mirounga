@@ -11,17 +11,26 @@ services:
 
   nginx:
     environment:
-      PROJECT_DEST: "${PROJECT_DEST}"
+      # PROJECT_DEST: "${PROJECT_DEST}"
+      PROJECT_DEST: "/vsdroot"
     volumes:
-      - "${PROJECT_ROOT}:${PROJECT_DEST}"
+      - "/home/wsl/hello-php:/vsdroot"
+
+      # - "${PROJECT_ROOT}:${PROJECT_DEST}"
+
       # Virtual host.
       - ./build/nginx/etc/nginx/conf.d/:/etc/nginx/conf.d/
       # Main config.
       - ./build/nginx/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+      # NJS script.
+      - ./build/nginx/etc/nginx/http.js:/etc/nginx/http.js
 
+  # to fire a separate php-fpm container per project.
+  # Need a per-project socket?
+  # Currently   fastcgi_pass unix:/sock/docker.sock; on vhost.conf
   php-fpm:
     volumes:
-      - "${PROJECT_ROOT}:${PROJECT_DEST}"
+       - "/home/wsl/hello-php:/vsdroot"
     # Allow nobody user logging to /dev/stdout.
     tty: true
 
