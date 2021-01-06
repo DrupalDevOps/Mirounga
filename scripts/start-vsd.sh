@@ -65,3 +65,10 @@ docker-compose \
 --project-name "${PWD##*/}" \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
 ps
+
+BROWSER_PORT=`docker-compose \
+--project-name "${PWD##*/}" \
+--file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
+port nginx 8080`
+echo ""
+echo "Your application is being served at ${BROWSER_PORT}"
