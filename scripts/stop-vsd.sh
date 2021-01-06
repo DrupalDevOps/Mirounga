@@ -6,11 +6,19 @@ echo "Stop Docker Compose ${ENV} environment."
 
 LOCALENV_HOME="/home/wsl/Sites/localenv"
 
-# Start shared services.
+# Backup database before tearing it down.
+# https://docs.docker.com/storage/volumes/#backup-a-container
+docker-compose \
+--file ${LOCALENV_HOME}/docker-compose.shared.yml \
+run --rm \
+--volume=$(pwd):/backup \
+backup ash -c "tar cvf /backup/backup.tar /var/lib/mysql"
+
+# Remove shared services.
 docker-compose \
 --file ${LOCALENV_HOME}/docker-compose.shared.yml down
 
-# Start per-project stack, using current directory as project name.
+# Remove per-project stack, using current directory as project name.
 # https://stackoverflow.com/a/1371283
 docker-compose \
 --project-name "${PWD##*/}" \

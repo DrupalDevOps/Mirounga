@@ -17,6 +17,11 @@ services:
     volumes:
       - mysql:/var/lib/mysql
 
+  backup:
+    image: alpine:3.11
+    volumes:
+      - mysql:/var/lib/mysql
+
   pma:
     image: phpmyadmin/phpmyadmin
     ports:
