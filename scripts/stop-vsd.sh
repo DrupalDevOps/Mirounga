@@ -8,18 +8,21 @@ LOCALENV_HOME="/home/wsl/Sites/localenv"
 
 # Backup database before tearing it down.
 # https://docs.docker.com/storage/volumes/#backup-a-container
+echo "Back up database filesystem."
 docker-compose \
 --file ${LOCALENV_HOME}/docker-compose.shared.yml \
+--file ${LOCALENV_HOME}/run/docker-compose.backup.yml \
 run --rm \
 --volume=$(pwd):/backup \
-backup ash -c "tar cvf /backup/backup.tar /var/lib/mysql"
+backup ash -c "tar cf /backup/backup.tar /var/lib/mysql"
 
 # Remove shared services.
+echo "Remove shared services."
 docker-compose \
 --file ${LOCALENV_HOME}/docker-compose.shared.yml down
 
 # Remove per-project stack, using current directory as project name.
-# https://stackoverflow.com/a/1371283
+echo "Remove project services."
 docker-compose \
 --project-name "${PWD##*/}" \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml down

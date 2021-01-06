@@ -1,0 +1,15 @@
+# Staying on version 2.x for performance tuning cpu, memory resources.
+# Ver. 3.x is meant for swarms and is not 100% backwards-compat.
+# Secrets are available only on 3.x.
+version: '3.7'
+networks:
+  default:
+    external: true
+    name: ${COMPOSE_NETWORK:-localenv}
+
+services:
+
+  backup:
+    image: alpine:3.11
+    volumes:
+      - mysql:/var/lib/mysql
