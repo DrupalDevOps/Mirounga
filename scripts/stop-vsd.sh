@@ -19,13 +19,16 @@ backup ash -c "tar cf /backup/backup.tar /var/lib/mysql"
 # Remove shared services.
 echo "Remove shared services."
 docker-compose \
---file ${LOCALENV_HOME}/docker-compose.shared.yml down
+--file ${LOCALENV_HOME}/docker-compose.shared.yml down -v --remove-orphans
 
 # Remove per-project stack, using current directory as project name.
 echo "Remove project services."
 docker-compose \
 --project-name "${PWD##*/}" \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml down
+
+# Cleanup while we're at it.
+docker system prune
 
 echo "Remove user bridge network."
 docker network rm VSD
