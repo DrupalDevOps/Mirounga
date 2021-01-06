@@ -66,9 +66,18 @@ docker-compose \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
 ps
 
+# Show where to find application.
 BROWSER_PORT=`docker-compose \
 --project-name "${PWD##*/}" \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
 port nginx 8080`
 echo ""
-echo "Your application is being served at ${BROWSER_PORT}"
+echo "Your application is being served at ${BROWSER_PORT} !!"
+echo ""
+
+# Provide courtesy logs, you could also do top.
+# docker-compose exec --entrypoint=ash --user=root $1 tail -f $2
+docker-compose \
+--project-name "${PWD##*/}" \
+--file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
+logs -f
