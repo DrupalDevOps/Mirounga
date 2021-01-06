@@ -3,15 +3,14 @@
 # VSC, WSL, DD Start File.
 #
 # Script integrates (V)isual Studio Code, Windows (S)ubsystem for Linux, and (D)ocker Desktop.
-# The name of the environment is VSD.
 
 # Using user-defined network eliminates need to use service links,
 # and allows multiple compose stacks to join/leave network on a as-needed basis -
 # as opposed to composing up or down an entire monolith compose stack.
 #
-# For benefits of user-defined bridge over default bridge https://docs.docker.com/network/bridge/
-# Compose networking: https://docs.docker.com/compose/networking/
-# Latest compose reference: https://docs.docker.com/compose/compose-file/#network-configuration-reference
+
+# Allow script to be invoked from anywhere.
+LOCALENV_HOME="/home/wsl/Sites/localenv"
 
 #
 # === START DOCKER COMPOSE VARIALBES ===
@@ -24,46 +23,45 @@
 export XDEBUG_REMOTE_HOST=`ip addr show eth0 | grep -oE '\d+(\.\d+){3}' | head -n 1`
 echo "XDebug will contact IDE at ${XDEBUG_REMOTE_HOST}"
 
-# Source code directory, to be found inside WSL Host.
-# The directory from where the start script is invoked is assumed to be the project root.
-#export PROJECT_ROOT=`pwd`
-
-# export PROJECT_ROOT="/home/wsl/drupal-8.8.1"
-# export PROJECT_ROOT="/home/wsl/hello-php"
-
-
-# Location to mount into the containers (php-fpm, nginx, drush).
-# export PROJECT_DEST="/sites"
+# Source code directory, assumed to be the current directory.
+export PROJECT_SOURCE=`readlink -f .`
+echo "Project location is ${PROJECT_SOURCE}"
 
 #
 # === END DOCKER COMPOSE VARIALBES ===
 #
 
 
-
-
 # Create user-defined bridge, and pass name to Docker Compose.
 export COMPOSE_NETWORK=VSD
 
-NETEXISTS=`docker network ls | grep -c $COMPOSE_NETWORK`
+NETEXISTS=`docker network ls | grep -c ${COMPOSE_NETWORK}`
 if ! (($NETEXISTS)) ; then
   echo "Create user-defined network"
-  docker network create --driver bridge --attachable $COMPOSE_NETWORK
-  docker network inspect $COMPOSE_NETWORK | grep Attachable
+  docker network create --driver bridge --attachable ${COMPOSE_NETWORK}
+  docker network inspect ${COMPOSE_NETWORK} | grep Attachable
 else
   echo "Docker network ${COMPOSE_NETWORK} already exists, joining."
 fi
 
 echo "Running Docker Compose for VSD environment."
 
+
+# Start shared services.
 docker-compose \
--f docker-compose.yml \
--f run/drupal/docker-compose.vsd.yml \
-up -d
+--file ${LOCALENV_HOME}/docker-compose.shared.yml up -d --no-recreate
 
-docker-compose ps
+# Start per-project stack, using current directory as project name.
+# https://stackoverflow.com/a/1371283
+docker-compose \
+--project-name "${PWD##*/}" \
+--file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml up -d
 
-# docker-compose \
-# -f docker-compose.yml \
-# -f run/drupal/docker-compose.vsd.yml \
-# up -d
+# Show status.
+docker-compose \
+--file ${LOCALENV_HOME}/docker-compose.yml \
+ps
+docker-compose \
+--project-name "${PWD##*/}" \
+--file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
+ps
