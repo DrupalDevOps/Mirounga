@@ -17,7 +17,7 @@ RUN \
 
 RUN apk add --no-cache supervisor
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY --chown=nobody:nobody nginx.conf index.html /etc/nginx/
 
 RUN \
   cd /tmp \
