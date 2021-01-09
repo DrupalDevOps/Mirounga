@@ -28,7 +28,7 @@ docker-compose \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml down
 
 # Cleanup while we're at it.
-docker system prune
+docker system prune --force
 
 echo "Remove user bridge network."
 docker network rm VSD
