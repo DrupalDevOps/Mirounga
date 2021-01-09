@@ -31,9 +31,6 @@ ENV NGINX_HTTP_LISTEN 8080
 RUN \
   cd /tmp \
   && apk add --no-cache su-exec \
-  # On Alpine /dev/pts has by default group tty, but needs tty allocated in Docker compose or run in order to work
-  # for logs forwarding.
-  && addgroup nobody tty \
   # Create .pid directory accessible by non root.
   && mkdir /var/run/nginx \
   && chmod -R o+rwx /var/run/nginx /var/cache/nginx \
