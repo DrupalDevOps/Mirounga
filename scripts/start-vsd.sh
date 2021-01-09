@@ -59,7 +59,7 @@ docker-compose \
 
 # Show status.
 docker-compose \
---file ${LOCALENV_HOME}/docker-compose.yml \
+--file ${LOCALENV_HOME}/docker-compose.shared.yml \
 ps
 docker-compose \
 --project-name "${PWD##*/}" \
