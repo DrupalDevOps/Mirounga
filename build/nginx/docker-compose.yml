@@ -1,22 +1,5 @@
 version: '3.4'
 
-#
-# README.md -
-#
-# Start nginx service
-# docker-compose -f build/nginx/docker-compose.yml up -d
-# Creating network "nginx_default" with the default driver
-# Creating nginx_nginx_1 ... done
-#
-# docker-compose -f build/nginx/docker-compose.yml ps
-#     Name              Command          State                      Ports
-# -------------------------------------------------------------------------------------------
-# nginx_nginx_1   nginx -g daemon off;   Up      127.0.0.1:443->443/tcp, 127.0.0.1:80->80/tcp
-#
-# Test
-#
-# curl localhost
-#
 services:
   nginx:
     image: alexanderallen/nginx:1.17-alpine
