@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  nginx:
+    image: alexanderallen/princess:alpine-3.12
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+      args:
+        NGINX_HTTP_LISTEN: 80
