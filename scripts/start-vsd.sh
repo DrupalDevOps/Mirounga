@@ -51,13 +51,13 @@ echo "Running Docker Compose for VSD environment."
 
 # Start shared services.
 docker-compose \
---file ${LOCALENV_HOME}/docker-compose.shared.yml up -d --no-recreate
+--file ${LOCALENV_HOME}/docker-compose.shared.yml up --detach --no-recreate
 
 # Start per-project stack, using current directory as project name.
 # https://stackoverflow.com/a/1371283
 docker-compose \
 --project-name $PROJECT_NAME \
---file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml up -d
+--file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml up --detach
 
 # Show status.
 docker-compose \
@@ -82,4 +82,4 @@ echo ""
 docker-compose \
 --project-name "${PWD##*/}" \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-logs -f
+logs --follow
