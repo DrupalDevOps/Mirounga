@@ -32,15 +32,5 @@ services:
     image: memcached:1.5.20-alpine
     command: -p 11211 -m 16 -vvv -M
 
-  princess:
-    image: alexanderallen/princess:alpine-3.12
-    tty: true
-    ports:
-      - 80:80
-    volumes:
-      - ./build/princess/nginx.conf:/etc/nginx/nginx.conf
-
-    entrypoint: [ "su-exec", "nobody", "/usr/sbin/nginx", "-g", "daemon off;" ]
-
 volumes:
   mysql:

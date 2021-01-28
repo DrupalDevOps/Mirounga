@@ -27,6 +27,8 @@ echo "XDebug will contact IDE at ${XDEBUG_REMOTE_HOST}"
 export PROJECT_SOURCE=`readlink -f .`
 echo "Project location is ${PROJECT_SOURCE}"
 
+PROJECT_NAME="${PWD##*/}"
+
 #
 # === END DOCKER COMPOSE VARIALBES ===
 #
@@ -54,7 +56,7 @@ docker-compose \
 # Start per-project stack, using current directory as project name.
 # https://stackoverflow.com/a/1371283
 docker-compose \
---project-name "${PWD##*/}" \
+--project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml up -d
 
 # Show status.
@@ -62,13 +64,13 @@ docker-compose \
 --file ${LOCALENV_HOME}/docker-compose.shared.yml \
 ps
 docker-compose \
---project-name "${PWD##*/}" \
+--project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
 ps
 
 # Show where to find application.
 BROWSER_PORT=`docker-compose \
---project-name "${PWD##*/}" \
+--project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
 port nginx 8080`
 echo ""
