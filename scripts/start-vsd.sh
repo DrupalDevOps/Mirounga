@@ -80,6 +80,6 @@ echo ""
 # Provide courtesy logs, you could also do top.
 # docker-compose exec --entrypoint=ash --user=root $1 tail -f $2
 docker-compose \
---project-name "${PWD##*/}" \
+--project-name $PROJECT_NAMEs \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
 logs --follow
