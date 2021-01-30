@@ -77,8 +77,6 @@ echo ""
 echo "Your application is being served at ${BROWSER_PORT} !!"
 echo ""
 
-# Provide courtesy logs, you could also do top.
-# docker-compose exec --entrypoint=ash --user=root $1 tail -f $2
 docker-compose \
 --project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
