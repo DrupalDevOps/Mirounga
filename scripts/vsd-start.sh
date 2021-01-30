@@ -83,7 +83,7 @@ echo ""
 echo "Your application is being served at ${BROWSER_PORT} !!"
 echo ""
 
-cmd.exe /c start chrome "http://${BROWSER_PORT}"
+cmd.exe /c start chrome "http://${BROWSER_PORT}" 2> /dev/null
 
 # Providing courtesy logs.
 docker-compose \
