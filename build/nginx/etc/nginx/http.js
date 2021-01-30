@@ -3,22 +3,20 @@
 // https://nginx.org/en/docs/http/ngx_http_js_module.html
 
 function projectDestination(r) {
-  r.warn("hello from projectDestination() handler");
-
-  // https://nginx.org/en/docs/njs/reference.html#core_global
-  r.warn("ENV VARS currently available to Nginx:");
-  // r.warn(njs.dump(process.env));
-  ngx.log(ngx.INFO, njs.dump(process.env));
+  // r.warn("hello from projectDestination() handler");
 
   var dest = process.env.PROJECT_DEST;
   return dest;
 }
 
-function dummyMessage(r) {
+function debugEnvVars(r) {
   // Request object reference.
   // https://nginx.org/en/docs/njs/reference.html
-  r.warn("Switching location");
+
+  // https://nginx.org/en/docs/njs/reference.html#core_global
+  ngx.log(ngx.INFO, njs.dump(process.env));
+
   return "meanwhile, in our universe !"
 }
 
-export default { projectDestination, dummyMessage };
+export default { projectDestination, debugEnvVars };
