@@ -8,6 +8,7 @@ using Docker for Mac, and built 100% with Alpine Linux.
 
 - [LOCALENV](#localenv)
   - [Table of Contents](#table-of-contents)
+  - [Update 1/19/2021: VSD Configuration](#update-1192021-vsd-configuration)
   - [Some Assembly Required](#some-assembly-required)
   - [Stack Components](#stack-components)
     - [Composer](#composer)
@@ -28,6 +29,28 @@ using Docker for Mac, and built 100% with Alpine Linux.
   - [Additional Documentation](#additional-documentation)
     - [Inspiration](#inspiration)
     - [TO DO:](#to-do)
+
+## Update 1/19/2021: VSD Configuration
+
+VSD is a preset and acryonym for (V)isual Studio Code, Windows (S)ubsystem for Linux,
+and (D)ocker.
+
+This preset uses Docker Compose to start a shared services stack (database, caching layer),
+and a project-specific services stack (PHP-FPM, Nginx, Drush, etc.).
+
+To use the VSD container configuration for your current project, use:
+
+    # Change to your current project dir first.
+    wsl@Alpine:~$ cd drupal-8.8.1/
+
+    # Start the VSD Docker Compose stack.
+    wsl@Alpine:~/drupal-8.8.1$ ../Sites/localenv/scripts/start-vsd.sh
+
+Once the project is up and running, the start script will provide the location
+where you can access your project in the browser.
+
+You can repeat this process independently for each project you have. All projects will
+share the same database and caching containers, but have dedicated PHP-FPM and Nginx containers.
 
 ## Some Assembly Required
 
