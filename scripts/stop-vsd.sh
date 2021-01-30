@@ -6,6 +6,8 @@ echo "Stop Docker Compose ${ENV} environment."
 
 LOCALENV_HOME="/home/wsl/Sites/localenv"
 
+export COMPOSE_NETWORK=VSD
+
 # Backup database before tearing it down.
 # https://docs.docker.com/storage/volumes/#backup-a-container
 echo "Back up database filesystem."
