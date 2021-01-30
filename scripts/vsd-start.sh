@@ -86,7 +86,7 @@ echo ""
 cmd.exe /c start chrome "http://${BROWSER_PORT}"
 
 # Providing courtesy logs.
-# docker-compose \
-# --project-name $PROJECT_NAME \
-# --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-# logs --follow
+docker-compose \
+--project-name $PROJECT_NAME \
+--file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
+logs --follow
