@@ -23,7 +23,6 @@ services:
       # PROJECT_DEST: "${PROJECT_DEST}"
       PROJECT_DEST: "/vsdroot"
     volumes:
-      #- "/home/wsl/hello-php:/vsdroot"
 
       # Main config.
       # - ./build/nginx/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
@@ -38,15 +37,11 @@ services:
       # Project source.
       - "${PROJECT_SOURCE}:/vsdroot"
 
-  # to fire a separate php-fpm container per project.
-  # Need a per-project socket?
-  # Currently   fastcgi_pass unix:/sock/docker.sock; on vhost.conf
+  # Per-project php-fpm container.
+  # Each project gets it's own socket with visibiilty into the project's files.
   php-fpm:
 
     volumes:
-      # hardcoded for testing
-      #- "/home/wsl/hello-php:/vsdroot"
-
       - "${PROJECT_SOURCE}:/vsdroot"
       - drawer:/sock
 
