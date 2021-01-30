@@ -69,15 +69,24 @@ docker-compose \
 ps
 
 # Show where to find application.
+# Docs
+# - https://ss64.com/nt/cmd.html
+# https://superuser.com/questions/1182275/how-to-use-start-command-in-bash-on-windows
+# https://github.com/microsoft/terminal/issues/204#issuecomment-696816617
+
 BROWSER_PORT=`docker-compose \
 --project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-port nginx 8080`
+port nginx 8080 | sed 's/0.0.0.0/localhost/g'`
+
 echo ""
 echo "Your application is being served at ${BROWSER_PORT} !!"
 echo ""
 
-docker-compose \
---project-name $PROJECT_NAME \
---file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-logs --follow
+cmd.exe /c start chrome "http://${BROWSER_PORT}"
+
+# Providing courtesy logs.
+# docker-compose \
+# --project-name $PROJECT_NAME \
+# --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
+# logs --follow
