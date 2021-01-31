@@ -14,6 +14,18 @@ networks:
 
 services:
 
+  varnish:
+    image: alexanderallen/varnish-6:alpine-3.12
+    # Expose port 80 on the Varnish container, randomized on host.
+    ports:
+      - 80
+    # Tell Varnish to listen on port 80 inside the container.
+    # The backend is port 8080 of the nginx service.
+    command: -F -s malloc,32M -a :80 -b nginx:8080
+    # Start Varnish only after nginx has started.
+    depends_on:
+      - nginx
+
   nginx:
     image: alexanderallen/nginx:1.17-alpine
     tty: true
