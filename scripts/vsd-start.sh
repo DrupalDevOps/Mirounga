@@ -88,5 +88,6 @@ cmd.exe /c start chrome "http://${BROWSER_PORT}" 2> /dev/null
 # Providing courtesy logs.
 docker-compose \
 --project-name $PROJECT_NAME \
+--file ${LOCALENV_HOME}/docker-compose.shared.yml \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-logs --follow
+logs --follow nginx php-fpm varnish
