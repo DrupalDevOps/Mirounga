@@ -34,6 +34,66 @@ must be able to reach.
 If Varnish starts before the backend service, it will show an error and the container
 will not work. Use the Docker container's logs to see what was the error.
 
+## Service disambiguation
+
+VSD is a shared bridge network setup for this Docker Compose project, defined by these two main attributes:
+
+- A central, shared copmose stack containing a MariaDB database.
+- Discrete per-project compose stacks containing a nginx, php-fpm, and varnish instance each.
+
+Each time you launch a new application, it joins the shared VSD network so they can
+talk to the database.
+
+When multiple NGINX and Varnish containers joined the shared network, Varnish needs to know
+which NGINX service to talk to.
+
+Varnish does not use hardcoded IP addresses to talk to Nginx, it uses Docker Compose service
+names. If there are multiple Nginx services on the shared network you can get this message:
+
+    varnish_1    | Error:
+    varnish_1    | Message from VCC-compiler:
+    varnish_1    | Backend host "nginx:8080": resolves to too many addresses.
+    varnish_1    | Only one IPv4 and one IPv6 are allowed.
+    varnish_1    | Please specify which exact address you want to use, we found all of these:
+    varnish_1    |  192.168.0.9:8080
+    varnish_1    |  192.168.0.6:8080
+    varnish_1    | ('<-b argument>' Line 3 Pos 13)
+    varnish_1    |     .host = "nginx:8080";
+    ...
+    varnish_1    |
+    varnish_1    | Running VCC-compiler failed, exited with 2
+    varnish_1    | VCL compilation failed
+    hello-php_varnish_1 exited with code 2
+
+When Varnish tries to resolve the compose service name `nginx:8080`, Docker's internal
+DNS returns `192.168.0.9` and `192.168.0.6`. Varnish does not know which nginx to talk to!
+
+To clear this confusion, a per-project service alias is added for each NGINX container
+instance (service), this alias is specified at the network level in the per-project Docker Compose definition `run\drupal\docker-compose.vsd.yml`.
+
+    nginx:
+      image: alexanderallen/nginx:1.17-alpine
+      networks:
+        VSD:
+          aliases:
+            # Give nginx a project-specific alias: Varnish needs to know
+            # which nginx service to talk to on the shared bridge network.
+            - "${PROJECT_NAME}-nginx"
+
+The `$PROJECT_NAME` is based on the current directory and set by the `scripts\vsd-start.sh` script.
+
+When Varnish is given the command `command: -F -s malloc,32M -a :80 -b "${PROJECT_NAME}-nginx:8080"` it then knows which backend to proxy from/to, since it is using the
+network service alias. In contrast, if you specified:
+
+    command: -F -s malloc,32M -a :80 -b "nginx:8080"
+
+instead of:
+
+    command: -F -s malloc,32M -a :80 -b "${PROJECT_NAME}-nginx:8080"
+
+Then you would give you the above error !
+
+
 ### Reference
 
     / # varnishd --help
