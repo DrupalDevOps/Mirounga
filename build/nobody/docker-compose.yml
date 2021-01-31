@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  nobody:
+    image: alexanderallen/nobody:alpine-3.12
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+       DOCKER_USER: nobody
+       USER_UID: 1000
+       USER_GECOS: Camina Drummer
