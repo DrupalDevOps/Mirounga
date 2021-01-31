@@ -57,6 +57,12 @@ services:
 
   # Per-project php-fpm container.
   # Each project gets it's own socket with visibiilty into the project's files.
+  #
+  # PHP-FPM DOES NOT NEED A NETWORK ALIAS THANKS TO SOCKETS !!!
+  #
+  # Nginx+PHP-FPM do not communicate via network names, instead they use a socket -
+  # a virtual volume specific to each project, creating a unique per-project 1-to-1 relationship.
+  # This is because volumes are namespaced per-project, and Docker Compose knows how to access that namespace.
   php-fpm:
 
     volumes:
