@@ -27,15 +27,19 @@ echo "XDebug will contact IDE at ${XDEBUG_REMOTE_HOST}"
 export PROJECT_SOURCE=`readlink -f .`
 echo "Project location is ${PROJECT_SOURCE}"
 
-PROJECT_NAME="${PWD##*/}"
+# Each application's docker compose needs to know the project's name
+# in order to create per-project service aliases for Nginx, since
+# multiple applications can join the shared VSD network to access the same database service.
+export PROJECT_NAME="${PWD##*/}"
+
+# Create user-defined bridge network, name is used by Docker Compose.
+# Shared compose services (database) are shared across all applications joining this network.
+export COMPOSE_NETWORK=VSD
 
 #
 # === END DOCKER COMPOSE VARIALBES ===
 #
 
-
-# Create user-defined bridge, and pass name to Docker Compose.
-export COMPOSE_NETWORK=VSD
 
 NETEXISTS=`docker network ls | grep -c ${COMPOSE_NETWORK}`
 if ! (($NETEXISTS)) ; then
@@ -51,7 +55,9 @@ echo "Running Docker Compose for VSD environment."
 
 # Start shared services.
 docker-compose \
---file ${LOCALENV_HOME}/docker-compose.shared.yml up --detach --no-recreate
+--file ${LOCALENV_HOME}/docker-compose.shared.yml \
+--file ${LOCALENV_HOME}/docker-compose.override.yml \
+up --detach --no-recreate
 
 # Start per-project stack, using current directory as project name.
 # https://stackoverflow.com/a/1371283
@@ -62,6 +68,7 @@ docker-compose \
 # Show status.
 docker-compose \
 --file ${LOCALENV_HOME}/docker-compose.shared.yml \
+--file ${LOCALENV_HOME}/docker-compose.override.yml \
 ps
 docker-compose \
 --project-name $PROJECT_NAME \
@@ -69,24 +76,35 @@ docker-compose \
 ps
 
 # Show where to find application.
-# Docs
+# Resources:
 # - https://ss64.com/nt/cmd.html
-# https://superuser.com/questions/1182275/how-to-use-start-command-in-bash-on-windows
-# https://github.com/microsoft/terminal/issues/204#issuecomment-696816617
+# - https://superuser.com/questions/1182275/how-to-use-start-command-in-bash-on-windows
+# - https://github.com/microsoft/terminal/issues/204#issuecomment-696816617
 
 BROWSER_PORT=`docker-compose \
 --project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
 port nginx 8080 | sed 's/0.0.0.0/localhost/g'`
 
+VARNISH_BROWSER_PORT=`docker-compose \
+--project-name $PROJECT_NAME \
+--file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
+port varnish 80 | sed 's/0.0.0.0/localhost/g'`
+
 echo ""
 echo "Your application is being served at ${BROWSER_PORT} !!"
 echo ""
 
-cmd.exe /c start chrome "http://${BROWSER_PORT}"
+echo "Varnish is being served fresh at ${VARNISH_BROWSER_PORT}"
+echo ""
 
-# Providing courtesy logs.
-# docker-compose \
-# --project-name $PROJECT_NAME \
-# --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-# logs --follow
+cmd.exe /c start chrome "http://${BROWSER_PORT}" 2> /dev/null
+cmd.exe /c start chrome "http://${VARNISH_BROWSER_PORT}" 2> /dev/null
+
+# Provide courtesy logs, and behold: The Glory Of Docker !
+docker-compose \
+--project-name $PROJECT_NAME \
+--file ${LOCALENV_HOME}/docker-compose.shared.yml \
+--file ${LOCALENV_HOME}/docker-compose.override.yml \
+--file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
+logs --follow nginx php-fpm varnish

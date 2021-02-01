@@ -10,11 +10,22 @@ if [ $1 ]; then
   docker-compose -f ./build/${1}/docker-compose.yml build
 
 else
+  ALPINE_MAJOR=3
+  ALPINE_MINOR=12
 
-  docker-compose -f ./build/nginx/docker-compose.yml build \
+  # If there is any base image, build first.
+  docker-compose -f ./build/nobody/docker-compose.yml build \
+    --build-arg ALPINE_MAJOR=$ALPINE_MAJOR --build-arg ALPINE_MINOR=$ALPINE_MINOR
+  docker tag alexanderallen/nobody alexanderallen/nobody:alpine-$ALPINE_MAJOR.$ALPINE_MINOR
+
+  docker-compose -f ./build/varnish/docker-compose.yml build \
+  && docker-compose -f ./build/nginx/docker-compose.yml build \
   && docker-compose -f ./build/mariadb-alpine/docker-compose.yml build \
   && docker-compose -f ./build/php-fpm/docker-compose.yml build \
   && docker-compose -f ./build/php-cli/docker-compose.yml build
+
+  docker tag alexanderallen/varnish alexanderallen/varnish:6
+  docker tag alexanderallen/varnish alexanderallen/varnish:alpine-$ALPINE_MAJOR.$ALPINE_MINOR
 
   docker images | grep alexanderallen
 fi
