@@ -1,4 +1,4 @@
-FROM alexanderallen/nobody:alpine-3.12
+FROM alexanderallen/nobody:latest
 LABEL maintainer="14018885+AlexanderAllen@users.noreply.github.com"
 
 ARG VARNISH_ADMIN_LISTEN_PORT=6082
