@@ -24,6 +24,9 @@ else
   && docker-compose -f ./build/php-fpm/docker-compose.yml build \
   && docker-compose -f ./build/php-cli/docker-compose.yml build
 
+  docker tag alexanderallen/varnish alexanderallen/varnish:6
+  docker tag alexanderallen/varnish alexanderallen/varnish:alpine-$ALPINE_MAJOR.$ALPINE_MINOR
+
   docker images | grep alexanderallen
 fi
 
