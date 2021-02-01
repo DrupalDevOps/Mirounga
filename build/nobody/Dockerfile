@@ -1,5 +1,5 @@
-ARG ALPINE_MAJOR=3
-ARG ALPINE_MINOR=12
+ARG ALPINE_MAJOR
+ARG ALPINE_MINOR
 
 FROM alpine:${ALPINE_MAJOR}.${ALPINE_MINOR}
 LABEL maintainer="14018885+AlexanderAllen@users.noreply.github.com"
