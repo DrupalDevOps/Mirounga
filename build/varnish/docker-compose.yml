@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   varnish:
-    image: alexanderallen/varnish-6:alpine-3.12
+    image: alexanderallen/varnish
     build:
       context: .
       dockerfile: Dockerfile
