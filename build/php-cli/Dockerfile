@@ -81,7 +81,7 @@ RUN composer global -vvv \
 # COPY common/drush.yml /root/.drush/drush.yml
 
 # Starts SSH agent.
-COPY common/.bashrc /home/${DOCKER_USER}/.bashrc
+#COPY common/.bashrc /home/${DOCKER_USER}/.bashrc
 
 
 
