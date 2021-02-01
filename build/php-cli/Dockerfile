@@ -20,6 +20,9 @@ RUN \
     php7-phar \
     bash \
     git \
+    mariadb-backup \
+    mariadb-client \
+    mysql-client \
     # Used for Composer install.
     curl
 
