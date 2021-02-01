@@ -7,6 +7,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-       DOCKER_USER: nobody
-       USER_UID: 1000
-       USER_GECOS: Camina Drummer
+        ALPINE_MAJOR: 3
+        ALPINE_MINOR: 12
+        DOCKER_USER: nobody
+        USER_UID: 1000
+        USER_GECOS: Camina Drummer
