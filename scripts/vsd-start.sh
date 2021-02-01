@@ -55,7 +55,9 @@ echo "Running Docker Compose for VSD environment."
 
 # Start shared services.
 docker-compose \
---file ${LOCALENV_HOME}/docker-compose.shared.yml up --detach --no-recreate
+--file ${LOCALENV_HOME}/docker-compose.shared.yml \
+--file ${LOCALENV_HOME}/docker-compose.override.yml \
+up --detach --no-recreate
 
 # Start per-project stack, using current directory as project name.
 # https://stackoverflow.com/a/1371283
@@ -66,6 +68,7 @@ docker-compose \
 # Show status.
 docker-compose \
 --file ${LOCALENV_HOME}/docker-compose.shared.yml \
+--file ${LOCALENV_HOME}/docker-compose.override.yml \
 ps
 docker-compose \
 --project-name $PROJECT_NAME \
@@ -102,5 +105,6 @@ cmd.exe /c start chrome "http://${VARNISH_BROWSER_PORT}" 2> /dev/null
 docker-compose \
 --project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/docker-compose.shared.yml \
+--file ${LOCALENV_HOME}/docker-compose.override.yml \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
 logs --follow nginx php-fpm varnish
