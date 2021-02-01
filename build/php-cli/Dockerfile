@@ -113,21 +113,3 @@ RUN \
 
 # Inform PHP Code Snifer (phpcs) about Drupal coding standards sniff files.
 RUN phpcs --config-set installed_paths ${COMPOSER_HOME}/vendor/drupal/coder/coder_sniffer
-
-
-FROM drush9 as cli-tools
-
-RUN \
-  cd /tmp \
-  && apk add --no-cache \
-  mysql-client \
-  tar \
-  tree \
-  tmux \
-  vim \
-  zsh \
-  && apk add --no-cache --virtual .networking \
-  net-tools \
-  nmap \
-  wget \
-  && git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
