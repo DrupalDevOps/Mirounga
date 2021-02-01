@@ -15,7 +15,7 @@ else
 
   # If there is any base image, build first.
   docker-compose -f ./build/nobody/docker-compose.yml build \
-    --no-cache --build-arg ALPINE_MAJOR=$ALPINE_MAJOR --build-arg ALPINE_MINOR=$ALPINE_MINOR
+    --build-arg ALPINE_MAJOR=$ALPINE_MAJOR --build-arg ALPINE_MINOR=$ALPINE_MINOR
   docker tag alexanderallen/nobody alexanderallen/nobody:alpine-$ALPINE_MAJOR.$ALPINE_MINOR
 
   docker-compose -f ./build/varnish/docker-compose.yml build \
