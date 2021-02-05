@@ -8,4 +8,4 @@ docker-compose \
 -f docker-compose.yml \
 -f run/drupal/docker-compose.${ENV}.yml \
 -f run/drush/docker-compose.${ENV}.yml \
-down
+down --remove-orphans
