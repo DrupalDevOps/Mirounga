@@ -49,3 +49,8 @@ EXPOSE ${NGINX_HTTP_LISTEN}
 STOPSIGNAL SIGTERM
 
 ENTRYPOINT [ "su-exec", "nobody", "/usr/sbin/nginx", "-g", "daemon off;" ]
+
+FROM core as ssl
+
+RUN \
+  apk add --no-cache certbot certbot-nginx

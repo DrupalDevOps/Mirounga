@@ -84,19 +84,19 @@ ps
 BROWSER_PORT=`docker-compose \
 --project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-port nginx 8080 | sed 's/0.0.0.0/localhost/g'`
+port nginx 443 | sed 's/0.0.0.0/alexanderallen.name/g'`
 
-VARNISH_BROWSER_PORT=`docker-compose \
---project-name $PROJECT_NAME \
---file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-port varnish 80 | sed 's/0.0.0.0/localhost/g'`
+# VARNISH_BROWSER_PORT=`docker-compose \
+# --project-name $PROJECT_NAME \
+# --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
+# port varnish 80 | sed 's/0.0.0.0/localhost/g'`
 
 echo ""
 echo "Your application is being served at ${BROWSER_PORT} !!"
 echo ""
 
-echo "Varnish is being served fresh at ${VARNISH_BROWSER_PORT}"
-echo ""
+# echo "Varnish is being served fresh at ${VARNISH_BROWSER_PORT}"
+# echo ""
 
 cmd.exe /c start chrome "http://${BROWSER_PORT}" 2> /dev/null
 cmd.exe /c start chrome "http://${VARNISH_BROWSER_PORT}" 2> /dev/null

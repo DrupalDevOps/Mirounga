@@ -16,17 +16,17 @@ networks:
 
 services:
 
-  varnish:
-    image: alexanderallen/varnish:alpine-3.12
-    # Expose port 80 on the Varnish container, randomized on host.
-    ports:
-      - 80
-    # Varnish listens on port 80, and proxies to a backend listening on 8080.
-    # Use network alias for multiple backends that have the same service name on a shared netowrk.
-    command: -F -s malloc,32M -a :80 -b "${PROJECT_NAME}-nginx:8080"
-    # Start Varnish only after nginx has started.
-    depends_on:
-      - nginx
+  # varnish:
+  #   image: alexanderallen/varnish:alpine-3.12
+  #   # Expose port 80 on the Varnish container, randomized on host.
+  #   ports:
+  #     - 80
+  #   # Varnish listens on port 80, and proxies to a backend listening on 8080.
+  #   # Use network alias for multiple backends that have the same service name on a shared netowrk.
+  #   command: -F -s malloc,32M -a :80 -b "${PROJECT_NAME}-nginx:8080"
+  #   # Start Varnish only after nginx has started.
+  #   depends_on:
+  #     - nginx
 
   nginx:
     image: alexanderallen/nginx:1.17-alpine
@@ -38,7 +38,8 @@ services:
           - "${PROJECT_NAME}-nginx"
     tty: true
     ports:
-      - 8080
+      # - 8080
+      - 443:443
     environment:
       PROJECT_DEST: "/vsdroot"
     volumes:
@@ -48,7 +49,7 @@ services:
       # Main config.
       # - ../../build/nginx/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
       # Virtual host.
-      # - ../../build/nginx/etc/nginx/conf.d/vhost.conf:/etc/nginx/conf.d/default.conf
+      - ../../build/nginx/etc/nginx/conf.d/vhost.conf:/etc/nginx/conf.d/default.conf
       # NJS script.
       # - ../../build/nginx/etc/nginx/http.js:/etc/nginx/http.js
 
