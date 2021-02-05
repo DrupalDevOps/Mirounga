@@ -84,7 +84,7 @@ ps
 BROWSER_PORT=`docker-compose \
 --project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-port nginx 443 | sed 's/0.0.0.0/alexanderallen.name/g'`
+port nginx 443 | sed 's/0.0.0.0/local.alexanderallen.name/g'`
 
 # VARNISH_BROWSER_PORT=`docker-compose \
 # --project-name $PROJECT_NAME \
@@ -98,8 +98,8 @@ echo ""
 # echo "Varnish is being served fresh at ${VARNISH_BROWSER_PORT}"
 # echo ""
 
-cmd.exe /c start chrome "http://${BROWSER_PORT}" 2> /dev/null
-cmd.exe /c start chrome "http://${VARNISH_BROWSER_PORT}" 2> /dev/null
+cmd.exe /c start chrome "https://${BROWSER_PORT}/index.html" 2> /dev/null
+# cmd.exe /c start chrome "http://${VARNISH_BROWSER_PORT}" 2> /dev/null
 
 # Provide courtesy logs, and behold: The Glory Of Docker !
 docker-compose \
@@ -107,4 +107,5 @@ docker-compose \
 --file ${LOCALENV_HOME}/docker-compose.shared.yml \
 --file ${LOCALENV_HOME}/docker-compose.override.yml \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-logs --follow nginx php-fpm varnish
+logs --follow nginx
+# php-fpm varnish
