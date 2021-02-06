@@ -107,5 +107,4 @@ docker-compose \
 --file ${LOCALENV_HOME}/docker-compose.shared.yml \
 --file ${LOCALENV_HOME}/docker-compose.override.yml \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-logs --follow nginx
-# php-fpm varnish
+logs --follow nginx php-fpm varnish
