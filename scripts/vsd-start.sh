@@ -98,7 +98,7 @@ echo ""
 # echo "Varnish is being served fresh at ${VARNISH_BROWSER_PORT}"
 # echo ""
 
-cmd.exe /c start chrome "https://${BROWSER_PORT}/index.html" 2> /dev/null
+cmd.exe /c start chrome "https://${BROWSER_PORT}" 2> /dev/null
 cmd.exe /c start chrome "http://${VARNISH_BROWSER_PORT}" 2> /dev/null
 
 # Provide courtesy logs, and behold: The Glory Of Docker !
