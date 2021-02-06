@@ -39,7 +39,7 @@ services:
     tty: true
     ports:
       # - 8080
-      - 443:443
+      - 443
     environment:
       PROJECT_DEST: "/vsdroot"
     volumes:
