@@ -55,7 +55,7 @@ RUN \
   && git checkout 7.4.0 \
   && git branch --show-current \
   && composer install \
-  && ln -s /opt/drush7/drush /usr/bin/drush7 \
+  && ln -s /opt/drush7/drush /usr/bin/drush \
   && /usr/bin/drush7 --version
 
 
