@@ -66,6 +66,7 @@ RUN \
         ${PHP_VERSION}-pdo_mysql \
         ${PHP_VERSION}-session \
         ${PHP_VERSION}-simplexml \
+        ${PHP_VERSION}-xmlwriter \
         ${PHP_VERSION}-tokenizer \
         ${PHP_VERSION}-xml \
         ${PHP_VERSION}-ctype \
