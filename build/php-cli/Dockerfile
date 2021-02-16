@@ -18,6 +18,8 @@ RUN \
   cd /tmp \
   && apk add --no-cache \
     php7-phar \
+    # Required by Drush 9.7.2.
+    php7-posix \
     bash \
     git \
     mariadb-backup \
