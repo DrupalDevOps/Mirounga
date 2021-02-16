@@ -40,6 +40,11 @@ export COMPOSE_NETWORK=VSD
 # === END DOCKER COMPOSE VARIALBES ===
 #
 
+# COPY XDEBUG CONFIGURATION FOR VSC
+mkdir -p ${PROJECT_SOURCE}/.vscode
+cp ${LOCALENV_HOME}/.vscode/launch.json ${PROJECT_SOURCE}/.vscode/launch.json
+
+
 
 NETEXISTS=`docker network ls | grep -c ${COMPOSE_NETWORK}`
 if ! (($NETEXISTS)) ; then
