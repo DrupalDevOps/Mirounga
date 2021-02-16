@@ -66,7 +66,10 @@ RUN \
         ${PHP_VERSION}-pdo_mysql \
         ${PHP_VERSION}-session \
         ${PHP_VERSION}-simplexml \
+        # Required by Drupal7.
         ${PHP_VERSION}-xmlwriter \
+        # Required by Drush 9.7.2.
+        ${PHP_VERSION}-posix \
         ${PHP_VERSION}-tokenizer \
         ${PHP_VERSION}-xml \
         ${PHP_VERSION}-ctype \
