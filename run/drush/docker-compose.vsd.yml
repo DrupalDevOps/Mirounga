@@ -53,3 +53,48 @@ services:
       # ; When this setting is set to 1, Xdebug will show a stack trace whenever an exception is raised - even if this exception
       # ; is actually caught.
       XDEBUG_SHOW_EXCEPTION_TRACE: 0
+
+  drush7:
+    # Image with xdebug and dev tools.
+    image: alexanderallen/php7-cli-drush7.prod:alpine-3.11
+    # Mount to same source destination as PHP-FPM and Nginx.
+    working_dir: /vsdroot
+    volumes:
+      # WSL2 to DD bind, performant.
+      - "${PROJECT_SOURCE}:${PROJECT_DEST}"
+      # Share the SSH socket file.
+      - ${SSH_AUTH_SOCK}:${SSH_AUTH_SOCK}
+    environment:
+      # Share the SSH socket variable.
+      SSH_AUTH_SOCK: $SSH_AUTH_SOCK
+
+      # Location of the Windows Subsystem for Linux Host.
+      XDEBUG_REMOTE_HOST: ${XDEBUG_REMOTE_HOST}
+
+      # Must be disabled (set to 0) in order for remote_host to work.
+      # https://stackoverflow.com/a/55856941/467453
+      # Recommended: DISABLE ON DOCKER
+      # When enabled on Docker, XDebug connects to the Docker VM instead of the IDE client.
+      XDEBUG_CONNECT_BACK: 0
+
+      # Forward XDebug connection logs to Docker for debugging
+      XDEBUG_REMOTE_LOG: /dev/stdout
+
+      XDEBUG_REMOTE_PORT: 9000
+      XDEBUG_IDE_KEY: 'PHPSTORM'
+
+      # ; This switch controls whether Xdebug should try to contact a debug client which is listening on the host and port as
+      # ; set with the settings xdebug.remote_host and xdebug.remote_port
+      XDEBUG_REMOTE_ENABLE: 1
+
+      # If this setting is 1, then stacktraces will be shown by default on an error event.
+      # It will also make xdebug logs extremely noisey and print caught exceptions as well.
+      XDEBUG_DEFAULT_ENABLE: 0
+
+      # If this setting is set to 1 then errors will always be displayed, no matter what the setting of PHP's
+      # ; display_errors is.
+      XDEBUG_FORCE_DISPLAY_ERRORS: 1
+
+      # ; When this setting is set to 1, Xdebug will show a stack trace whenever an exception is raised - even if this exception
+      # ; is actually caught.
+      XDEBUG_SHOW_EXCEPTION_TRACE: 0

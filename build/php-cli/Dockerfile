@@ -1,6 +1,7 @@
 FROM alexanderallen/php7-fpm.prod:alpine-3.11 as composer-prod
 
 ARG DOCKER_USER=nobody
+ARG DRUSH_TAG
 
 ENV \
   DOCKER_USER=${DOCKER_USER} \
@@ -41,6 +42,21 @@ RUN chown -R ${DOCKER_USER}:${DOCKER_USER} ${COMPOSER_HOME}
 ENTRYPOINT ["/bin/bash"]
 
 
+
+# Legacy platform (Drupal 7) target.
+FROM composer-prod as drush7-prod
+RUN \
+  cd /opt \
+  && git clone https://github.com/drush-ops/drush.git drush7
+RUN \
+  cd /opt/drush7 \
+  && git branch --show-current \
+  && echo "switching to branch/tag" \
+  && git checkout 7.4.0 \
+  && git branch --show-current \
+  && composer install \
+  && ln -s /opt/drush7/drush /usr/bin/drush7 \
+  && /usr/bin/drush7 --version
 
 
 #
@@ -106,12 +122,12 @@ RUN \
 # Targets below this line not yet built or implemented. #
 #########################################################
 
-FROM drush9 as qa-tools
-RUN \
-  cd /tmp \
-  && apk add --no-cache \
-    # REQ: Composer squizlabs/php_codesniffer 2.7.0 requires ext-tokenizer
-    ${PHP_VERSION}-tokenizer
+# FROM drush9 as qa-tools
+# RUN \
+#   cd /tmp \
+#   && apk add --no-cache \
+#     # REQ: Composer squizlabs/php_codesniffer 2.7.0 requires ext-tokenizer
+#     ${PHP_VERSION}-tokenizer
 
-# Inform PHP Code Snifer (phpcs) about Drupal coding standards sniff files.
-RUN phpcs --config-set installed_paths ${COMPOSER_HOME}/vendor/drupal/coder/coder_sniffer
+# # Inform PHP Code Snifer (phpcs) about Drupal coding standards sniff files.
+# RUN phpcs --config-set installed_paths ${COMPOSER_HOME}/vendor/drupal/coder/coder_sniffer

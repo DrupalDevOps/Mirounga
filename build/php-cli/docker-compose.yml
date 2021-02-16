@@ -43,6 +43,16 @@ services:
       args:
         DRUSH_VERSION: 9
 
+  drush7-prod:
+    image: alexanderallen/php7-cli-drush7.prod:alpine-3.11
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Build target drush9 might be compatible with DRUSH_VERSION 10.
+      target: drush7-prod
+      args:
+        DRUSH_TAG: "7.4.0"
+
   drush9-devel:
     image: alexanderallen/php7-cli-drush9.dev:alpine-3.11
     build:
