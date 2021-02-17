@@ -10,10 +10,13 @@
       "request": "launch",
       "port": 9000,
       // "cwd": "${workspaceRoot}/app",
-      "stopOnEntry": true,
       "pathMappings": {
-        "/app": "${workspaceFolder}/app"
+        "/vsdroot": "${workspaceFolder}"
       },
+      // WARNING !!!
+      // stopOnEntry is great to test that XDebug is working, however in some cases (Drupal);
+      // Enabling it will exhaust xdebug.max_nesting_level, even when maxed out (1023)
+      "stopOnEntry": false,
     },
     {
       "name": "Launch currently open script",
