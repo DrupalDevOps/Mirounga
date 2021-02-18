@@ -76,9 +76,24 @@ echo ""
 # cmd.exe /c start chrome "http://${VARNISH_BROWSER_PORT}" 2> /dev/null
 
 # Provide courtesy logs, and behold: The Glory Of Docker !
-docker-compose \
+# docker-compose \
+# --project-name $PROJECT_NAME \
+# --file ${LOCALENV_HOME}/docker-compose.shared.yml \
+# --file ${LOCALENV_HOME}/docker-compose.override.yml \
+# --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
+# logs --follow $@
+
+docker inspect -f '{{.Name}}' \
+$(docker-compose \
 --project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/docker-compose.shared.yml \
 --file ${LOCALENV_HOME}/docker-compose.override.yml \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-logs --follow nginx php-fpm varnish
+ps -q php-fpm) | cut -c2-
+
+
+
+# truncate -s 0 $(docker inspect --format='{{.LogPath}}' <container_name_or_id>)
+
+
+# logs --follow nginx php-fpm varnish
