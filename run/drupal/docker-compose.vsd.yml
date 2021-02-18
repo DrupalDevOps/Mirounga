@@ -105,12 +105,6 @@ services:
       # Location of the Windows Subsystem for Linux Host.
       XDEBUG_REMOTE_HOST: ${XDEBUG_REMOTE_HOST}
 
-      # Must be disabled (set to 0) in order for remote_host to work.
-      # https://stackoverflow.com/a/55856941/467453
-      # Recommended: DISABLE ON DOCKER
-      # When enabled on Docker, XDebug connects to the Docker VM instead of the IDE client.
-      XDEBUG_CONNECT_BACK: 0
-
       # Set to /dev/stdout to log remote connection logs to Docker.
       # Note: XDebug v2 is very noisy!
       XDEBUG_REMOTE_LOG: /tmp/xdebug-remote.log
