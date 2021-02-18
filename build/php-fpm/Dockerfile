@@ -71,6 +71,7 @@ RUN \
         ${PHP_VERSION}-tokenizer \
         ${PHP_VERSION}-xml \
         ${PHP_VERSION}-ctype \
+        ${PHP_VERSION}-memcache \
         #
         zlib \
         su-exec \
