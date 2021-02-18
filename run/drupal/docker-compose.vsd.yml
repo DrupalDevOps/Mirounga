@@ -68,6 +68,9 @@ services:
       - "${PROJECT_SOURCE}:/vsdroot"
       - drawer:/sock
 
+      # For live settings development.
+      - ../../build/php-fpm/xdebug.ini:/etc/php7/conf.d/20-xdebug.ini
+
     # Allow nobody user logging to /dev/stdout.
     tty: true
 
