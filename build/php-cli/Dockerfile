@@ -27,7 +27,6 @@ RUN \
     git \
     mariadb-backup \
     mariadb-client \
-    mysql-client \
     # Used for Composer install.
     curl
 
