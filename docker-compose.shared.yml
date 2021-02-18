@@ -33,7 +33,7 @@ services:
     command: -p 11211 -m 16 -vvv -M
 
   phpmemcachedadmin:
-    image: moonbuggy2000/phpmemcachedadmin:latest
+    image: moonbuggy2000/phpmemcachedadmin:1.3.0
     ports:
       - 8585:8080
     depends_on:
