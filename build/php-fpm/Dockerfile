@@ -1,4 +1,5 @@
-FROM alpine:3.11 AS prod
+# FROM alpine:3.11 AS prod
+FROM alexanderallen/nobody:latest AS prod
 
 LABEL InitialReleaseDate="First released on Oct 14, 2016."
 LABEL RELEASEDATE="20191222"
@@ -34,18 +35,6 @@ ENV \
 
 RUN \
     cd /tmp \
-    #
-    # Setup base user for the rest of the images.
-    # Default nobody user has a non-friendly uid/gid (nobody:x:65534:65534:nobody:/:/sbin/nologin)
-    # WSL users use uid/gid 1000, new default alpine user uses uid/gid 1000. So let's reset nobody to be uid/gid 1000.
-    && id nobody \
-    && deluser nobody \
-    && adduser --disabled-password --gecos 'Klaes Ashford' --uid 1000 nobody \
-    # Add nobody user to group tty, allowing php-fpm to log into /dev/std[out|err] as non-root.
-    && addgroup nobody tty \
-    # Confirm new uid/gid is 1000.
-    && groups nobody && id nobody \
-    \
     && apk add --no-cache \
         ${PHP_VERSION} \
         ${PHP_VERSION}-curl \
@@ -74,7 +63,6 @@ RUN \
         ${PHP_VERSION}-pecl-memcache \
         #
         zlib \
-        su-exec \
     # Cleanup defualt pool configuration.
     && rm /etc/php7/php-fpm.d/www.conf \
     #
