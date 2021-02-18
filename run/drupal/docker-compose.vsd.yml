@@ -64,6 +64,13 @@ services:
   # This is because volumes are namespaced per-project, and Docker Compose knows how to access that namespace.
   php-fpm:
 
+    # https://stackoverflow.com/a/42510314/467453
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100k"
+        max-file: "1"
+
     volumes:
       - "${PROJECT_SOURCE}:/vsdroot"
       - drawer:/sock
