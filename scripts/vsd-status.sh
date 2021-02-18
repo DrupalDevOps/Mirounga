@@ -76,24 +76,27 @@ echo ""
 # cmd.exe /c start chrome "http://${VARNISH_BROWSER_PORT}" 2> /dev/null
 
 # Provide courtesy logs, and behold: The Glory Of Docker !
-# docker-compose \
-# --project-name $PROJECT_NAME \
-# --file ${LOCALENV_HOME}/docker-compose.shared.yml \
-# --file ${LOCALENV_HOME}/docker-compose.override.yml \
-# --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-# logs --follow $@
-
-docker inspect -f '{{.Name}}' \
-$(docker-compose \
+docker-compose \
 --project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/docker-compose.shared.yml \
 --file ${LOCALENV_HOME}/docker-compose.override.yml \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-ps -q php-fpm) | cut -c2-
+logs --follow --timestamps --tail="30" $@
 
+# https://stackoverflow.com/a/55990412/467453
+# Get container names in order to truncate logs.
+# CONTAINER_NAME=$(docker inspect -f '{{.Name}}' \
+# $(docker-compose \
+# --project-name $PROJECT_NAME \
+# --file ${LOCALENV_HOME}/docker-compose.shared.yml \
+# --file ${LOCALENV_HOME}/docker-compose.override.yml \
+# --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
+# ps -q $@) | cut -c2-)
+# echo $CONTAINER_NAME
 
-
-# truncate -s 0 $(docker inspect --format='{{.LogPath}}' <container_name_or_id>)
+# https://stackoverflow.com/a/42510314/467453
+# Currently docker-desktop-data not available from WSL for manual truncate.
+# truncate -s 0 $(docker inspect --format='{{.LogPath}}' $CONTAINER_NAME)
 
 
 # logs --follow nginx php-fpm varnish
