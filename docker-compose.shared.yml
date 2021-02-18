@@ -32,5 +32,14 @@ services:
     image: memcached:1.5.20-alpine
     command: -p 11211 -m 16 -vvv -M
 
+  phpmemcachedadmin:
+    image: moonbuggy2000/phpmemcachedadmin:latest
+    ports:
+      - 8585:8080
+    depends_on:
+      - memcached
+    volumes:
+      - ./run/phpmemcachedadmin/Config/Memcache.php:/var/www/html/Config/Memcache.php
+
 volumes:
   mysql:
