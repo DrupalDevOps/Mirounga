@@ -103,7 +103,8 @@ FROM prod AS dev
 # Tidewall is a replacement for the original XHProf (outdated).
 # https://github.com/tideways/php-xhprof-extension/releases
 ARG XHPROF_RELEASE='v5.0.2'
-ARG XDEBUG_RELEASE='2.9.0'
+ARG XDEBUG_MAJOR='3'
+ARG XDEBUG_MINOR_PATCH='0.2'
 
 ENV \
     XDEBUG_REMOTE_ENABLE=1 \
@@ -155,7 +156,7 @@ RUN \
     && git clone git://github.com/xdebug/xdebug.git \
     && ( \
         cd xdebug \
-        && git checkout tags/${XDEBUG_RELEASE} \
+        && git checkout tags/${XDEBUG_MAJOR}.${XDEBUG_MINOR_PATCH} \
         && phpize \
         && ./configure --enable-xdebug \
         && make \
@@ -181,7 +182,7 @@ RUN \
     && ln -sf /dev/stdout ${XDEBUG_REMOTE_LOG}
 
 # Configure XDebug.
-COPY xdebug.ini /etc/${PHP_VERSION}/conf.d/20-xdebug.ini
+COPY xdebug-v${XDEBUG_MAJOR}.ini /etc/${PHP_VERSION}/conf.d/20-xdebug.ini
 
 # Configure XHProf.
 COPY xhprof.ini /etc/${PHP_VERSION}/conf.d/20-xhprof.ini
