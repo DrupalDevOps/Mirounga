@@ -1,4 +1,6 @@
-FROM alexanderallen/php7-fpm.prod:alpine-3.11 as composer-prod
+FROM alexanderallen/php7-fpm.dev:alpine-3.11 as composer-prod
+# Build from dev in order to get xdebug.
+# FROM alexanderallen/php7-fpm.prod:alpine-3.11 as composer-prod
 
 ARG DOCKER_USER=nobody
 ARG DRUSH_TAG
