@@ -107,18 +107,10 @@ ARG XDEBUG_MAJOR='3'
 ARG XDEBUG_MINOR_PATCH='0.2'
 
 ENV \
-    XDEBUG_REMOTE_ENABLE=1 \
-    XDEBUG_CONNECT_BACK=1 \
-    XDEBUG_REMOTE_HOST=10.254.254.254 \
-    XDEBUG_REMOTE_PORT=9000 \
-    XDEBUG_REMOTE_LOG=/tmp/xdebug.log \
-    XDEBUG_IDE_KEY='PHPSTORM' \
-    XDEBUG_FORCE_DISPLAY_ERRORS=1 \
-    XDEBUG_SHOW_EXCEPTION_TRACE=0 \
-    XDEBUG_SHOW_MEMDELTA=1 \
-    XDEBUG_DEFAULT_ENABLE=1 \
     XHPROF_OUTPUT_DIR=/var/tmp/xhprof \
-    XHPROF_PATH=/usr/local/xhprof
+    XHPROF_PATH=/usr/local/xhprof \
+    XDEBUG_REMOTE_PORT=9000 \
+    XDEBUG_IDE_KEY='PHPSTORM'
 
 # Build dependencies.
 ENV BUILD_DEPS \
@@ -178,8 +170,9 @@ RUN \
         && mkdir -m +rw ${XHPROF_OUTPUT_DIR} &> /dev/null \
     ) \
     && rm -rf php-xhprof-extension \
-    && apk del .build-deps \
-    && ln -sf /dev/stdout ${XDEBUG_REMOTE_LOG}
+    && apk del .build-deps
+    # Link Docker log to xdebug remote log (noisy)
+    # && ln -sf /dev/stdout ${XDEBUG_REMOTE_LOG}
 
 # Configure XDebug.
 COPY conf.d/xdebug-v${XDEBUG_MAJOR}.ini /etc/${PHP_VERSION}/conf.d/20-xdebug.ini
