@@ -176,7 +176,7 @@ RUN \
     # && ln -sf /dev/stdout ${XDEBUG_REMOTE_LOG}
 
 # Configure XDebug.
-COPY conf.d/xdebug-v${XDEBUG_MAJOR}.ini /etc/${PHP_VERSION}/conf.d/00-xdebug.ini
+COPY "conf.d/xdebug-v${XDEBUG_MAJOR}.ini" /etc/${PHP_VERSION}/conf.d/00-xdebug.ini
 
 # Configure XHProf.
 COPY conf.d/xhprof.ini /etc/${PHP_VERSION}/conf.d/xhprof.ini
