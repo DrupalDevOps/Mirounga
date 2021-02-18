@@ -111,8 +111,9 @@ services:
       # When enabled on Docker, XDebug connects to the Docker VM instead of the IDE client.
       XDEBUG_CONNECT_BACK: 0
 
-      # Forward XDebug connection logs to Docker for debugging
-      XDEBUG_REMOTE_LOG: /dev/stdout
+      # Set to /dev/stdout to log remote connection logs to Docker.
+      # Note: XDebug v2 is very noisy!
+      XDEBUG_REMOTE_LOG: /tmp/xdebug-remote.log
 
       XDEBUG_REMOTE_PORT: 9000
       XDEBUG_IDE_KEY: 'PHPSTORM'
