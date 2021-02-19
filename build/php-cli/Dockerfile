@@ -89,7 +89,7 @@ RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
 USER ${DOCKER_USER}
 
 # Install drush globally and anything else defined in the composer manifest.
-RUN composer global -vvv \
+RUN composer global -v \
     --no-cache \
     install \
     --no-dev \
