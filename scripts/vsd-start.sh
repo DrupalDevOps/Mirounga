@@ -107,11 +107,17 @@ echo ""
 echo ${BROWSER_PORT} > ${PROJECT_SOURCE}/CONTAINER_HTTP_PORT
 
 
+
+cmd.exe /c start chrome "http://${BROWSER_PORT}" 2> /dev/null
+
+# Optional: open varnish port.
+# cmd.exe /c start chrome "http://${VARNISH_BROWSER_PORT}" 2> /dev/null
+
 # Optional: Open window to PMA.
 # cmd.exe /c start chrome "http://localhost:8080" 2> /dev/null
 
-cmd.exe /c start chrome "http://${BROWSER_PORT}" 2> /dev/null
-cmd.exe /c start chrome "http://${VARNISH_BROWSER_PORT}" 2> /dev/null
+# Optional: Open window to Memcache.
+# cmd.exe /c start chrome "http://localhost:8585" 2> /dev/null
 
 # Provide courtesy logs, and behold: The Glory Of Docker !
 docker-compose \
