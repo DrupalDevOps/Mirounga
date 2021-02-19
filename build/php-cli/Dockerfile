@@ -38,7 +38,17 @@ RUN \
   && curl -o /tmp/composer-setup.php https://getcomposer.org/installer \
   && curl -o /tmp/composer-setup.sig https://composer.github.io/installer.sig \
   && php -r "if (hash('SHA384', file_get_contents('/tmp/composer-setup.php')) !== trim(file_get_contents('/tmp/composer-setup.sig'))) { unlink('/tmp/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" \
-  && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --snapshot && rm -rf /tmp/composer-setup.php
+  && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer --snapshot \
+  && rm /tmp/composer-setup.sig /tmp/composer-setup.php \
+  \
+  # Unit testing.
+  && wget -O /usr/local/bin/phpunit https://phar.phpunit.de/phpunit-9.phar \
+  && chmod +x /usr/local/bin/phpunit \
+  # Behavioral testing.
+  && /usr/local/bin/composer global require behat/behat:~3.0 \
+  # https://stackoverflow.com/a/65146922/467453
+  && /usr/local/bin/composer suggests --list --all | xargs -i /usr/local/bin/composer global require {}
+
 
 RUN chown -R ${DOCKER_USER}:${DOCKER_USER} ${COMPOSER_HOME}
 
