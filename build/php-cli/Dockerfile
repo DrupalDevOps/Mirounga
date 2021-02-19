@@ -104,20 +104,6 @@ RUN composer global -vvv \
 
 
 
-FROM drush9-prod as drush9-dev
-RUN \
-  cd /tmp \
-  apk add --no-cache \
-  ${PHP_VERSION}-pecl-xdebug \
-  ${PHP_VERSION}-pecl-xhprof-assets \
-  ${PHP_VERSION}-tideways_xhprof
-
-
-
-
-
-
-
 
 #########################################################
 # Targets below this line not yet built or implemented. #
