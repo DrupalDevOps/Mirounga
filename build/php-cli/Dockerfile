@@ -28,7 +28,9 @@ RUN \
     mariadb-backup \
     mariadb-client \
     # Used for Composer install.
-    curl
+    curl \
+    # For using private packagist repos.
+    openssh-client
 
 # Install Composer.
 RUN \
@@ -65,13 +67,8 @@ RUN \
 #
 FROM composer-prod as drush9-prod
 
-# Specifies which composer.json file to use for build.
-ARG DRUSH_VERSION
-
-# Currently mounting keys to containers due to lack of agent socket support.
-RUN apk add --no-cache openssh-client
-
 # Composer manifest for global Drush install.
+ARG DRUSH_VERSION
 COPY drush/${DRUSH_VERSION}/composer.json ${COMPOSER_HOME}/composer.json
 
 # Install Drupal console (separate from Drush).
@@ -98,10 +95,6 @@ RUN composer global -v \
 
 # Configure Drush 9 and above. Can be done by drush core:init instead.
 # COPY common/drush.yml /root/.drush/drush.yml
-
-# Starts SSH agent.
-#COPY common/.bashrc /home/${DOCKER_USER}/.bashrc
-
 
 
 
