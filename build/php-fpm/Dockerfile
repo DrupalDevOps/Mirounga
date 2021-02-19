@@ -56,8 +56,10 @@ RUN \
         ${PHP_VERSION}-session \
         ${PHP_VERSION}-simplexml \
         # Required by Drupal7.
+        ${PHP_VERSION}-xmlreader \
         ${PHP_VERSION}-xmlwriter \
         ${PHP_VERSION}-tokenizer \
+        ${PHP_VERSION}-intl \
         ${PHP_VERSION}-xml \
         ${PHP_VERSION}-ctype \
         ${PHP_VERSION}-pecl-memcache \
