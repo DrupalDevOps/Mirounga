@@ -103,14 +103,14 @@ services:
       PHP_FPM_CHILDREN_SPARE_MAX: 10
 
       # Location of the Windows Subsystem for Linux Host.
+      # WARNING: DO NOT REMOVE THIS !!!
       XDEBUG_REMOTE_HOST: ${XDEBUG_REMOTE_HOST}
+      XDEBUG_REMOTE_PORT: 9000
+      XDEBUG_IDE_KEY: 'PHPSTORM'
 
       # Set to /dev/stdout to log remote connection logs to Docker.
       # Note: XDebug v2 is very noisy!
       XDEBUG_REMOTE_LOG: /tmp/xdebug-remote.log
-
-      XDEBUG_REMOTE_PORT: 9000
-      XDEBUG_IDE_KEY: 'PHPSTORM'
 
       # ; This switch controls whether Xdebug should try to contact a debug client which is listening on the host and port as
       # ; set with the settings xdebug.remote_host and xdebug.remote_port
