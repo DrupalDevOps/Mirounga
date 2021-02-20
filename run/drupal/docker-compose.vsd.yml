@@ -76,7 +76,7 @@ services:
       - drawer:/sock
 
       # For live settings development.
-      - ../../build/php-fpm/conf.d/xdebug-v3.ini:/etc/php7/conf.d/20-xdebug.ini
+      - ../../build/php-fpm/conf.d/xdebug-v3.ini:/etc/php7/conf.d/00-xdebug.ini
 
     # Allow nobody user logging to /dev/stdout.
     tty: true
