@@ -212,6 +212,9 @@ func service_show(project Project) string {
 		port = "8080"
 	}
 
+	fmt.Printf("Retrieving service %s @ %s\n", service, port)
+
+	// NOTE: Only shows project services, and not shared services!
 	command = fmt.Sprintf(`docker-compose --project-name="%s" \
 	 --file %s/run/drupal/docker-compose.vsd.yml \
 	 port %s %s | sed 's/0.0.0.0/%s/g'`,
