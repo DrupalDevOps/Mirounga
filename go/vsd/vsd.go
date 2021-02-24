@@ -25,7 +25,10 @@ func run(msg string, cmd *exec.Cmd) {
 // Creates the named (attachable) network if it doesn't exist.
 func setup_network(compose_network string) {
 	networks := exec.Command("docker", "network", "ls")
-	output, nil := networks.Output()
+	output, err := networks.Output()
+	if err != nil {
+		log.Println(err)
+	}
 
 	matches := regexp.MustCompile(compose_network).FindStringSubmatch(string(output))
 	if len(matches) >= 1 {
