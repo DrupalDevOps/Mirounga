@@ -47,6 +47,8 @@ func help() {
 
 // Environment variables used by Docker Compose.
 type Project struct {
+	// Path to Docker Compose specifications.
+	compose_specs string
 	// Shared network name.
 	network string
 	// Path to source code directory, mounted into containers.
@@ -69,6 +71,7 @@ func gather_prerequisites() Project {
 	}
 	fmt.Printf("Your project location is %s\n", PROJECT_SOURCE)
 
+	// https://stackoverflow.com/a/1371283
 	PROJECT_NAME, err := exec.Command("bash", "-c", "echo ${PWD##*/}").Output()
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -83,7 +86,7 @@ func gather_prerequisites() Project {
 		fmt.Printf("XDebug will contact your Visual Studio Code IDE at %s\n", XDEBUG_HOST)
 	}
 
-	return Project{COMPOSE_NETWORK, PROJECT_SOURCE, string(PROJECT_NAME), string(XDEBUG_HOST)}
+	return Project{"../..", COMPOSE_NETWORK, PROJECT_SOURCE, string(PROJECT_NAME), string(XDEBUG_HOST)}
 }
 
 func main() {
@@ -109,8 +112,8 @@ func main() {
 	case "status":
 		fmt.Println("get status")
 	case "start":
-		fmt.Println("starting")
-		start_shared()
+		start_shared(project)
+		start_project(project)
 	case "stop":
 		fmt.Println("stopping")
 	case "recreate":
@@ -122,16 +125,19 @@ func main() {
 }
 
 // Create compose stack for current directory.
-func project_stack() {
-
+func start_project(project Project) {
+	run("Start project stack",
+		exec.Command("docker-compose",
+			"--project-name", project.name,
+			"--file", fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.compose_specs),
+			"up", "--detach"))
 }
 
 // Fire up stack shared amongst all projects.
-func start_shared() {
-	stack_location := "../.."
-	shared := exec.Command("docker-compose",
-		"--file", fmt.Sprintf("%s/docker-compose.shared.yml", stack_location),
-		"--file", fmt.Sprintf("%s/docker-compose.override.yml", stack_location),
-		"up", "--detach", "--no-recreate")
-	run("start shared stack", shared)
+func start_shared(project Project) {
+	run("Start shared stack",
+		exec.Command("docker-compose",
+			"--file", fmt.Sprintf("%s/docker-compose.shared.yml", project.compose_specs),
+			"--file", fmt.Sprintf("%s/docker-compose.override.yml", project.compose_specs),
+			"up", "--detach", "--no-recreate"))
 }
