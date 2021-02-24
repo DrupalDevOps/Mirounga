@@ -63,30 +63,30 @@ type Project struct {
 
 // Gather information used by all sub-commands.
 func gather_prerequisites() Project {
-	COMPOSE_NETWORK := `VSD`
+	compose_network := `VSD`
 
-	PROJECT_SOURCE, err := os.Getwd()
+	project_source, err := os.Getwd()
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Printf("Your project location is %s\n", PROJECT_SOURCE)
+	fmt.Printf("Your project location is %s\n", project_source)
 
 	// https://stackoverflow.com/a/1371283
-	PROJECT_NAME, err := exec.Command("bash", "-c", "echo ${PWD##*/}").Output()
+	project_name, err := exec.Command("bash", "-c", "echo ${PWD##*/}").Output()
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else {
-		fmt.Printf("Your project name is: %s", PROJECT_NAME)
+		fmt.Printf("Your project name is: %s", project_name)
 	}
 
-	XDEBUG_HOST, err := exec.Command("bash", "-c", `ip addr show eth0 | grep -oE '\d+(\.\d+){3}' | head -n 1`).Output()
+	xdebug_host, err := exec.Command("bash", "-c", `ip addr show eth0 | grep -oE '\d+(\.\d+){3}' | head -n 1`).Output()
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else {
-		fmt.Printf("XDebug will contact your Visual Studio Code IDE at %s\n", XDEBUG_HOST)
+		fmt.Printf("XDebug will contact your Visual Studio Code IDE at %s\n", xdebug_host)
 	}
 
-	return Project{"../..", COMPOSE_NETWORK, PROJECT_SOURCE, string(PROJECT_NAME), string(XDEBUG_HOST)}
+	return Project{"../..", compose_network, project_source, string(project_name), string(xdebug_host)}
 }
 
 func main() {
@@ -131,6 +131,16 @@ func start_project(project Project) {
 			"--project-name", project.name,
 			"--file", fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.compose_specs),
 			"up", "--detach"))
+
+	// # Show status.
+	// docker-compose \
+	// --file ${LOCALENV_HOME}/docker-compose.shared.yml \
+	// --file ${LOCALENV_HOME}/docker-compose.override.yml \
+	// ps
+	// docker-compose \
+	// --project-name $PROJECT_NAME \
+	// --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
+	// ps
 }
 
 // Fire up stack shared amongst all projects.
