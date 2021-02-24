@@ -129,9 +129,9 @@ func main() {
 		stack_status(project)
 	case "show":
 		//@TODO: Create a mapping of services source ports, user should not need to specify them.
-		service_show(project, os.Args[2], os.Args[3])
+		service_show(project)
 	case "open":
-		service_port := service_show(project, os.Args[2], os.Args[3])
+		service_port := service_show(project)
 		service_open(service_port)
 	default:
 		show_help()
@@ -196,9 +196,23 @@ func stack_down(project Project) {
 // Show location of service port.
 //
 // Example: go run ./vsd.go show nginx 8080
-func service_show(project Project, service string, port string) string {
+func service_show(project Project) string {
 	// @TODO: Decouple domain-name for use with let's encrypt!
-	command := fmt.Sprintf(`docker-compose --project-name="%s" \
+
+	var service string
+	var port string
+
+	// Define default service to show.
+	var command string
+	if len(os.Args) >= 3 && os.Args[2] != "" && os.Args[3] != "" {
+		service = os.Args[2]
+		port = os.Args[3]
+	} else {
+		service = "nginx"
+		port = "8080"
+	}
+
+	command = fmt.Sprintf(`docker-compose --project-name="%s" \
 	 --file %s/run/drupal/docker-compose.vsd.yml \
 	 port %s %s | sed 's/0.0.0.0/%s/g'`,
 		strings.TrimSuffix(project.name, "\n"),
