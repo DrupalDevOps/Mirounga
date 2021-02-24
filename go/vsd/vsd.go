@@ -67,28 +67,29 @@ func gather_prerequisites() Project {
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Printf("Project location is %s\n", PROJECT_SOURCE)
+	fmt.Printf("Your project location is %s\n", PROJECT_SOURCE)
 
 	PROJECT_NAME, err := exec.Command("bash", "-c", "echo ${PWD##*/}").Output()
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else {
-		fmt.Printf("PROJECT_NAME is: %s\n", PROJECT_NAME)
+		fmt.Printf("Your project name is: %s", PROJECT_NAME)
 	}
 
 	XDEBUG_HOST, err := exec.Command("bash", "-c", `ip addr show eth0 | grep -oE '\d+(\.\d+){3}' | head -n 1`).Output()
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else {
-		fmt.Printf("XDebug will contact IDE at %s\n", XDEBUG_HOST)
+		fmt.Printf("XDebug will contact your Visual Studio Code IDE at %s\n", XDEBUG_HOST)
 	}
 
 	return Project{COMPOSE_NETWORK, PROJECT_SOURCE, string(PROJECT_NAME), string(XDEBUG_HOST)}
 }
 
 func main() {
-	fmt.Println("VSD ENVIRONMENT")
-	fmt.Println("(V)isual Studio | (S)ubsystem4Linux | (D)ocker")
+	fmt.Println("WELCOME TO THE VSD ENVIRONMENT !!!")
+	fmt.Println("(V)isual Studio Code | (S)ubsystem4Linux | (D)ocker")
+	fmt.Println("")
 
 	if len(os.Args) == 1 {
 		help()
@@ -102,7 +103,7 @@ func main() {
 	os.Setenv("COMPOSE_NETWORK", project.network)
 	os.Setenv("PROJECT_SOURCE", project.source)
 	os.Setenv("PROJECT_NAME", project.name)
-	os.Setenv("PROJECT_NAME", project.xdebug)
+	os.Setenv("XDEBUG_REMOTE_HOST", project.xdebug)
 
 	switch os.Args[1] {
 	case "status":
