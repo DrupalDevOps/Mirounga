@@ -110,10 +110,11 @@ func main() {
 
 	switch os.Args[1] {
 	case "status":
-		fmt.Println("get status")
+		stack_status(project)
 	case "start":
 		start_shared(project)
 		start_project(project)
+		stack_status(project)
 	case "stop":
 		fmt.Println("stopping")
 	case "recreate":
@@ -124,6 +125,20 @@ func main() {
 	fmt.Println(quote.Go())
 }
 
+// Show current stack status.
+func stack_status(project Project) {
+	run("Shared stack status",
+		exec.Command("docker-compose",
+			"--file", fmt.Sprintf("%s/docker-compose.shared.yml", project.compose_specs),
+			"--file", fmt.Sprintf("%s/docker-compose.override.yml", project.compose_specs),
+			"ps"))
+	run("Project stack status",
+		exec.Command("docker-compose",
+			"--project-name", project.name,
+			"--file", fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.compose_specs),
+			"ps"))
+}
+
 // Create compose stack for current directory.
 func start_project(project Project) {
 	run("Start project stack",
@@ -131,16 +146,6 @@ func start_project(project Project) {
 			"--project-name", project.name,
 			"--file", fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.compose_specs),
 			"up", "--detach"))
-
-	// # Show status.
-	// docker-compose \
-	// --file ${LOCALENV_HOME}/docker-compose.shared.yml \
-	// --file ${LOCALENV_HOME}/docker-compose.override.yml \
-	// ps
-	// docker-compose \
-	// --project-name $PROJECT_NAME \
-	// --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-	// ps
 }
 
 // Fire up stack shared amongst all projects.
