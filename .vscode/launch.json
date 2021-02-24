@@ -5,26 +5,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Listen for XDebug",
-      "type": "php",
+      "name": "Launch file",
+      "type": "go",
       "request": "launch",
-      "port": 9000,
-      // "cwd": "${workspaceRoot}/app",
-      "pathMappings": {
-        "/vsdroot": "${workspaceFolder}"
-      },
-      // WARNING !!!
-      // stopOnEntry is great to test that XDebug is working, however in some cases (Drupal);
-      // Enabling it will exhaust xdebug.max_nesting_level, even when maxed out (1023)
-      "stopOnEntry": false,
-    },
-    {
-      "name": "Launch currently open script",
-      "type": "php",
-      "request": "launch",
+      "mode": "debug",
       "program": "${file}",
-      "cwd": "${fileDirname}",
-      "port": 9000
+      "args": [
+        "start"
+      ]
     }
   ]
 }
