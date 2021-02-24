@@ -115,11 +115,14 @@ func main() {
 		start_shared(project)
 		start_project(project)
 		stack_status(project)
-	case "stop":
-		fmt.Println("stopping")
+	case "down":
+		stack_down(project)
 	case "recreate":
 	case "rec":
-		fmt.Println("recreating")
+		stack_down(project)
+		start_shared(project)
+		start_project(project)
+		stack_status(project)
 	}
 
 	fmt.Println(quote.Go())
@@ -155,4 +158,25 @@ func start_shared(project Project) {
 			"--file", fmt.Sprintf("%s/docker-compose.shared.yml", project.compose_specs),
 			"--file", fmt.Sprintf("%s/docker-compose.override.yml", project.compose_specs),
 			"up", "--detach", "--no-recreate"))
+}
+
+// Remove services, containers, and networks.
+func stack_down(project Project) {
+	run("Stop shared services",
+		exec.Command("docker-compose",
+			"--file", fmt.Sprintf("%s/docker-compose.shared.yml", project.compose_specs),
+			"down", "--remove-orphans"))
+	// "down", "--volumes", "--remove-orphans"))
+
+	run("Stop project services",
+		exec.Command("docker-compose",
+			"--project-name", project.name,
+			"--file", fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.compose_specs),
+			"down"))
+
+	run("Cleanup Docker containers",
+		exec.Command("docker", "system", "prune", "--force"))
+
+	run("Cleanup Docker network",
+		exec.Command("docker", "network", "rm", project.network))
 }
