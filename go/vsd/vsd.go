@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"strings"
 
 	"rsc.io/quote"
 )
@@ -44,7 +45,7 @@ func setup_network(compose_network string) {
 	}
 }
 
-func help() {
+func show_help() {
 	fmt.Println("Help placeholder")
 }
 
@@ -98,7 +99,7 @@ func main() {
 	fmt.Println("")
 
 	if len(os.Args) == 1 {
-		help()
+		show_help()
 		os.Exit(0)
 	}
 
@@ -126,6 +127,14 @@ func main() {
 		start_shared(project)
 		start_project(project)
 		stack_status(project)
+	case "show":
+		//@TODO: Create a mapping of services source ports, user should not need to specify them.
+		service_show(project, os.Args[2], os.Args[3])
+	case "open":
+		service_port := service_show(project, os.Args[2], os.Args[3])
+		service_open(service_port)
+	default:
+		show_help()
 	}
 
 	fmt.Println(quote.Go())
@@ -182,4 +191,48 @@ func stack_down(project Project) {
 
 	run("Cleanup Docker network",
 		exec.Command("docker", "network", "rm", project.network))
+}
+
+// Show location of service port.
+//
+// Example: go run ./vsd.go show nginx 8080
+func service_show(project Project, service string, port string) string {
+	// @TODO: Decouple domain-name for use with let's encrypt!
+	command := fmt.Sprintf(`docker-compose --project-name="%s" \
+	 --file %s/run/drupal/docker-compose.vsd.yml \
+	 port %s %s | sed 's/0.0.0.0/%s/g'`,
+		strings.TrimSuffix(project.name, "\n"),
+		project.compose_specs,
+		service,
+		port,
+		"localhost")
+
+	url := exec.Command("bash", "-c", command)
+
+	service_location, err := url.Output()
+	if err != nil {
+		fmt.Println("Error:", err)
+	} else {
+		fmt.Printf("Service %s is running at: %s\n", service, service_location)
+	}
+	return string(service_location)
+}
+
+// Open default browser to specified services' mapped port.
+//
+// Example: go run ./vsd.go open nginx 8080
+//
+// Resources:
+// - https://ss64.com/nt/cmd.html
+// - https://superuser.com/questions/1182275/how-to-use-start-command-in-bash-on-windows
+// - https://github.com/microsoft/terminal/issues/204#issuecomment-696816617
+func service_open(service_port string) {
+	format := fmt.Sprintf(`cmd.exe /c start chrome "http://%s" 2> /dev/null`, service_port)
+
+	command := exec.Command("bash", "-c", format)
+	command.Stdout = os.Stdout
+	command.Stderr = os.Stdout
+	if err := command.Run(); err != nil {
+		fmt.Println("Error:", err)
+	}
 }
