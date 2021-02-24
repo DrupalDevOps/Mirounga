@@ -53,6 +53,10 @@ type Project struct {
 	source string
 	// Name of current directory, used for service aliases.
 	name string
+	// Expected input by the php-fpm service, tells XDebug address where to find IDE.
+	// php-fpm service located in docker-compose.vsd.yml file.
+	// https://www.reddit.com/r/bashonubuntuonwindows/comments/c871g7/command_to_get_virtual_machine_ip_in_wsl2/
+	xdebug string
 }
 
 // Gather information used by all sub-commands.
@@ -72,7 +76,14 @@ func gather_prerequisites() Project {
 		fmt.Printf("PROJECT_NAME is: %s\n", PROJECT_NAME)
 	}
 
-	return Project{COMPOSE_NETWORK, PROJECT_SOURCE, string(PROJECT_NAME)}
+	XDEBUG_HOST, err := exec.Command("bash", "-c", `ip addr show eth0 | grep -oE '\d+(\.\d+){3}' | head -n 1`).Output()
+	if err != nil {
+		fmt.Println("Error:", err)
+	} else {
+		fmt.Printf("XDebug will contact IDE at %s\n", XDEBUG_HOST)
+	}
+
+	return Project{COMPOSE_NETWORK, PROJECT_SOURCE, string(PROJECT_NAME), string(XDEBUG_HOST)}
 }
 
 func main() {
@@ -91,6 +102,7 @@ func main() {
 	os.Setenv("COMPOSE_NETWORK", project.network)
 	os.Setenv("PROJECT_SOURCE", project.source)
 	os.Setenv("PROJECT_NAME", project.name)
+	os.Setenv("PROJECT_NAME", project.xdebug)
 
 	switch os.Args[1] {
 	case "status":
