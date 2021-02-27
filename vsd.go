@@ -1,7 +1,9 @@
 package main
 
 import (
+	"embed"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -10,6 +12,29 @@ import (
 
 	"rsc.io/quote"
 )
+
+//go:embed hello.txt
+var s string
+
+//go:embed docker
+var dockerfs embed.FS
+
+func test_assets() {
+	print(s)
+	// func (f FS) Open(name string) (fs.File, error)
+	file, e := dockerfs.ReadFile("docker/docker-compose.yml")
+	if e != nil {
+		panic(e)
+	} else {
+		print(string(file))
+	}
+
+	// d1 := []byte("hello\ngo\n")
+	err := ioutil.WriteFile("/tmp/dat1", file, 0644)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func run(msg string, cmd *exec.Cmd) {
 	fmt.Println(msg)
@@ -90,13 +115,15 @@ func gather_prerequisites() Project {
 		fmt.Printf("XDebug will contact your Visual Studio Code IDE at %s\n", xdebug_host)
 	}
 
-	return Project{"../..", compose_network, project_source, string(project_name), string(xdebug_host)}
+	return Project{"./docker", compose_network, project_source, string(project_name), string(xdebug_host)}
 }
 
 func main() {
 	fmt.Println("WELCOME TO THE VSD ENVIRONMENT !!!")
 	fmt.Println("(V)isual Studio Code | (S)ubsystem4Linux | (D)ocker")
 	fmt.Println("")
+
+	test_assets()
 
 	if len(os.Args) == 1 {
 		show_help()
