@@ -3,7 +3,6 @@ package main
 import (
 	"embed"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -19,21 +18,12 @@ var s string
 //go:embed docker
 var dockerfs embed.FS
 
-func test_assets() {
-	print(s)
-	// func (f FS) Open(name string) (fs.File, error)
-	file, e := dockerfs.ReadFile("docker/docker-compose.yml")
+func embed_read(filename string) []byte {
+	file, e := dockerfs.ReadFile(filename)
 	if e != nil {
 		panic(e)
-	} else {
-		print(string(file))
 	}
-
-	// d1 := []byte("hello\ngo\n")
-	err := ioutil.WriteFile("/tmp/dat1", file, 0644)
-	if err != nil {
-		panic(err)
-	}
+	return file
 }
 
 func run(msg string, cmd *exec.Cmd) {
@@ -123,8 +113,6 @@ func main() {
 	fmt.Println("(V)isual Studio Code | (S)ubsystem4Linux | (D)ocker")
 	fmt.Println("")
 
-	test_assets()
-
 	if len(os.Args) == 1 {
 		show_help()
 		os.Exit(0)
@@ -179,6 +167,26 @@ func stack_status(project Project) {
 			"--project-name", project.name,
 			"--file", fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.compose_specs),
 			"ps"))
+
+	// shared_stack := embed_read("docker/docker-compose.shared.yml")
+	// // project_stack := embed_read("run/drupal/docker-compose.vsd.yml")
+	// cmd := exec.Command("bash", "-c", fmt.Sprintf("docker-compose --project-name docker --file /dev/stdin ps"))
+	// stdin, err := cmd.StdinPipe()
+	// if err != nil {
+	// 	fmt.Println("Error:", err)
+	// }
+
+	// go func() {
+	// 	defer stdin.Close()
+	// 	io.WriteString(stdin, string(shared_stack))
+	// }()
+
+	// out, err := cmd.CombinedOutput()
+	// if err != nil {
+	// 	fmt.Println("Error:", err)
+	// }
+
+	// fmt.Printf("%s\n", out)
 }
 
 // Create compose stack for current directory.
