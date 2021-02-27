@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -11,20 +12,6 @@ import (
 
 	"rsc.io/quote"
 )
-
-//go:embed hello.txt
-var s string
-
-//go:embed docker
-var dockerfs embed.FS
-
-func embed_read(filename string) []byte {
-	file, e := dockerfs.ReadFile(filename)
-	if e != nil {
-		panic(e)
-	}
-	return file
-}
 
 func run(msg string, cmd *exec.Cmd) {
 	fmt.Println(msg)
@@ -105,7 +92,7 @@ func gather_prerequisites() Project {
 		fmt.Printf("XDebug will contact your Visual Studio Code IDE at %s\n", xdebug_host)
 	}
 
-	return Project{"./docker", compose_network, project_source, string(project_name), string(xdebug_host)}
+	return Project{"docker", compose_network, project_source, strings.TrimSuffix(string(project_name), "\n"), string(xdebug_host)}
 }
 
 func main() {
@@ -148,6 +135,7 @@ func main() {
 	case "open":
 		service_port := service_show(project)
 		service_open(service_port)
+	// @TODO: Provide override subcommand, emits physical compose override file from embed compose file. Provide directory listing of available overrides.
 	default:
 		show_help()
 	}
@@ -155,38 +143,56 @@ func main() {
 	fmt.Println(quote.Go())
 }
 
+//go:embed docker
+var dockerfs embed.FS
+
+func embed_read(filename string) []byte {
+	file, e := dockerfs.ReadFile(filename)
+	if e != nil {
+		panic(e)
+	}
+	return file
+}
+
+// Execute Docker Compose command using embedded spec.
+//
+// For pipe execution see https://golang.org/pkg/os/exec/#Cmd.StdinPipe.
+func docker_compose_embed(project_name string, spec_name string, command string) {
+	// @TODO: HOW TO ALLOW AN OVERRIDE FILE TO BE INCLUDED?
+	// @todo: add project name to shared stack.
+	// @todo: switch all exec to embedded: allows calling binary globally.
+
+	spec_file := embed_read(spec_name)
+	// // project_stack := embed_read("run/drupal/docker-compose.vsd.yml")
+	cmd := exec.Command("bash", "-c",
+		fmt.Sprintf("docker-compose --project-name %s --file /dev/stdin %s", project_name, command))
+
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	go func() {
+		defer stdin.Close()
+		io.WriteString(stdin, string(spec_file))
+	}()
+
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	fmt.Printf("%s\n", out)
+}
+
 // Show current stack status.
 func stack_status(project Project) {
-	run("Shared stack status",
-		exec.Command("docker-compose",
-			"--file", fmt.Sprintf("%s/docker-compose.shared.yml", project.compose_specs),
-			"--file", fmt.Sprintf("%s/docker-compose.override.yml", project.compose_specs),
-			"ps"))
-	run("Project stack status",
-		exec.Command("docker-compose",
-			"--project-name", project.name,
-			"--file", fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.compose_specs),
-			"ps"))
 
-	// shared_stack := embed_read("docker/docker-compose.shared.yml")
-	// // project_stack := embed_read("run/drupal/docker-compose.vsd.yml")
-	// cmd := exec.Command("bash", "-c", fmt.Sprintf("docker-compose --project-name docker --file /dev/stdin ps"))
-	// stdin, err := cmd.StdinPipe()
-	// if err != nil {
-	// 	fmt.Println("Error:", err)
-	// }
+	fmt.Println("Shared services status")
+	docker_compose_embed("localenv", fmt.Sprintf("%s/docker-compose.shared.yml", project.compose_specs), "ps")
 
-	// go func() {
-	// 	defer stdin.Close()
-	// 	io.WriteString(stdin, string(shared_stack))
-	// }()
-
-	// out, err := cmd.CombinedOutput()
-	// if err != nil {
-	// 	fmt.Println("Error:", err)
-	// }
-
-	// fmt.Printf("%s\n", out)
+	fmt.Println("Project services status")
+	docker_compose_embed(project.name, fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.compose_specs), "ps")
 }
 
 // Create compose stack for current directory.
