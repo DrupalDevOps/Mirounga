@@ -195,37 +195,25 @@ func stack_status(project Project) {
 	docker_compose_embed(project.name, fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.compose_specs), "ps")
 }
 
-// Create compose stack for current directory.
+// Start compose service for current directory.
 func start_project(project Project) {
-	run("Start project stack",
-		exec.Command("docker-compose",
-			"--project-name", project.name,
-			"--file", fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.compose_specs),
-			"up", "--detach"))
+	fmt.Println("Start project services")
+	docker_compose_embed(project.name, "docker/run/drupal/docker-compose.vsd.yml", "up --detach")
 }
 
 // Fire up stack shared amongst all projects.
 func start_shared(project Project) {
-	run("Start shared stack",
-		exec.Command("docker-compose",
-			"--file", fmt.Sprintf("%s/docker-compose.shared.yml", project.compose_specs),
-			"--file", fmt.Sprintf("%s/docker-compose.override.yml", project.compose_specs),
-			"up", "--detach", "--no-recreate"))
+	fmt.Println("Start shared services")
+	docker_compose_embed("localenv", "docker/docker-compose.shared.yml", "up --detach --no-recreate")
 }
 
 // Remove services, containers, and networks.
 func stack_down(project Project) {
-	run("Stop shared services",
-		exec.Command("docker-compose",
-			"--file", fmt.Sprintf("%s/docker-compose.shared.yml", project.compose_specs),
-			"down", "--remove-orphans"))
-	// "down", "--volumes", "--remove-orphans"))
+	fmt.Println("Stop shared services")
+	docker_compose_embed("localenv", "docker/docker-compose.shared.yml", "down --remove-orphans")
 
-	run("Stop project services",
-		exec.Command("docker-compose",
-			"--project-name", project.name,
-			"--file", fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.compose_specs),
-			"down"))
+	fmt.Println("Stop project servicess")
+	docker_compose_embed(project.name, "docker/run/drupal/docker-compose.vsd.yml", "down --remove-orphans")
 
 	run("Cleanup Docker containers",
 		exec.Command("docker", "system", "prune", "--force"))
