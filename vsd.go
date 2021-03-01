@@ -26,20 +26,20 @@ func run(msg string, cmd *exec.Cmd) {
 // Sets up the shared Docker Compose network.
 //
 // Creates the named (attachable) network if it doesn't exist.
-func setup_network(compose_network string) {
+func setupNetwork(composeNetwork string) {
 	networks := exec.Command("docker", "network", "ls")
 	output, err := networks.Output()
 	if err != nil {
 		log.Println(err)
 	}
 
-	matches := regexp.MustCompile(compose_network).FindStringSubmatch(string(output))
+	matches := regexp.MustCompile(composeNetwork).FindStringSubmatch(string(output))
 	if len(matches) >= 1 {
-		fmt.Printf("Docker network %s already exists, joining.\n", compose_network)
+		fmt.Printf("Docker network %s already exists, joining.\n", composeNetwork)
 	} else {
 		fmt.Println("Create user-defined network")
-		create_newnet := exec.Command("docker", "network", "create", "--driver", "bridge", "--attachable", compose_network)
-		if output, err := create_newnet.Output(); err != nil {
+		createNewnet := exec.Command("docker", "network", "create", "--driver", "bridge", "--attachable", composeNetwork)
+		if output, err := createNewnet.Output(); err != nil {
 			fmt.Println("Error:", err)
 		} else {
 			fmt.Printf("Otuput: %s\n", output)
@@ -47,14 +47,14 @@ func setup_network(compose_network string) {
 	}
 }
 
-func show_help() {
+func showHelp() {
 	fmt.Println("Help placeholder")
 }
 
-// Environment variables used by Docker Compose.
+// Project ..  Environment variables used by Docker Compose.
 type Project struct {
 	// Path to Docker Compose specifications.
-	compose_specs string
+	composeSpecs string
 	// Shared network name.
 	network string
 	// Path to source code directory, mounted into containers.
@@ -68,31 +68,31 @@ type Project struct {
 }
 
 // Gather information used by all sub-commands.
-func gather_prerequisites() Project {
-	compose_network := `VSD`
+func gatherPrerequisites() Project {
+	composeNetwork := `VSD`
 
-	project_source, err := os.Getwd()
+	projectSource, err := os.Getwd()
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Printf("Your project location is %s\n", project_source)
+	fmt.Printf("Your project location is %s\n", projectSource)
 
 	// https://stackoverflow.com/a/1371283
-	project_name, err := exec.Command("bash", "-c", "echo ${PWD##*/}").Output()
+	projectName, err := exec.Command("bash", "-c", "echo ${PWD##*/}").Output()
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else {
-		fmt.Printf("Your project name is: %s", project_name)
+		fmt.Printf("Your project name is: %s", projectName)
 	}
 
-	xdebug_host, err := exec.Command("bash", "-c", `ip addr show eth0 | grep -oE '\d+(\.\d+){3}' | head -n 1`).Output()
+	xdebugHost, err := exec.Command("bash", "-c", `ip addr show eth0 | grep -oE '\d+(\.\d+){3}' | head -n 1`).Output()
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else {
-		fmt.Printf("XDebug will contact your Visual Studio Code IDE at %s\n", xdebug_host)
+		fmt.Printf("XDebug will contact your Visual Studio Code IDE at %s\n", xdebugHost)
 	}
 
-	return Project{"docker", compose_network, project_source, strings.TrimSuffix(string(project_name), "\n"), string(xdebug_host)}
+	return Project{"docker", composeNetwork, projectSource, strings.TrimSuffix(string(projectName), "\n"), string(xdebugHost)}
 }
 
 func main() {
@@ -101,12 +101,12 @@ func main() {
 	fmt.Println("")
 
 	if len(os.Args) == 1 {
-		show_help()
+		showHelp()
 		os.Exit(0)
 	}
 
-	project := gather_prerequisites()
-	setup_network(project.network)
+	project := gatherPrerequisites()
+	setupNetwork(project.network)
 
 	// Set up environment variables for Docker Compose.
 	os.Setenv("COMPOSE_NETWORK", project.network)
@@ -118,28 +118,28 @@ func main() {
 	case "version":
 		print("VSD version 0.3.0\n")
 	case "status":
-		stack_status(project)
+		stackStatus(project)
 	case "start":
-		start_shared(project)
-		start_project(project)
-		stack_status(project)
+		startShared(project)
+		startProject(project)
+		stackStatus(project)
 	case "down":
-		stack_down(project)
+		stackDown(project)
 	case "recreate":
 	case "rec":
-		stack_down(project)
-		start_shared(project)
-		start_project(project)
-		stack_status(project)
+		stackDown(project)
+		startShared(project)
+		startProject(project)
+		stackStatus(project)
 	case "show":
 		//@TODO: Create a mapping of services source ports, user should not need to specify them.
-		service_show(project)
+		serviceShow(project)
 	case "open":
-		service_port := service_show(project)
-		service_open(service_port)
+		servicePort := serviceShow(project)
+		serviceOpen(servicePort)
 	// @TODO: Provide override subcommand, emits physical compose override file from embed compose file. Provide directory listing of available overrides.
 	default:
-		show_help()
+		showHelp()
 	}
 
 	fmt.Println(quote.Go())
@@ -148,7 +148,7 @@ func main() {
 //go:embed docker
 var dockerfs embed.FS
 
-func embed_read(filename string) []byte {
+func embedRead(filename string) []byte {
 	file, e := dockerfs.ReadFile(filename)
 	if e != nil {
 		panic(e)
@@ -159,15 +159,15 @@ func embed_read(filename string) []byte {
 // Execute Docker Compose command using embedded spec.
 //
 // For pipe execution see https://golang.org/pkg/os/exec/#Cmd.StdinPipe.
-func docker_compose_embed(project_name string, spec_name string, command string) {
+func dockerComposeEmbed(projectName string, specName string, command string) {
 	// @TODO: HOW TO ALLOW AN OVERRIDE FILE TO BE INCLUDED?
 	// @todo: add project name to shared stack.
 	// @todo: switch all exec to embedded: allows calling binary globally.
 
-	spec_file := embed_read(spec_name)
+	specFile := embedRead(specName)
 	// // project_stack := embed_read("run/drupal/docker-compose.vsd.yml")
 	cmd := exec.Command("bash", "-c",
-		fmt.Sprintf("docker-compose --project-name %s --file /dev/stdin %s", project_name, command))
+		fmt.Sprintf("docker-compose --project-name %s --file /dev/stdin %s", projectName, command))
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -176,7 +176,7 @@ func docker_compose_embed(project_name string, spec_name string, command string)
 
 	go func() {
 		defer stdin.Close()
-		io.WriteString(stdin, string(spec_file))
+		io.WriteString(stdin, string(specFile))
 	}()
 
 	out, err := cmd.CombinedOutput()
@@ -188,34 +188,34 @@ func docker_compose_embed(project_name string, spec_name string, command string)
 }
 
 // Show current stack status.
-func stack_status(project Project) {
+func stackStatus(project Project) {
 
 	fmt.Println("Shared services status")
-	docker_compose_embed("localenv", fmt.Sprintf("%s/docker-compose.shared.yml", project.compose_specs), "ps")
+	dockerComposeEmbed("localenv", fmt.Sprintf("%s/docker-compose.shared.yml", project.composeSpecs), "ps")
 
 	fmt.Println("Project services status")
-	docker_compose_embed(project.name, fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.compose_specs), "ps")
+	dockerComposeEmbed(project.name, fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs), "ps")
 }
 
 // Start compose service for current directory.
-func start_project(project Project) {
+func startProject(project Project) {
 	fmt.Println("Start project services")
-	docker_compose_embed(project.name, "docker/run/drupal/docker-compose.vsd.yml", "up --detach")
+	dockerComposeEmbed(project.name, "docker/run/drupal/docker-compose.vsd.yml", "up --detach")
 }
 
 // Fire up stack shared amongst all projects.
-func start_shared(project Project) {
+func startShared(project Project) {
 	fmt.Println("Start shared services")
-	docker_compose_embed("localenv", "docker/docker-compose.shared.yml", "up --detach --no-recreate")
+	dockerComposeEmbed("localenv", "docker/docker-compose.shared.yml", "up --detach --no-recreate")
 }
 
 // Remove services, containers, and networks.
-func stack_down(project Project) {
+func stackDown(project Project) {
 	fmt.Println("Stop shared services")
-	docker_compose_embed("localenv", "docker/docker-compose.shared.yml", "down --remove-orphans")
+	dockerComposeEmbed("localenv", "docker/docker-compose.shared.yml", "down --remove-orphans")
 
 	fmt.Println("Stop project servicess")
-	docker_compose_embed(project.name, "docker/run/drupal/docker-compose.vsd.yml", "down --remove-orphans")
+	dockerComposeEmbed(project.name, "docker/run/drupal/docker-compose.vsd.yml", "down --remove-orphans")
 
 	run("Cleanup Docker containers",
 		exec.Command("docker", "system", "prune", "--force"))
@@ -227,7 +227,7 @@ func stack_down(project Project) {
 // Show location of service port.
 //
 // Example: go run ./vsd.go show nginx 8080
-func service_show(project Project) string {
+func serviceShow(project Project) string {
 	// @TODO: Decouple domain-name for use with let's encrypt!
 
 	var service string
@@ -250,20 +250,20 @@ func service_show(project Project) string {
 	 --file %s/run/drupal/docker-compose.vsd.yml \
 	 port %s %s | sed 's/0.0.0.0/%s/g'`,
 		strings.TrimSuffix(project.name, "\n"),
-		project.compose_specs,
+		project.composeSpecs,
 		service,
 		port,
 		"localhost")
 
 	url := exec.Command("bash", "-c", command)
 
-	service_location, err := url.Output()
+	srvLocation, err := url.Output()
 	if err != nil {
 		fmt.Println("Error:", err)
 	} else {
-		fmt.Printf("Service %s is running at: %s\n", service, service_location)
+		fmt.Printf("Service %s is running at: %s\n", service, srvLocation)
 	}
-	return string(service_location)
+	return string(srvLocation)
 }
 
 // Open default browser to specified services' mapped port.
@@ -274,8 +274,8 @@ func service_show(project Project) string {
 // - https://ss64.com/nt/cmd.html
 // - https://superuser.com/questions/1182275/how-to-use-start-command-in-bash-on-windows
 // - https://github.com/microsoft/terminal/issues/204#issuecomment-696816617
-func service_open(service_port string) {
-	format := fmt.Sprintf(`cmd.exe /c start chrome "http://%s" 2> /dev/null`, service_port)
+func serviceOpen(servicePort string) {
+	format := fmt.Sprintf(`cmd.exe /c start chrome "http://%s" 2> /dev/null`, servicePort)
 
 	command := exec.Command("bash", "-c", format)
 	command.Stdout = os.Stdout
