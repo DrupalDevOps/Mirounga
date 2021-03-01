@@ -115,6 +115,8 @@ func main() {
 	os.Setenv("XDEBUG_REMOTE_HOST", project.xdebug)
 
 	switch os.Args[1] {
+	case "version":
+		print("VSD version 0.3.0\n")
 	case "status":
 		stack_status(project)
 	case "start":
