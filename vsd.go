@@ -56,6 +56,8 @@ func showHelp() {
 type Project struct {
 	// Path to Docker Compose specifications.
 	composeSpecs string
+	// Options passed to Docker Compose command.
+	composeOptions string
 	// Shared network name.
 	network string
 	// Path to source code directory, mounted into containers.
@@ -71,6 +73,9 @@ type Project struct {
 // Gather information used by all sub-commands.
 func gatherPrerequisites() Project {
 	composeNetwork := `VSD`
+
+	composeOptsPtr := flag.String("options", "", "Options passed to Docker Compose command (optional).")
+	flag.Parse()
 
 	projectSource, err := os.Getwd()
 	if err != nil {
@@ -93,7 +98,7 @@ func gatherPrerequisites() Project {
 		fmt.Printf("XDebug will contact your Visual Studio Code IDE at %s\n", xdebugHost)
 	}
 
-	return Project{"docker", composeNetwork, projectSource, strings.TrimSuffix(string(projectName), "\n"), string(xdebugHost)}
+	return Project{"docker", string(*composeOptsPtr), composeNetwork, projectSource, strings.TrimSuffix(string(projectName), "\n"), string(xdebugHost)}
 }
 
 func main() {
@@ -101,17 +106,24 @@ func main() {
 	fmt.Println("(V)isual Studio Code | (S)ubsystem4Linux | (D)ocker")
 	fmt.Println("")
 
-	statusCmd := flag.NewFlagSet("status", flag.ExitOnError)
-	fooName := statusCmd.String("override", "", "name")
+	// flagSetStatus := flag.NewFlagSet("status", flag.ExitOnError)
+	// flagSetStart := flag.NewFlagSet("start", flag.ExitOnError)
+	// flagSetDown := flag.NewFlagSet("down", flag.ExitOnError)
+	// flagSetRec := flag.NewFlagSet("recreate", flag.ExitOnError)
+	// flagSetShow := flag.NewFlagSet("show", flag.ExitOnError)
 
-	if err := statusCmd.Parse(os.Args[2:]); err == nil {
-		fmt.Println("  name:", *fooName)
-		fmt.Println("  tail:", statusCmd.Args())
-	}
+	// overrideStatus := flagSetStatus.String("override", "", "name")
+	// overrideStart := flagSetStart.String("override", "", "name")
+	// overrideDown := flagSetDown.String("override", "", "name")
+	// overrideRec := flagSetRec.String("override", "", "name")
+	// overrideShow := flagSetShow.String("override", "", "name")
 
-	os.Exit(0)
+	// if err := flagSetStatus.Parse(os.Args[2:]); err == nil {
+	// 	fmt.Println("  name:", *overrideStatus)
+	// 	fmt.Println("  tail:", flagSetStatus.Args())
+	// }
 
-	if len(os.Args) == 1 {
+	if len(os.Args) < 1 {
 		showHelp()
 		os.Exit(0)
 	}
@@ -125,7 +137,9 @@ func main() {
 	os.Setenv("PROJECT_NAME", project.name)
 	os.Setenv("XDEBUG_REMOTE_HOST", project.xdebug)
 
-	switch os.Args[1] {
+	subcommand := flag.Arg(0)
+
+	switch subcommand {
 	case "version":
 		print("VSD version 0.3.0\n")
 	case "status":
@@ -137,7 +151,6 @@ func main() {
 	case "down":
 		stackDown(project)
 	case "recreate":
-	case "rec":
 		stackDown(project)
 		startShared(project)
 		startProject(project)
@@ -171,8 +184,8 @@ func embedRead(filename string) []byte {
 type ComposeExec struct {
 	// Project name associated with Docker Compose.
 	project string
-	// Additional dockre-compose command parameters.
-	parameters string
+	// Additional docker-compose options.
+	options string
 	// Embedded spec file to execute.
 	spec string
 	// Docker Compose command to execute.
@@ -188,9 +201,10 @@ func dockerComposeEmbed(compose ComposeExec) {
 	// @todo: switch all exec to embedded: allows calling binary globally.
 
 	specFile := embedRead(compose.spec)
-	// // project_stack := embed_read("run/drupal/docker-compose.vsd.yml")
-	cmd := exec.Command("bash", "-c",
-		fmt.Sprintf("docker-compose --project-name %s %s --file /dev/stdin %s", compose.project, compose.parameters, compose.command))
+	cmdString := fmt.Sprintf("docker-compose --project-name %s %s --file /dev/stdin %s", compose.project, compose.options, compose.command)
+	log.Default().Printf("Executing command: %s", cmdString)
+
+	cmd := exec.Command("bash", "-c", cmdString)
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -215,18 +229,18 @@ func stackStatus(project Project) {
 
 	fmt.Println("Shared services status")
 	dockerComposeEmbed(ComposeExec{
-		project:    "localenv",
-		parameters: "",
-		spec:       fmt.Sprintf("%s/docker-compose.shared.yml", project.composeSpecs),
-		command:    "ps",
+		project: "localenv",
+		options: project.composeOptions,
+		spec:    fmt.Sprintf("%s/docker-compose.shared.yml", project.composeSpecs),
+		command: "ps",
 	})
 
 	fmt.Println("Project services status")
 	dockerComposeEmbed(ComposeExec{
-		project:    project.name,
-		parameters: "",
-		spec:       fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
-		command:    "ps",
+		project: project.name,
+		options: project.composeOptions,
+		spec:    fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
+		command: "ps",
 	})
 }
 
@@ -234,10 +248,10 @@ func stackStatus(project Project) {
 func startProject(project Project) {
 	fmt.Println("Start project services")
 	dockerComposeEmbed(ComposeExec{
-		project:    project.name,
-		parameters: "",
-		spec:       fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
-		command:    "up --detach",
+		project: project.name,
+		options: project.composeOptions,
+		spec:    fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
+		command: "up --detach",
 	})
 }
 
@@ -245,10 +259,10 @@ func startProject(project Project) {
 func startShared(project Project) {
 	fmt.Println("Start shared services")
 	dockerComposeEmbed(ComposeExec{
-		project:    "localenv",
-		parameters: "",
-		spec:       fmt.Sprintf("%s/docker-compose.shared.yml", project.composeSpecs),
-		command:    "up --detach --no-recreate",
+		project: "localenv",
+		options: project.composeOptions,
+		spec:    fmt.Sprintf("%s/docker-compose.shared.yml", project.composeSpecs),
+		command: "up --detach --no-recreate",
 	})
 }
 
@@ -256,18 +270,18 @@ func startShared(project Project) {
 func stackDown(project Project) {
 	fmt.Println("Stop shared services")
 	dockerComposeEmbed(ComposeExec{
-		project:    "localenv",
-		parameters: "",
-		spec:       fmt.Sprintf("%s/docker-compose.shared.yml", project.composeSpecs),
-		command:    "down --remove-orphans",
+		project: "localenv",
+		options: project.composeOptions,
+		spec:    fmt.Sprintf("%s/docker-compose.shared.yml", project.composeSpecs),
+		command: "down --remove-orphans",
 	})
 
 	fmt.Println("Stop project servicess")
 	dockerComposeEmbed(ComposeExec{
-		project:    project.name,
-		parameters: "",
-		spec:       fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
-		command:    "down --remove-orphans",
+		project: project.name,
+		options: project.composeOptions,
+		spec:    fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
+		command: "down --remove-orphans",
 	})
 
 	run("Cleanup Docker containers",
