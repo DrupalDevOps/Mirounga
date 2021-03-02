@@ -1,5 +1,5 @@
 
-LOCALENV_HOME="/home/wsl/Sites/localenv"
+LOCALENV_HOME="/home/wsl/Sites/localenv/docker"
 PROJECT_NAME="${PWD##*/}"
 
 # Argument no.1 is the name of the container to connect to.

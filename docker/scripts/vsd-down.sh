@@ -4,7 +4,7 @@
 ENV=${ENVIRONMENT:-vsd}
 echo "Stop Docker Compose ${ENV} environment."
 
-LOCALENV_HOME="/home/wsl/Sites/localenv"
+LOCALENV_HOME="/home/wsl/Sites/localenv/docker"
 
 export COMPOSE_NETWORK=VSD
 

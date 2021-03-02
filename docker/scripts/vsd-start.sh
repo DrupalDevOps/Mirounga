@@ -10,7 +10,7 @@
 #
 
 # Allow script to be invoked from anywhere.
-LOCALENV_HOME="/home/wsl/Sites/localenv"
+LOCALENV_HOME="/home/wsl/Sites/localenv/docker"
 
 #
 # === START DOCKER COMPOSE VARIALBES ===
@@ -41,8 +41,8 @@ export COMPOSE_NETWORK=VSD
 #
 
 # COPY XDEBUG CONFIGURATION FOR VSC
-mkdir -p ${PROJECT_SOURCE}/.vscode
-cp ${LOCALENV_HOME}/.vscode/launch.json ${PROJECT_SOURCE}/.vscode/launch.json
+# mkdir -p ${PROJECT_SOURCE}/.vscode
+# cp ${LOCALENV_HOME}/.vscode/launch.json ${PROJECT_SOURCE}/.vscode/launch.json
 
 
 
@@ -89,12 +89,12 @@ ps
 BROWSER_PORT=`docker-compose \
 --project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-port nginx 443 | sed 's/0.0.0.0/local.alexanderallen.name/g'`
+port nginx 8080 | sed 's/0.0.0.0/local.alexanderallen.name/g'`
 
 VARNISH_BROWSER_PORT=`docker-compose \
 --project-name $PROJECT_NAME \
 --file ${LOCALENV_HOME}/run/drupal/docker-compose.vsd.yml \
-port varnish 80 | sed 's/0.0.0.0/localhost/g'`
+port varnish 80 | sed 's/0.0.0.0/local.alexanderallen.name/g'`
 
 echo ""
 echo "Your application is being served at ${BROWSER_PORT} !!"

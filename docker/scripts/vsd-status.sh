@@ -10,7 +10,7 @@
 #
 
 # Allow script to be invoked from anywhere.
-LOCALENV_HOME="/home/wsl/Sites/localenv"
+LOCALENV_HOME="/home/wsl/Sites/localenv/docker"
 
 #
 # === START DOCKER COMPOSE VARIALBES ===

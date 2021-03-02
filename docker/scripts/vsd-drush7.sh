@@ -13,7 +13,7 @@ echo "Project location is ${PROJECT_SOURCE}"
 export PROJECT_DEST="/vsdroot"
 
 PROJECT_NAME="${PWD##*/}"
-LOCALENV_HOME="/home/wsl/Sites/localenv"
+LOCALENV_HOME="/home/wsl/Sites/localenv/docker"
 
 # Sharing SSH socket from WSL2 into containers.
 export SSH_AUTH_SOCK=${SSH_AUTH_SOCK}
