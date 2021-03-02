@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -99,6 +100,16 @@ func main() {
 	fmt.Println("WELCOME TO THE VSD ENVIRONMENT !!!")
 	fmt.Println("(V)isual Studio Code | (S)ubsystem4Linux | (D)ocker")
 	fmt.Println("")
+
+	statusCmd := flag.NewFlagSet("status", flag.ExitOnError)
+	fooName := statusCmd.String("override", "", "name")
+
+	if err := statusCmd.Parse(os.Args[2:]); err == nil {
+		fmt.Println("  name:", *fooName)
+		fmt.Println("  tail:", statusCmd.Args())
+	}
+
+	os.Exit(0)
 
 	if len(os.Args) == 1 {
 		showHelp()
