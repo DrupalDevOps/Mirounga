@@ -196,9 +196,6 @@ type ComposeExec struct {
 //
 // For pipe execution see https://golang.org/pkg/os/exec/#Cmd.StdinPipe.
 func dockerComposeEmbed(compose ComposeExec) {
-	// @TODO: HOW TO ALLOW AN OVERRIDE FILE TO BE INCLUDED?
-	// @todo: add project name to shared stack.
-	// @todo: switch all exec to embedded: allows calling binary globally.
 
 	specFile := embedRead(compose.spec)
 	cmdString := fmt.Sprintf("docker-compose --project-name %s %s --file /dev/stdin %s", compose.project, compose.options, compose.command)
