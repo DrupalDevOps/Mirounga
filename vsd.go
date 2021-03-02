@@ -156,18 +156,30 @@ func embedRead(filename string) []byte {
 	return file
 }
 
+// ComposeExec Docker Compose command specs.
+type ComposeExec struct {
+	// Project name associated with Docker Compose.
+	project string
+	// Additional dockre-compose command parameters.
+	parameters string
+	// Embedded spec file to execute.
+	spec string
+	// Docker Compose command to execute.
+	command string
+}
+
 // Execute Docker Compose command using embedded spec.
 //
 // For pipe execution see https://golang.org/pkg/os/exec/#Cmd.StdinPipe.
-func dockerComposeEmbed(projectName string, specName string, command string) {
+func dockerComposeEmbed(compose ComposeExec) {
 	// @TODO: HOW TO ALLOW AN OVERRIDE FILE TO BE INCLUDED?
 	// @todo: add project name to shared stack.
 	// @todo: switch all exec to embedded: allows calling binary globally.
 
-	specFile := embedRead(specName)
+	specFile := embedRead(compose.spec)
 	// // project_stack := embed_read("run/drupal/docker-compose.vsd.yml")
 	cmd := exec.Command("bash", "-c",
-		fmt.Sprintf("docker-compose --project-name %s --file /dev/stdin %s", projectName, command))
+		fmt.Sprintf("docker-compose --project-name %s %s --file /dev/stdin %s", compose.project, compose.parameters, compose.command))
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -191,31 +203,61 @@ func dockerComposeEmbed(projectName string, specName string, command string) {
 func stackStatus(project Project) {
 
 	fmt.Println("Shared services status")
-	dockerComposeEmbed("localenv", fmt.Sprintf("%s/docker-compose.shared.yml", project.composeSpecs), "ps")
+	dockerComposeEmbed(ComposeExec{
+		project:    "localenv",
+		parameters: "",
+		spec:       fmt.Sprintf("%s/docker-compose.shared.yml", project.composeSpecs),
+		command:    "ps",
+	})
 
 	fmt.Println("Project services status")
-	dockerComposeEmbed(project.name, fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs), "ps")
+	dockerComposeEmbed(ComposeExec{
+		project:    project.name,
+		parameters: "",
+		spec:       fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
+		command:    "ps",
+	})
 }
 
 // Start compose service for current directory.
 func startProject(project Project) {
 	fmt.Println("Start project services")
-	dockerComposeEmbed(project.name, "docker/run/drupal/docker-compose.vsd.yml", "up --detach")
+	dockerComposeEmbed(ComposeExec{
+		project:    project.name,
+		parameters: "",
+		spec:       fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
+		command:    "up --detach",
+	})
 }
 
 // Fire up stack shared amongst all projects.
 func startShared(project Project) {
 	fmt.Println("Start shared services")
-	dockerComposeEmbed("localenv", "docker/docker-compose.shared.yml", "up --detach --no-recreate")
+	dockerComposeEmbed(ComposeExec{
+		project:    "localenv",
+		parameters: "",
+		spec:       fmt.Sprintf("%s/docker-compose.shared.yml", project.composeSpecs),
+		command:    "up --detach --no-recreate",
+	})
 }
 
 // Remove services, containers, and networks.
 func stackDown(project Project) {
 	fmt.Println("Stop shared services")
-	dockerComposeEmbed("localenv", "docker/docker-compose.shared.yml", "down --remove-orphans")
+	dockerComposeEmbed(ComposeExec{
+		project:    "localenv",
+		parameters: "",
+		spec:       fmt.Sprintf("%s/docker-compose.shared.yml", project.composeSpecs),
+		command:    "down --remove-orphans",
+	})
 
 	fmt.Println("Stop project servicess")
-	dockerComposeEmbed(project.name, "docker/run/drupal/docker-compose.vsd.yml", "down --remove-orphans")
+	dockerComposeEmbed(ComposeExec{
+		project:    project.name,
+		parameters: "",
+		spec:       fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
+		command:    "down --remove-orphans",
+	})
 
 	run("Cleanup Docker containers",
 		exec.Command("docker", "system", "prune", "--force"))
