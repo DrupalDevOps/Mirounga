@@ -45,8 +45,20 @@ RUN \
   && wget -O /usr/local/bin/phpunit https://phar.phpunit.de/phpunit-9.phar \
   && chmod +x /usr/local/bin/phpunit \
   # Behavioral testing.
-  && /usr/local/bin/composer global require behat/behat:~3.0 \
+  && /usr/local/bin/composer global require --dev behat/behat:~3.0 \
   # https://stackoverflow.com/a/65146922/467453
+  # For BEHAT development we need
+  # 1. Locally sourced behat - visible to the IDE.
+  # 2 Development dependencies for BEHAT.
+  # 3. Selenium, Goutte, and ghost, and related drivers.
+  # problem:
+  # you can containerize behat...but what about the drupal source and behat?
+  # you can mount drupal as a volume, but then it would overwrite behat
+  # and we need them both on the same location?
+  # solution
+  # put behat on parent directory - you can composer install there.
+  # then put drupal on inner directory, mounted or not.
+  # that way the IDE can see them both!
   && /usr/local/bin/composer suggests --list --all | xargs -i /usr/local/bin/composer global require {}
 
 

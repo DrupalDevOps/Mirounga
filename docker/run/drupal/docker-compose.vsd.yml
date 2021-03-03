@@ -48,8 +48,12 @@ services:
 
       # Main config.
       # - ../../build/nginx/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
-      # Virtual host.
-      - ../../build/nginx/etc/nginx/conf.d/vhost.conf:/etc/nginx/conf.d/default.conf
+      # Live virtual host, relative path, using original bash scripts.
+      # - ../../build/nginx/etc/nginx/conf.d/vhost.conf:/etc/nginx/conf.d/default.conf
+
+      # Live virtual host, using absolute path for go executable. @TODO: Move example to override.yml.
+      # - /home/wsl/Sites/localenv/docker/build/nginx/etc/nginx/conf.d/vhost.conf:/etc/nginx/conf.d/default.conf
+
       # NJS script.
       # - ../../build/nginx/etc/nginx/http.js:/etc/nginx/http.js
 
@@ -76,7 +80,7 @@ services:
       - drawer:/sock
 
       # For live settings development.
-      - ../../build/php-fpm/conf.d/xdebug-v3.ini:/etc/php7/conf.d/00-xdebug.ini
+      # - ../../build/php-fpm/conf.d/xdebug-v3.ini:/etc/php7/conf.d/00-xdebug.ini
 
     # Allow nobody user logging to /dev/stdout.
     tty: true
