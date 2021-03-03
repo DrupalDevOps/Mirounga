@@ -70,16 +70,42 @@ type Project struct {
 	xdebug string
 }
 
+//go:embed docker
+var dockerfs embed.FS
+
+func embedRead(filename string) []byte {
+	file, e := dockerfs.ReadFile(filename)
+	if e != nil {
+		panic(e)
+	}
+	return file
+}
+
+func provideOverride() {
+	filename := "docker-compose.override.yml"
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		// Grab and dump override spec from embed filesystem into current PWD.
+		fmt.Printf("Override not found, providing override example in %s", filename)
+		override := embedRead("docker/docker-compose.override.yml")
+		err := os.WriteFile(filename, override, 0644)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
 // Gather information used by all sub-commands.
-func gatherPrerequisites() Project {
+func bootstrap() Project {
 	composeNetwork := `VSD`
 
-	composeOptsPtr := flag.String("options", "", "Options passed to Docker Compose command (optional).")
+	provideOverride()
+
+	composeOptsPtr := flag.String("options", "--file=docker-compose.override.yml", "Options passed to Docker Compose command (optional).")
 	flag.Parse()
 
 	projectSource, err := os.Getwd()
 	if err != nil {
-		log.Println(err)
+		fmt.Println("Error:", err)
 	}
 	fmt.Printf("Your project location is %s\n", projectSource)
 
@@ -128,7 +154,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	project := gatherPrerequisites()
+	project := bootstrap()
 	setupNetwork(project.network)
 
 	// Set up environment variables for Docker Compose.
@@ -162,22 +188,13 @@ func main() {
 		servicePort := serviceShow(project)
 		serviceOpen(servicePort)
 	// @TODO: Provide override subcommand, emits physical compose override file from embed compose file. Provide directory listing of available overrides.
+	case "log":
+		serviceLog(project, fmt.Sprintf("%s", flag.Args()))
 	default:
 		showHelp()
 	}
 
 	fmt.Println(quote.Go())
-}
-
-//go:embed docker
-var dockerfs embed.FS
-
-func embedRead(filename string) []byte {
-	file, e := dockerfs.ReadFile(filename)
-	if e != nil {
-		panic(e)
-	}
-	return file
 }
 
 // ComposeExec Docker Compose command specs.
@@ -239,6 +256,18 @@ func stackStatus(project Project) {
 		spec:    fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
 		command: "ps",
 	})
+}
+
+func serviceLog(project Project, service string) {
+	fmt.Println("Services log")
+	dockerComposeEmbed(ComposeExec{
+		project: project.name,
+		options: `--file=./docker/docker-compose.shared.yml \
+		--file=./docker/docker-compose.override.yml`,
+		spec:    fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
+		command: fmt.Sprintf("logs --follow --timestamps --tail=30 %s", service),
+	})
+
 }
 
 // Start compose service for current directory.
