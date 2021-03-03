@@ -81,13 +81,12 @@ func embedRead(filename string) []byte {
 	return file
 }
 
-func provideOverride() {
-	filename := "docker-compose.override.yml"
-	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		// Grab and dump override spec from embed filesystem into current PWD.
-		fmt.Printf("Override not found, providing override example in %s", filename)
-		override := embedRead("docker/docker-compose.override.yml")
-		err := os.WriteFile(filename, override, 0644)
+// Search destination for compose spec file, copies from source in embed filesystem into destination if not found.
+func provideOverride(source string, destination string) {
+	if _, err := os.Stat(destination); os.IsNotExist(err) {
+		fmt.Printf("Docker Compose override spec not found, providing example in %s", destination)
+		override := embedRead(source)
+		err := os.WriteFile(destination, override, 0644)
 		if err != nil {
 			panic(err)
 		}
@@ -98,7 +97,8 @@ func provideOverride() {
 func bootstrap() Project {
 	composeNetwork := `VSD`
 
-	provideOverride()
+	// Provide shared services override, if not present already.
+	provideOverride("docker/docker-compose.override.yml", "docker-compose.override.yml")
 
 	composeOptsPtr := flag.String("options", "--file=docker-compose.override.yml", "Options passed to Docker Compose command (optional).")
 	flag.Parse()
@@ -252,7 +252,7 @@ func stackStatus(project Project) {
 	fmt.Println("Project services status")
 	dockerComposeEmbed(ComposeExec{
 		project: project.name,
-		options: project.composeOptions,
+		options: "",
 		spec:    fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
 		command: "ps",
 	})
@@ -275,7 +275,7 @@ func startProject(project Project) {
 	fmt.Println("Start project services")
 	dockerComposeEmbed(ComposeExec{
 		project: project.name,
-		options: project.composeOptions,
+		options: "",
 		spec:    fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
 		command: "up --detach",
 	})
@@ -305,7 +305,7 @@ func stackDown(project Project) {
 	fmt.Println("Stop project servicess")
 	dockerComposeEmbed(ComposeExec{
 		project: project.name,
-		options: project.composeOptions,
+		options: "",
 		spec:    fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
 		command: "down --remove-orphans",
 	})
