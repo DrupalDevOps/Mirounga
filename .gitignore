@@ -19,3 +19,6 @@ app/*
 
 # Go artifacts.
 vsd
+
+# VSC extension for Makefiles.
+.vscode/*.log
