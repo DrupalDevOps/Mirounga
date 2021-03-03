@@ -11,7 +11,25 @@
       "mode": "debug",
       "program": "${file}",
       "args": [
-        "start"
+        // "--options=--file=./docker/docker-compose.override.yml",
+        "status",
+        // "nginx",
+        // "tail2"
+        // ./docker/docker-compose.override.yml
+      ]
+    },
+    {
+      "name": "Launch from project",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/vsd.go",
+      "cwd": "/home/wsl/WWW/research",
+      "args": [
+        // "--options=--file=./docker/docker-compose.override.yml",
+        "start",
+        // "nginx",
+        // "tail2"
       ]
     }
   ]
