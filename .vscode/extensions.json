@@ -1,0 +1,24 @@
+{
+  "recommendations": [
+    // VSD project.
+    "golang.go",
+    "ms-vscode.makefile-tools",
+    // Cosmetics.
+    "pkief.material-icon-theme",
+    "k--kato.intellij-idea-keybindings",
+    "2gua.rainbow-brackets",
+    "monokai.theme-monokai-pro-vscode",
+    "hsnazar.hyper-term-theme",
+    "rokoroku.vscode-theme-darcula",
+    "dustinsanders.an-old-hope-theme-vscode",
+    // PHP/Drupal Development.
+    "felixfbecker.php-pack",
+    "dbaeumer.vscode-eslint",
+    "msjsdiag.debugger-for-chrome",
+    "whatwedo.twig",
+    // DevOps.
+    "ms-azuretools.vscode-docker",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "redhat.vscode-yaml",
+  ]
+}
