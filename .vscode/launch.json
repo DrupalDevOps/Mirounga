@@ -5,23 +5,14 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Listen for XDebug",
-      "type": "php",
+      "name": "Launch file",
+      "type": "go",
       "request": "launch",
-      "port": 9000,
-      // "cwd": "${workspaceRoot}/app",
-      "stopOnEntry": true,
-      "pathMappings": {
-        "/app": "${workspaceFolder}/app"
-      },
-    },
-    {
-      "name": "Launch currently open script",
-      "type": "php",
-      "request": "launch",
+      "mode": "debug",
       "program": "${file}",
-      "cwd": "${fileDirname}",
-      "port": 9000
+      "args": [
+        "start"
+      ]
     }
   ]
 }

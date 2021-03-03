@@ -16,3 +16,6 @@ docker-compose.override.yml
 
 # Ignore contents of /app
 app/*
+
+# Go artifacts.
+vsd
