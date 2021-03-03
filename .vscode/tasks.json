@@ -19,7 +19,8 @@
         "cwd": "${workspaceFolder}/docker",
       },
       "detail": "Build Docker images.",
-      "group": "build"
+      "group": "build",
+      "problemMatcher": "$go"
     }
   ]
 }
