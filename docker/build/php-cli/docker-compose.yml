@@ -52,13 +52,3 @@ services:
       target: drush7-prod
       args:
         DRUSH_TAG: "7.4.0"
-
-  drush9-devel:
-    image: alexanderallen/php7-cli-drush9.dev:alpine-3.11
-    build:
-      context: .
-      dockerfile: Dockerfile
-      # Target including xdebug, xhprof, and any other perf tools.
-      target: drush9-dev
-      args:
-        DRUSH_VERSION: 9
