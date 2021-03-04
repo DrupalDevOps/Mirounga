@@ -84,12 +84,14 @@ func embedRead(filename string) []byte {
 // Search destination for compose spec file, copies from source in embed filesystem into destination if not found.
 func provideOverride(source string, destination string) {
 	if _, err := os.Stat(destination); os.IsNotExist(err) {
-		fmt.Printf("Docker Compose override spec not found, providing example in %s \n", destination)
+		fmt.Printf("Required file %s not found, copying into %s \n", source, destination)
 		override := embedRead(source)
-		err := os.WriteFile(destination, override, 0644)
+		err := os.WriteFile(destination, override, 0744)
 		if err != nil {
 			panic(err)
 		}
+	} else {
+		fmt.Printf("Required file %s found. \n", source)
 	}
 }
 
@@ -212,7 +214,7 @@ func main() {
 	case "log":
 		serviceLog(project, fmt.Sprintf("%s", flag.Args()))
 	case "drush":
-		serviceDrush(project, flag.Arg(1))
+		serviceDrushBash(project, flag.Arg(1))
 	default:
 		showHelp()
 	}
@@ -403,13 +405,14 @@ func serviceOpen(servicePort string) {
 
 // Fires up drush container into current PWD.
 func serviceDrush(project Project, version string) {
-	fmt.Printf("Start container for drush %s", version)
+	fmt.Printf("Start container for drush %s\n", version)
 
 	// Copy embedded compose specs.
 	provideOverride("docker/docker-compose.shared.yml", "docker-compose.shared.yml")
 	provideOverride("docker/docker-compose.override.yml", "docker-compose.override.yml")
 	provideOverride("docker/run/drupal/docker-compose.vsd.yml", "docker-compose.vsd.yml")
 
+	// Warning: dockerComposeEmbed() does not provide a pty/tty response.
 	// Source specs from current PWD.
 	dockerComposeEmbed(ComposeExec{
 		project: project.name,
@@ -419,4 +422,25 @@ func serviceDrush(project Project, version string) {
 		spec:    fmt.Sprintf("%s/run/drush/docker-compose.vsd.yml", project.composeSpecs),
 		command: fmt.Sprintf("run --entrypoint=ash --rm --user=root drush%s", version),
 	})
+}
+
+// TTY into Drush container using bash script.
+func serviceDrushBash(project Project, version string) {
+	fmt.Printf("Start container for drush %s\n", version)
+
+	// Copy embedded compose specs.
+	provideOverride("docker/docker-compose.shared.yml", "docker-compose.shared.yml")
+	provideOverride("docker/docker-compose.override.yml", "docker-compose.override.yml")
+	provideOverride("docker/run/drupal/docker-compose.vsd.yml", "docker-compose.vsd-go-drupal.yml")
+	provideOverride("docker/run/drush/docker-compose.vsd.yml", "docker-compose.vsd-go-drush.yml")
+	provideOverride("docker/scripts/vsd-go-drush7.sh", "vsd-go-drush7.sh")
+
+	cmd := exec.Command("./vsd-go-drush7.sh")
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		fmt.Println("Error:", err)
+	}
+
 }
