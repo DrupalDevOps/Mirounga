@@ -201,6 +201,8 @@ func main() {
 		stackDown(project)
 	case "recreate":
 		stackDown(project)
+		// Recreate the network as well.
+		setupNetwork(project.network)
 		startShared(project)
 		startProject(project)
 		stackStatus(project)
