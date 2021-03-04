@@ -154,23 +154,6 @@ func main() {
 	fmt.Println("(V)isual Studio Code | (S)ubsystem4Linux | (D)ocker")
 	fmt.Println("")
 
-	// flagSetStatus := flag.NewFlagSet("status", flag.ExitOnError)
-	// flagSetStart := flag.NewFlagSet("start", flag.ExitOnError)
-	// flagSetDown := flag.NewFlagSet("down", flag.ExitOnError)
-	// flagSetRec := flag.NewFlagSet("recreate", flag.ExitOnError)
-	// flagSetShow := flag.NewFlagSet("show", flag.ExitOnError)
-
-	// overrideStatus := flagSetStatus.String("override", "", "name")
-	// overrideStart := flagSetStart.String("override", "", "name")
-	// overrideDown := flagSetDown.String("override", "", "name")
-	// overrideRec := flagSetRec.String("override", "", "name")
-	// overrideShow := flagSetShow.String("override", "", "name")
-
-	// if err := flagSetStatus.Parse(os.Args[2:]); err == nil {
-	// 	fmt.Println("  name:", *overrideStatus)
-	// 	fmt.Println("  tail:", flagSetStatus.Args())
-	// }
-
 	if len(os.Args) < 1 {
 		showHelp()
 		os.Exit(0)
