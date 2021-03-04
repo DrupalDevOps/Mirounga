@@ -124,7 +124,15 @@ func bootstrap() Project {
 		fmt.Printf("XDebug will contact your Visual Studio Code IDE at %s\n", xdebugHost)
 	}
 
-	return Project{"docker", string(*composeOptsPtr), composeNetwork, projectSource, strings.TrimSuffix(string(projectName), "\n"), string(xdebugHost)}
+	project := Project{
+		composeSpecs:   "docker",
+		composeOptions: string(*composeOptsPtr),
+		network:        composeNetwork,
+		source:         projectSource,
+		name:           strings.TrimSuffix(string(projectName), "\n"),
+		xdebug:         string(xdebugHost),
+}
+	return project
 }
 
 func main() {
