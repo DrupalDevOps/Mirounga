@@ -214,6 +214,8 @@ func main() {
 	case "log":
 		serviceLog(project, fmt.Sprintf("%s", flag.Args()))
 	case "drush":
+		serviceDrush(project, flag.Arg(1))
+	case "drush-bash":
 		serviceDrushBash(project, flag.Arg(1))
 	default:
 		showHelp()
@@ -235,6 +237,10 @@ type ComposeExec struct {
 }
 
 // Execute Docker Compose command using embedded spec.
+//
+// Only one embedded file is supported by --file /dev/stdin
+//
+// WARNING: dockerComposeEmbed() DOES NOT provide a pty/tty response.
 //
 // For pipe execution see https://golang.org/pkg/os/exec/#Cmd.StdinPipe.
 func dockerComposeEmbed(compose ComposeExec) {
@@ -261,6 +267,25 @@ func dockerComposeEmbed(compose ComposeExec) {
 	}
 
 	fmt.Printf("%s\n", out)
+}
+
+func dockerComposeTTY(compose ComposeExec) {
+
+	cmdString := fmt.Sprintf(
+		"docker-compose --project-name %s %s %s",
+		compose.project,
+		compose.options,
+		compose.command,
+	)
+	log.Default().Printf("Executing command:\n %s", cmdString)
+
+	cmd := exec.Command("bash", "-c", cmdString)
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		fmt.Println("Error:", err)
+	}
 }
 
 // Show current stack status.
@@ -410,16 +435,16 @@ func serviceDrush(project Project, version string) {
 	// Copy embedded compose specs.
 	provideOverride("docker/docker-compose.shared.yml", "docker-compose.shared.yml")
 	provideOverride("docker/docker-compose.override.yml", "docker-compose.override.yml")
-	provideOverride("docker/run/drupal/docker-compose.vsd.yml", "docker-compose.vsd.yml")
+	provideOverride("docker/run/drupal/docker-compose.vsd.yml", "docker-compose.vsd-go-drupal.yml")
+	provideOverride("docker/run/drush/docker-compose.vsd.yml", "docker-compose.vsd-go-drush.yml")
 
-	// Warning: dockerComposeEmbed() does not provide a pty/tty response.
 	// Source specs from current PWD.
-	dockerComposeEmbed(ComposeExec{
+	dockerComposeTTY(ComposeExec{
 		project: project.name,
-		options: `--file=./docker-compose.shared.yml \
-		--file=./docker-compose.override.yml \
-		--file=./docker-compose.vsd.yml`,
-		spec:    fmt.Sprintf("%s/run/drush/docker-compose.vsd.yml", project.composeSpecs),
+		options: `--file ./docker-compose.shared.yml \
+		--file ./docker-compose.override.yml \
+		--file ./docker-compose.vsd-go-drupal.yml \
+		--file ./docker-compose.vsd-go-drush.yml`,
 		command: fmt.Sprintf("run --entrypoint=ash --rm --user=root drush%s", version),
 	})
 }
