@@ -91,7 +91,7 @@ func provideOverride(source string, destination string) {
 			panic(err)
 		}
 	} else {
-		fmt.Printf("Required file %s found. \n", source)
+		fmt.Printf("Found requried file: %s \n", source)
 	}
 }
 
