@@ -126,16 +126,12 @@ func bootstrap() Project {
 		fmt.Printf("XDebug will contact your Visual Studio Code IDE at %s\n", xdebugHost)
 	}
 
-	// @TODO CHECK FOR SSH_AUTH_SOCK
-
-	// currentEnv := os.Environ()
-	// fmt.Println(currentEnv)
-
 	sshAuthSock := os.Getenv("SSH_AUTH_SOCK")
 	if sshAuthSock != "" {
 		fmt.Printf("Using SSH_AUTH_SOCK: %s\n", sshAuthSock)
 	} else {
-		log.Default().Println("Missing environment variable: $SSH_AUTH_SOCK")
+		log.Default().Println(`Missing environment variable: $SSH_AUTH_SOCK
+		*Interaction with Git and firewalled Packagist repositories may be limited*`)
 	}
 
 	project := Project{
@@ -195,7 +191,6 @@ func main() {
 	case "open":
 		servicePort := serviceShow(project)
 		serviceOpen(servicePort)
-	// @TODO: Provide override subcommand, emits physical compose override file from embed compose file. Provide directory listing of available overrides.
 	case "log":
 		serviceLog(project, fmt.Sprintf("%s", flag.Args()))
 	case "drush":
