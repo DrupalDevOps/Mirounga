@@ -269,6 +269,7 @@ func dockerComposeEmbed(compose ComposeExec) {
 	fmt.Printf("%s\n", out)
 }
 
+// Run Docker Compose w/ interactive (tty) support.
 func dockerComposeTTY(compose ComposeExec) {
 
 	cmdString := fmt.Sprintf(
