@@ -31,6 +31,34 @@
         // "nginx",
         // "tail2"
       ]
+    },
+    {
+      "name": "Drush container",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/vsd.go",
+      "cwd": "/home/wsl/WWW/research",
+      "args": [
+        "drush",
+        "${input:drushVersion}",
+      ],
+      "env": {
+        "SSH_AUTH_SOCK": "${env:WSL_DISTRO_NAME}"
+      }
+    }
+  ],
+  // https://code.visualstudio.com/docs/editor/variables-reference#_input-variables
+  "inputs": [
+    {
+      "id": "drushVersion",
+      "type": "pickString",
+      "description": "Drush version to launch.",
+      "options": [
+        "7",
+        "9",
+      ],
+      "default": "7"
     }
   ]
 }
