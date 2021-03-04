@@ -44,7 +44,7 @@
         "${input:drushVersion}",
       ],
       "env": {
-        "SSH_AUTH_SOCK": "${env:WSL_DISTRO_NAME}"
+        "SSH_AUTH_SOCK": "${env:SSH_AUTH_SOCK}"
       }
     }
   ],

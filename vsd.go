@@ -84,7 +84,7 @@ func embedRead(filename string) []byte {
 // Search destination for compose spec file, copies from source in embed filesystem into destination if not found.
 func provideOverride(source string, destination string) {
 	if _, err := os.Stat(destination); os.IsNotExist(err) {
-		fmt.Printf("Docker Compose override spec not found, providing example in %s", destination)
+		fmt.Printf("Docker Compose override spec not found, providing example in %s \n", destination)
 		override := embedRead(source)
 		err := os.WriteFile(destination, override, 0644)
 		if err != nil {
@@ -124,6 +124,18 @@ func bootstrap() Project {
 		fmt.Printf("XDebug will contact your Visual Studio Code IDE at %s\n", xdebugHost)
 	}
 
+	// @TODO CHECK FOR SSH_AUTH_SOCK
+
+	// currentEnv := os.Environ()
+	// fmt.Println(currentEnv)
+
+	sshAuthSock := os.Getenv("SSH_AUTH_SOCK")
+	if sshAuthSock != "" {
+		fmt.Printf("Using SSH_AUTH_SOCK: %s\n", sshAuthSock)
+	} else {
+		log.Default().Println("Missing environment variable: $SSH_AUTH_SOCK")
+	}
+
 	project := Project{
 		composeSpecs:   "docker",
 		composeOptions: string(*composeOptsPtr),
@@ -131,7 +143,7 @@ func bootstrap() Project {
 		source:         projectSource,
 		name:           strings.TrimSuffix(string(projectName), "\n"),
 		xdebug:         string(xdebugHost),
-}
+	}
 	return project
 }
 
@@ -170,6 +182,7 @@ func main() {
 	os.Setenv("PROJECT_SOURCE", project.source)
 	os.Setenv("PROJECT_NAME", project.name)
 	os.Setenv("XDEBUG_REMOTE_HOST", project.xdebug)
+	os.Setenv("PROJECT_DEST", "/vsdroot")
 
 	subcommand := flag.Arg(0)
 
@@ -198,6 +211,8 @@ func main() {
 	// @TODO: Provide override subcommand, emits physical compose override file from embed compose file. Provide directory listing of available overrides.
 	case "log":
 		serviceLog(project, fmt.Sprintf("%s", flag.Args()))
+	case "drush":
+		serviceDrush(project, flag.Arg(1))
 	default:
 		showHelp()
 	}
@@ -224,7 +239,7 @@ func dockerComposeEmbed(compose ComposeExec) {
 
 	specFile := embedRead(compose.spec)
 	cmdString := fmt.Sprintf("docker-compose --project-name %s %s --file /dev/stdin %s", compose.project, compose.options, compose.command)
-	log.Default().Printf("Executing command: %s", cmdString)
+	log.Default().Printf("Executing command:\n %s", cmdString)
 
 	cmd := exec.Command("bash", "-c", cmdString)
 
@@ -384,4 +399,24 @@ func serviceOpen(servicePort string) {
 	if err := command.Run(); err != nil {
 		fmt.Println("Error:", err)
 	}
+}
+
+// Fires up drush container into current PWD.
+func serviceDrush(project Project, version string) {
+	fmt.Printf("Start container for drush %s", version)
+
+	// Copy embedded compose specs.
+	provideOverride("docker/docker-compose.shared.yml", "docker-compose.shared.yml")
+	provideOverride("docker/docker-compose.override.yml", "docker-compose.override.yml")
+	provideOverride("docker/run/drupal/docker-compose.vsd.yml", "docker-compose.vsd.yml")
+
+	// Source specs from current PWD.
+	dockerComposeEmbed(ComposeExec{
+		project: project.name,
+		options: `--file=./docker-compose.shared.yml \
+		--file=./docker-compose.override.yml \
+		--file=./docker-compose.vsd.yml`,
+		spec:    fmt.Sprintf("%s/run/drush/docker-compose.vsd.yml", project.composeSpecs),
+		command: fmt.Sprintf("run --entrypoint=ash --rm --user=root drush%s", version),
+	})
 }
