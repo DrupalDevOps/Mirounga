@@ -1,6 +1,9 @@
 version: '3.4'
 services:
 
+  # DRUSH COMPATIBILITY MATRIX
+  # https://www.drush.org/latest/install/
+
   # To copy the contents of /composer to the host for debugging, use docker cp.
   # http://stackoverflow.com/a/36246479
   # Example:
@@ -20,35 +23,43 @@ services:
   # - https://hub.docker.com/r/composer/composer/~/dockerfile/
 
   # Base Composer image with minimal dependencies.
-  php-cli.prod:
-    image: alexanderallen/php7-cli.prod:alpine-3.11
+  php7-cli.prod:
+    image: alexanderallen/php7-cli.prod:alpine-3.12.14
     build:
       context: .
       dockerfile: Dockerfile
-      target: composer-prod
+      target: composer
     environment:
       COMPOSER_VERSION: master
-    volumes:
-      - ~/Sites:/www
+
+  # Use for Drupal 8.4+, and Drupal 9.
+  drush10:
+    image: alexanderallen/php7-cli-drush10.dev:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: drush10
+      args:
+        DRUSH_VERSION: 10
 
   # Drush version for Drupal 8.4+, but not backwards compat with 8.3- and below.
   # https://docs.drush.org/en/master/install/
-  drush9-prod:
+  drush9:
     image: alexanderallen/php7-cli-drush9.prod:alpine-3.11
     build:
       context: .
       dockerfile: Dockerfile
       # Build target drush9 might be compatible with DRUSH_VERSION 10.
-      target: drush9-prod
+      target: drush9
       args:
         DRUSH_VERSION: 9
 
-  drush7-prod:
+  drush7:
     image: alexanderallen/php7-cli-drush7.prod:alpine-3.11
     build:
       context: .
       dockerfile: Dockerfile
       # Build target drush9 might be compatible with DRUSH_VERSION 10.
-      target: drush7-prod
+      target: drush7
       args:
         DRUSH_TAG: "7.4.0"

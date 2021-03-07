@@ -1,14 +1,14 @@
 version: '3.4'
 services:
   php-fpm.prod:
-    image: alexanderallen/php7-fpm.prod:alpine-3.11
+    image: alexanderallen/php7-fpm.prod:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
     build:
       context: .
       dockerfile: Dockerfile
       target: prod
 
   php-fpm.dev:
-    image: alexanderallen/php7-fpm.dev:alpine-3.11
+    image: alexanderallen/php7-fpm.dev:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
     build:
       context: .
       dockerfile: Dockerfile

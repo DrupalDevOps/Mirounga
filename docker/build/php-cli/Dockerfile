@@ -1,4 +1,4 @@
-FROM alexanderallen/php7-fpm.dev:alpine-3.11 as composer-prod
+FROM alexanderallen/php7-fpm.dev:alpine-3.12.14 as composer
 # Build from dev in order to get xdebug.
 # FROM alexanderallen/php7-fpm.prod:alpine-3.11 as composer-prod
 
@@ -69,7 +69,7 @@ ENTRYPOINT ["/bin/bash"]
 
 
 # Legacy platform (Drupal 7) target.
-FROM composer-prod as drush7-prod
+FROM composer as drush7
 RUN \
   cd /opt \
   && git clone https://github.com/drush-ops/drush.git drush7
@@ -87,11 +87,15 @@ RUN \
 #
 # Build stage optimized with Composer packages for Drupal development.
 #
-FROM composer-prod as drush9-prod
+FROM composer as drush9
 
 # Composer manifest for global Drush install.
 ARG DRUSH_VERSION
 COPY drush/${DRUSH_VERSION}/composer.json ${COMPOSER_HOME}/composer.json
+
+
+FROM composer-prod
+
 
 # Install Drupal console (separate from Drush).
 #

@@ -10,22 +10,29 @@ if [ $1 ]; then
   docker-compose -f ./build/${1}/docker-compose.yml build
 
 else
-  ALPINE_MAJOR=3
-  ALPINE_MINOR=12
+  # Follow Alpine releases @ https://alpinelinux.org.
+  export ALPINE_MAJOR=3
+  export ALPINE_MINOR=12
+  export ALPINE_PATCH=14
+
+  # Specify --no-cache to bust cache.
+  USE_CACHE=""
 
   # If there is any base image, build first.
-  docker-compose -f ./build/nobody/docker-compose.yml build \
-    --build-arg ALPINE_MAJOR=$ALPINE_MAJOR --build-arg ALPINE_MINOR=$ALPINE_MINOR
-  docker tag alexanderallen/nobody alexanderallen/nobody:alpine-$ALPINE_MAJOR.$ALPINE_MINOR
+  docker-compose -f ./build/nobody/docker-compose.yml build ${USE_CACHE} \
+    --build-arg ALPINE_MAJOR=${ALPINE_MAJOR} \
+    --build-arg ALPINE_MINOR=${ALPINE_MINOR} \
+    --build-arg ALPINE_PATCH=${ALPINE_PATCH}
+  docker tag alexanderallen/nobody alexanderallen/nobody:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
 
-  docker-compose -f ./build/varnish/docker-compose.yml build \
-  && docker-compose -f ./build/nginx/docker-compose.yml build \
-  && docker-compose -f ./build/mariadb-alpine/docker-compose.yml build \
-  && docker-compose -f ./build/php-fpm/docker-compose.yml build \
-  && docker-compose -f ./build/php-cli/docker-compose.yml build
+  docker-compose -f ./build/varnish/docker-compose.yml build ${USE_CACHE} \
+  && docker-compose -f ./build/nginx/docker-compose.yml build ${USE_CACHE} \
+  && docker-compose -f ./build/mariadb-alpine/docker-compose.yml build ${USE_CACHE} \
+  && docker-compose -f ./build/php-fpm/docker-compose.yml build ${USE_CACHE} \
+  && docker-compose -f ./build/php-cli/docker-compose.yml build ${USE_CACHE}
 
   docker tag alexanderallen/varnish alexanderallen/varnish:6
-  docker tag alexanderallen/varnish alexanderallen/varnish:alpine-$ALPINE_MAJOR.$ALPINE_MINOR
+  docker tag alexanderallen/varnish alexanderallen/varnish:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
 
   docker images | grep alexanderallen
 fi
