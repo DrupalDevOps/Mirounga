@@ -28,8 +28,11 @@ else
   docker-compose -f ./build/varnish/docker-compose.yml build ${USE_CACHE} \
   && docker-compose -f ./build/nginx/docker-compose.yml build ${USE_CACHE} \
   && docker-compose -f ./build/mariadb-alpine/docker-compose.yml build ${USE_CACHE} \
-  && docker-compose -f ./build/php-fpm/docker-compose.yml build ${USE_CACHE} \
-  && docker-compose -f ./build/php-cli/docker-compose.yml build ${USE_CACHE}
+  && docker-compose -f ./build/php-fpm/docker-compose.yml build ${USE_CACHE}
+
+  docker tag alexanderallen/php7-fpm.dev:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH} alexanderallen/php7-fpm.dev:latest
+
+  docker-compose -f ./build/php-cli/docker-compose.yml build ${USE_CACHE}
 
   docker tag alexanderallen/varnish alexanderallen/varnish:6
   docker tag alexanderallen/varnish alexanderallen/varnish:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
