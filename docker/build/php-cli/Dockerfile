@@ -63,16 +63,17 @@ RUN \
 
 RUN chown -R ${DOCKER_USER}:${DOCKER_USER} ${COMPOSER_HOME}
 
-# Install Drupal console (separate from Drush).
+# Install Drupal console global launcher.
 #
 # https://drupalconsole.com/docs/en/getting/launcher
 # You must execute the launcher within a drupal site directory or use --root=/path/to/drupal8.dev
 # to specify your drupal site path.
 #
 RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
-  && mv drupal.phar /opt/drupal \
-  && chmod +x /opt/drupal \
-  && chown -R ${DOCKER_USER}:${DOCKER_USER} /opt/drupal /opt
+  && chmod +x drupal.phar \
+  && mkdir -p /opt/localenv/bin \
+  && mv drupal.phar /opt/localenv/bin/drupal
+ENV PATH=/opt/localenv/bin:$PATH
 
 ENTRYPOINT ["/bin/bash"]
 
