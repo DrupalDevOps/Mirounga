@@ -11,7 +11,10 @@ services:
 
   mysql:
     hostname: mysql
-    image: alexanderallen/mariadb-10:alpine-3.13.2
+    # Needs optimization and permissions fix.
+    # image: alexanderallen/mariadb-10:alpine-3.13.2
+    # previous release.
+    image: alexanderallen/mariadb-alpine:10.4.10-r0
     ports:
       - 3306:3306
     volumes:
@@ -36,6 +39,11 @@ services:
     # https://hub.docker.com/_/memcached
     image: memcached:1.5.20-alpine
     command: -p 11211 -m 16 -vvv -M
+    healthcheck:
+      test: ["CMD", "/bin/nc", "-z", "127.0.0.1", "11211"]
+      interval: 30s
+      timeout: 2s
+      start_period: 3s
 
   phpmemcachedadmin:
     image: moonbuggy2000/phpmemcachedadmin:1.3.0
