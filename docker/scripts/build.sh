@@ -18,6 +18,10 @@ else
   # Specify --no-cache to bust cache.
   USE_CACHE=""
 
+  docker-compose --file ./build/nginx/docker-compose.yml build ${USE_CACHE}
+
+  ### BEGIN IMAGES DEPENDENT ON NOBODY ###
+
   # If there is any base image, build first.
   docker-compose --file ./build/nobody/docker-compose.yml build ${USE_CACHE} \
     --build-arg ALPINE_MAJOR=${ALPINE_MAJOR} \
@@ -27,9 +31,8 @@ else
   docker tag alexanderallen/nobody:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH} \
     alexanderallen/nobody:latest
 
-  docker-compose --file ./build/varnish/docker-compose.yml build ${USE_CACHE}
-  docker-compose --file ./build/nginx/docker-compose.yml build ${USE_CACHE}
   docker-compose --file ./build/mariadb-alpine/docker-compose.yml build ${USE_CACHE}
+  docker-compose --file ./build/varnish/docker-compose.yml build ${USE_CACHE}
   docker-compose --file ./build/php-fpm/docker-compose.yml build ${USE_CACHE}
 
   docker tag alexanderallen/php7-fpm.dev:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH} \
@@ -39,6 +42,8 @@ else
 
   docker tag alexanderallen/varnish alexanderallen/varnish:6
   docker tag alexanderallen/varnish alexanderallen/varnish:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
+
+  ### END IMAGES DEPENDENT ON NOBODY ###
 
   docker images | grep alexanderallen
 fi
