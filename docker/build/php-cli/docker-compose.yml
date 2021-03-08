@@ -41,23 +41,23 @@ services:
       args:
         DRUSH_TAG: "7.4.0"
 
+  # drush8:
+  #   image: alexanderallen/php7-cli-drush8.prod:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: drush-multi-global
+  #     args:
+  #       DRUSH_VERSION: 8
+
   drush9:
     image: alexanderallen/php7-cli-drush9.prod:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
     build:
       context: .
       dockerfile: Dockerfile
-      target: drush9
-      args:
-        DRUSH_VERSION: 9
-
-  drush8:
-    image: alexanderallen/php7-cli-drush8.prod:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
-    build:
-      context: .
-      dockerfile: Dockerfile
       target: drush-multi-global
       args:
-        DRUSH_VERSION: 8
+        DRUSH_VERSION: 9
 
   drush10:
     image: alexanderallen/php7-cli-drush10.prod:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
