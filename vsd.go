@@ -68,6 +68,10 @@ type Project struct {
 	// php-fpm service located in docker-compose.vsd.yml file.
 	// https://www.reddit.com/r/bashonubuntuonwindows/comments/c871g7/command_to_get_virtual_machine_ip_in_wsl2/
 	xdebug string
+	// Name the shared services.
+	sharedServices []string
+	// Name the project services.
+	projectServices []string
 }
 
 //go:embed docker
@@ -134,13 +138,18 @@ func bootstrap() Project {
 		*Interaction with Git and firewalled Packagist repositories may be limited*`)
 	}
 
+	sServices := []string{"mysql", "pma", "memcached"}
+	pServices := []string{"varnish", "nginx", "php-fpm"}
+
 	project := Project{
-		composeSpecs:   "docker",
-		composeOptions: string(*composeOptsPtr),
-		network:        composeNetwork,
-		source:         projectSource,
-		name:           strings.TrimSuffix(string(projectName), "\n"),
-		xdebug:         string(xdebugHost),
+		composeSpecs:    "docker",
+		composeOptions:  string(*composeOptsPtr),
+		network:         composeNetwork,
+		source:          projectSource,
+		name:            strings.TrimSuffix(string(projectName), "\n"),
+		xdebug:          string(xdebugHost),
+		sharedServices:  sServices,
+		projectServices: pServices,
 	}
 	return project
 }
@@ -178,6 +187,7 @@ func main() {
 		stackStatus(project)
 	case "down":
 		stackDown(project)
+	case "rec":
 	case "recreate":
 		stackDown(project)
 		// Recreate the network as well.
@@ -191,12 +201,14 @@ func main() {
 	case "open":
 		servicePort := serviceShow(project)
 		serviceOpen(servicePort)
-	case "log":
-		serviceLog(project, fmt.Sprintf("%s", flag.Args()))
+	case "logs":
+		serviceLog(project, flag.Arg(1))
 	case "drush":
 		serviceDrush(project, flag.Arg(1))
 	case "drush-bash":
 		serviceDrushBash(project, flag.Arg(1))
+	case "exec":
+		serviceExec(project, flag.Arg(1))
 	default:
 		showHelp()
 	}
@@ -287,18 +299,6 @@ func stackStatus(project Project) {
 		spec:    fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
 		command: "ps",
 	})
-}
-
-func serviceLog(project Project, service string) {
-	fmt.Println("Services log")
-	dockerComposeEmbed(ComposeExec{
-		project: project.name,
-		options: `--file=./docker/docker-compose.shared.yml \
-		--file=./docker/docker-compose.override.yml`,
-		spec:    fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
-		command: fmt.Sprintf("logs --follow --timestamps --tail=30 %s", service),
-	})
-
 }
 
 // Start compose service for current directory.
@@ -449,4 +449,74 @@ func serviceDrushBash(project Project, version string) {
 		fmt.Println("Error:", err)
 	}
 
+}
+
+func contains(a []string, x string) bool {
+	for _, n := range a {
+		if x == n {
+			return true
+		}
+	}
+	return false
+}
+
+func serviceExec(project Project, service string) {
+	fmt.Printf("Running compose exec for service %s\n", service)
+
+	if contains(project.sharedServices, service) {
+		provideOverride("docker/docker-compose.shared.yml", "docker-compose.shared.yml")
+		provideOverride("docker/docker-compose.override.yml", "docker-compose.override.yml")
+		dockerComposeTTY(ComposeExec{
+			project: "localenv",
+			options: `--file ./docker-compose.shared.yml \
+				--file ./docker-compose.override.yml`,
+			command: fmt.Sprintf("exec --user=root %s ash", service),
+		})
+	}
+	if contains(project.projectServices, service) {
+		provideOverride("docker/run/drupal/docker-compose.vsd.yml", "docker-compose.vsd-go-drupal.yml")
+		dockerComposeTTY(ComposeExec{
+			project: project.name,
+			options: `--file ./docker-compose.vsd-go-drupal.yml`,
+			command: fmt.Sprintf("exec --user=root %s ash", service),
+		})
+	}
+}
+
+// Show service log.
+func serviceLog(project Project, service string) {
+	if contains(project.sharedServices, service) {
+		serviceLogShared(project, service)
+	}
+	if contains(project.projectServices, service) {
+		serviceLogProject(project, service)
+	}
+}
+
+func serviceLogShared(project Project, service string) {
+	fmt.Printf("Show Docker log for shared service %s\n", service)
+
+	// Copy embedded compose specs.
+	provideOverride("docker/docker-compose.shared.yml", "docker-compose.shared.yml")
+	provideOverride("docker/docker-compose.override.yml", "docker-compose.override.yml")
+
+	// If you want to --follow the log, golang must allocate tty.
+	dockerComposeTTY(ComposeExec{
+		project: "localenv",
+		options: `--file ./docker-compose.shared.yml \
+		--file ./docker-compose.override.yml`,
+		command: fmt.Sprintf("logs --follow --tail=30 %s", service),
+	})
+}
+
+func serviceLogProject(project Project, service string) {
+	fmt.Printf("Show Docker log for project service %s\n", service)
+
+	// This log show example does not follow, therefore doesn't allocate tty.
+	dockerComposeEmbed(ComposeExec{
+		project: project.name,
+		options: "",
+		spec:    fmt.Sprintf("%s/run/drupal/docker-compose.vsd.yml", project.composeSpecs),
+		command: fmt.Sprintf("logs --tail=30 %s", service),
+	})
 }
