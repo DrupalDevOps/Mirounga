@@ -63,6 +63,8 @@ RUN \
         ${PHP_VERSION}-xml \
         ${PHP_VERSION}-ctype \
         ${PHP_VERSION}-pecl-memcache \
+        # Required by Drush 10.x.
+        ${PHP_VERSION}-zip \
         #
         zlib \
     # Cleanup defualt pool configuration.
