@@ -6,6 +6,9 @@ FROM alexanderallen/nobody:latest
 # Username used to log in to the database using MySQL client.
 ARG CLIENT_USER=docker
 
+# Persistent env variable is used by container's run/install scripts.
+ENV DAEMON_USER=nobody
+
 # Build-time metadata as defined at http://label-schema.org
 # DEPRECATED IN FAVOUR OF OCI IMAGE SPEC !!!
 # https://github.com/opencontainers/image-spec
@@ -33,7 +36,7 @@ RUN \
   && touch ${sharedir}/mysql_system_tables_data.sql \
   && mkdir -p /run/mysqld \
   # Grant permissions to container user, container won't be running as root.
-  && chown --recursive nobody:nobody /etc/my.cnf.d/ /run/mysqld ${sharedir}/mysql_system_tables_data.sql /usr/lib/mariadb \
+  && chown --recursive ${DAEMON_USER}:${DAEMON_USER} /var/lib/mysql /etc/my.cnf.d/ /run/mysqld ${sharedir}/mysql_system_tables_data.sql /usr/lib/mariadb \
   && for p in aria* myisam* mysqld_* innochecksum \
               mysqlslap replace wsrep* msql2mysql sst_dump \
               resolve_stack_dump mysqlbinlog myrocks_hotbackup test-connect-t \
