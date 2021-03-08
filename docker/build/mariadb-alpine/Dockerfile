@@ -1,10 +1,8 @@
-FROM alpine:3.11
+FROM alexanderallen/nobody:latest
 
 # Maintainer is deprecated, use LABEL.
 # MAINTAINER Johan Bergström <bugs@bergstroem.nu>
 
-# System user used to run the MySQL server.
-ENV DAEMON_USER=mysql
 # Username used to log in to the database using MySQL client.
 ARG CLIENT_USER=docker
 
@@ -21,7 +19,7 @@ ARG CLIENT_USER=docker
 RUN \
   export sharedir=/usr/share/mariadb \
   # Need bash for evaluating path name expansions.
-  && apk add --no-cache mariadb bash su-exec \
+  && apk add --no-cache mariadb bash \
   #
   # Cleanup after install.
   #
@@ -35,7 +33,7 @@ RUN \
   && touch ${sharedir}/mysql_system_tables_data.sql \
   && mkdir -p /run/mysqld \
   # Grant permissions to container user, container won't be running as root.
-  && chown --recursive ${DAEMON_USER}:${DAEMON_USER} /etc/my.cnf.d/ /run/mysqld ${sharedir}/mysql_system_tables_data.sql /usr/lib/mariadb \
+  && chown --recursive nobody:nobody /etc/my.cnf.d/ /run/mysqld ${sharedir}/mysql_system_tables_data.sql /usr/lib/mariadb \
   && for p in aria* myisam* mysqld_* innochecksum \
               mysqlslap replace wsrep* msql2mysql sst_dump \
               resolve_stack_dump mysqlbinlog myrocks_hotbackup test-connect-t \
@@ -44,14 +42,11 @@ RUN \
   # Not using pam for authentication.
   && /bin/bash -c 'rm -rf /lib/{libpam*,security}' \
   # APK cleanup, remove changes in new layer ~1.3MB.
-  && apk del -q --no-cache --purge bash \
+  && apk del -q --no-cache --purge bash
   # Compression, PCRE, libstdc++, libxml, ssl, tls.
   # Apparently all these new libs are installed AND needed by the new mariadb version.
   #   && rm -rf /usr/lib/libxml* /usr/lib/libpcre* /usr/lib/libstd* /usr/lib/libpanel* /usr/lib/libncurses* /usr/lib/libme* /usr/lib/liblzma* \
   #     /usr/lib/libgcc* /usr/lib/libform* /usr/lib/libbz* /usr/lib/libaio* /usr/lib/libz*
-  #
-  # Allow server user to log to /dev/stdout and /dev/stderr.
-  && addgroup ${DAEMON_USER} tty
 
 COPY scripts/install /opt/docker/install
 COPY my.cnf /tmp/
