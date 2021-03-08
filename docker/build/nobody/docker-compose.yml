@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   nobody:
-    image: alexanderallen/nobody
+    image: alexanderallen/nobody:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
     build:
       context: .
       dockerfile: Dockerfile
