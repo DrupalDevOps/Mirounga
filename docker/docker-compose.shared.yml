@@ -11,7 +11,7 @@ services:
 
   mysql:
     hostname: mysql
-    image: alexanderallen/mariadb-10:3.13.2
+    image: alexanderallen/mariadb-10:alpine-3.13.2
     ports:
       - 3306:3306
     volumes:
