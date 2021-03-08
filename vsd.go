@@ -426,7 +426,7 @@ func serviceDrush(project Project, version string) {
 		--file ./docker-compose.override.yml \
 		--file ./docker-compose.vsd-go-drupal.yml \
 		--file ./docker-compose.vsd-go-drush.yml`,
-		command: fmt.Sprintf("run --entrypoint=ash --rm --user=root drush%s", version),
+		command: fmt.Sprintf("run --entrypoint=ash --rm --user=nobody drush%s", version),
 	})
 }
 
