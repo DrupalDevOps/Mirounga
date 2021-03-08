@@ -17,7 +17,7 @@ networks:
 services:
 
   varnish:
-    image: alexanderallen/varnish:alpine-3.12
+    image: alexanderallen/varnish:alpine-3.13.2
     # Expose port 80 on the Varnish container, randomized on host.
     ports:
       - 80
@@ -67,6 +67,8 @@ services:
   # a virtual volume specific to each project, creating a unique per-project 1-to-1 relationship.
   # This is because volumes are namespaced per-project, and Docker Compose knows how to access that namespace.
   php-fpm:
+    # The prod image is not setup for xdebug, use the dev image.
+    image: alexanderallen/php7-fpm.dev:alpine-3.13.2
 
     # https://stackoverflow.com/a/42510314/467453
     logging:
@@ -84,9 +86,6 @@ services:
 
     # Allow nobody user logging to /dev/stdout.
     tty: true
-
-    # The prod image is not setup for xdebug, use the dev image.
-    image: "alexanderallen/php7-fpm.dev:alpine-3.11"
     environment:
       # Currently ignored, hardcoded in
       # build\php-fpm\php-fpm.d\docker-pool.conf

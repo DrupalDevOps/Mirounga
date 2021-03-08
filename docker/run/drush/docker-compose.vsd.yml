@@ -9,9 +9,9 @@ networks:
 
 services:
 
-  drush:
+  drush9:
     # Image with xdebug and dev tools.
-    image: alexanderallen/php7-cli-drush9.dev:alpine-3.11
+    image: alexanderallen/php7-cli-drush9.prod:alpine-3.13.2
     # Mount to same source destination as PHP-FPM and Nginx.
     working_dir: /vsdroot
     volumes:
@@ -56,7 +56,7 @@ services:
 
   drush7:
     # Image with xdebug and dev tools.
-    image: alexanderallen/php7-cli-drush7.prod:alpine-3.11
+    image: alexanderallen/php7-cli-drush7.prod:alpine-3.13.2
     # Mount to same source destination as PHP-FPM and Nginx.
     working_dir: /vsdroot
     volumes:
