@@ -61,8 +61,18 @@ RUN \
   # that way the IDE can see them both!
   && /usr/local/bin/composer suggests --list --all | xargs -i /usr/local/bin/composer global require {}
 
-
 RUN chown -R ${DOCKER_USER}:${DOCKER_USER} ${COMPOSER_HOME}
+
+# Install Drupal console (separate from Drush).
+#
+# https://drupalconsole.com/docs/en/getting/launcher
+# You must execute the launcher within a drupal site directory or use --root=/path/to/drupal8.dev
+# to specify your drupal site path.
+#
+RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
+  && mv drupal.phar /opt/drupal \
+  && chmod +x /opt/drupal \
+  && chown -R ${DOCKER_USER}:${DOCKER_USER} /opt/drupal /opt
 
 ENTRYPOINT ["/bin/bash"]
 
@@ -84,29 +94,12 @@ RUN \
   && /usr/bin/drush --version
 
 
-#
-# Build stage optimized with Composer packages for Drupal development.
-#
+
 FROM composer as drush9
 
 # Composer manifest for global Drush install.
 ARG DRUSH_VERSION
 COPY drush/${DRUSH_VERSION}/composer.json ${COMPOSER_HOME}/composer.json
-
-
-FROM composer-prod
-
-
-# Install Drupal console (separate from Drush).
-#
-# https://drupalconsole.com/docs/en/getting/launcher
-# You must execute the launcher within a drupal site directory or use --root=/path/to/drupal8.dev
-# to specify your drupal site path.
-#
-RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
-  && mv drupal.phar /opt/drupal \
-  && chmod +x /opt/drupal \
-  && chown -R ${DOCKER_USER}:${DOCKER_USER} /opt/drupal /opt
 
 # Switch to non-root user before running drush commands.
 USER ${DOCKER_USER}
@@ -123,17 +116,14 @@ RUN composer global -v \
 # COPY common/drush.yml /root/.drush/drush.yml
 
 
+FROM composer as drush-multi-global
+ARG DRUSH_VERSION
 
-#########################################################
-# Targets below this line not yet built or implemented. #
-#########################################################
+# Switch to non-root user before running drush commands.
+USER ${DOCKER_USER}
 
-# FROM drush9 as qa-tools
-# RUN \
-#   cd /tmp \
-#   && apk add --no-cache \
-#     # REQ: Composer squizlabs/php_codesniffer 2.7.0 requires ext-tokenizer
-#     ${PHP_VERSION}-tokenizer
-
-# # Inform PHP Code Snifer (phpcs) about Drupal coding standards sniff files.
-# RUN phpcs --config-set installed_paths ${COMPOSER_HOME}/vendor/drupal/coder/coder_sniffer
+RUN composer global \
+  --no-cache \
+  --optimize-autoloader \
+  --with-all-dependencies \
+  require drush/drush:${DRUSH_VERSION}.x

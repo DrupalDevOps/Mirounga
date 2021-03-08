@@ -10,7 +10,7 @@ if [ $1 ]; then
   docker-compose -f ./build/${1}/docker-compose.yml build
 
 else
-  # Follow Alpine releases @ https://alpinelinux.org.
+  # Follow Alpine releases @ https://alpinelinux.org/releases.
   export ALPINE_MAJOR=3
   export ALPINE_MINOR=13
   export ALPINE_PATCH=2
