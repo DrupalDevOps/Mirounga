@@ -1,4 +1,4 @@
-FROM alexanderallen/php7-fpm.dev:alpine-3.12.14 as composer
+FROM alexanderallen/php7-fpm.dev:latest as composer
 # Build from dev in order to get xdebug.
 # FROM alexanderallen/php7-fpm.prod:alpine-3.11 as composer-prod
 

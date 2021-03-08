@@ -24,7 +24,7 @@ services:
 
   # Base Composer image with minimal dependencies.
   php7-cli.prod:
-    image: alexanderallen/php7-cli.prod:alpine-3.12.14
+    image: alexanderallen/php7-cli.prod:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
     build:
       context: .
       dockerfile: Dockerfile
@@ -33,19 +33,19 @@ services:
       COMPOSER_VERSION: master
 
   # Use for Drupal 8.4+, and Drupal 9.
-  drush10:
-    image: alexanderallen/php7-cli-drush10.dev:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: drush10
-      args:
-        DRUSH_VERSION: 10
+  # drush10:
+  #   image: alexanderallen/php7-cli-drush10.dev:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: drush10
+  #     args:
+  #       DRUSH_VERSION: 10
 
   # Drush version for Drupal 8.4+, but not backwards compat with 8.3- and below.
   # https://docs.drush.org/en/master/install/
   drush9:
-    image: alexanderallen/php7-cli-drush9.prod:alpine-3.11
+    image: alexanderallen/php7-cli-drush9.prod:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
     build:
       context: .
       dockerfile: Dockerfile
@@ -55,7 +55,7 @@ services:
         DRUSH_VERSION: 9
 
   drush7:
-    image: alexanderallen/php7-cli-drush7.prod:alpine-3.11
+    image: alexanderallen/php7-cli-drush7.prod:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
     build:
       context: .
       dockerfile: Dockerfile
