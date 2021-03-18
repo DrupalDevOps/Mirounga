@@ -1,0 +1,12 @@
+version: '3.4'
+services:
+
+  traefik:
+    image: alexanderallen/proxy:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # args:
+      #   TRAEFIK_MAJOR: 1
+      #   TRAEFIK_MINOR: 7
+      #   TRAEFIK_PATCH: 28

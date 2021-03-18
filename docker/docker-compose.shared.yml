@@ -9,6 +9,11 @@ networks:
 
 services:
 
+  proxy:
+    image: alexanderallen/proxy:alpine-3.13.2
+    ports:
+      - 8989:80
+
   mysql:
     hostname: mysql
     # Needs optimization and permissions fix.

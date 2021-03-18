@@ -43,6 +43,11 @@ else
   docker tag alexanderallen/varnish alexanderallen/varnish:6
   docker tag alexanderallen/varnish alexanderallen/varnish:alpine-${ALPINE_MAJOR}.${ALPINE_MINOR}.${ALPINE_PATCH}
 
+  docker-compose --file ./build/proxy/docker-compose.yml build ${USE_CACHE} \
+    --build-arg TRAEFIK_MAJOR=1 \
+    --build-arg TRAEFIK_MINOR=7 \
+    --build-arg TRAEFIK_PATCH=28
+
   ### END IMAGES DEPENDENT ON NOBODY ###
 
   docker images | grep alexanderallen
