@@ -1,4 +1,3 @@
-# FROM alpine:3.11 AS prod
 FROM alexanderallen/nobody:latest AS prod
 
 LABEL InitialReleaseDate="First released on Oct 14, 2016."
