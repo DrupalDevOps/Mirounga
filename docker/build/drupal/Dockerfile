@@ -26,7 +26,7 @@ RUN composer -vvv --no-cache create-project --prefer-dist --no-dev drupal/recomm
 
 
 # Extract source code from intermediate build step and copy to volume.
-FROM alpine:3.11 as prod
+FROM alpine:3.13 as prod
 
 COPY --from=intermediate /source /app
 
