@@ -1,4 +1,4 @@
-FROM nginx:1.19-alpine AS core
+FROM nginx:1.25.2-alpine AS core
 # See https://github.com/nginxinc/docker-nginx/blob/a973c221f6cedede4dab3ab36d18240c4d3e3d74/mainline/alpine/Dockerfile'
 # FROM alpine:3.11 AS core
 LABEL maintainer="14018885+AlexanderAllen@users.noreply.github.com"
